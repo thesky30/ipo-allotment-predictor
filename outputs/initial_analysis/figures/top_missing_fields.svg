@@ -12,39 +12,39 @@
 <text x="792.5" y="647.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">75%</text>
 <line x1="930.0" y1="60" x2="930.0" y2="625" stroke="#e6e6e6"/>
 <text x="930.0" y="647.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">100%</text>
-<text x="368.0" y="86.5" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_lower_limit_10k</text>
-<rect x="380" y="67.1" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="86.5" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="121.8" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_upper_limit_10k</text>
-<rect x="380" y="102.4" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="121.8" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="157.1" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_step_10k</text>
-<rect x="380" y="137.7" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="157.1" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="192.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_allotment_accounts</text>
-<rect x="380" y="173.0" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="192.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="227.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_investors_count</text>
-<rect x="380" y="208.3" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="227.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="263.0" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_subscription_total_10k</text>
-<rect x="380" y="243.6" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="263.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="298.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_deadline_date</text>
-<rect x="380" y="278.9" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="298.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="333.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_deadline_date</text>
-<rect x="380" y="314.2" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="557.7" y="333.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
-<text x="368.0" y="369.0" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_vs_offer</text>
-<rect x="380" y="349.6" width="175.1" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="561.1" y="369.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.8%</text>
-<text x="368.0" y="404.3" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_median</text>
-<rect x="380" y="384.9" width="175.1" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="561.1" y="404.3" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.8%</text>
-<text x="368.0" y="439.6" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_weighted_avg</text>
-<rect x="380" y="420.2" width="175.1" height="21.2" fill="#E45756" fill-opacity="0.82"/>
-<text x="561.1" y="439.6" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.8%</text>
+<text x="368.0" y="86.5" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_vs_offer</text>
+<rect x="380" y="67.1" width="139.9" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="525.9" y="86.5" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.4%</text>
+<text x="368.0" y="121.8" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_median</text>
+<rect x="380" y="102.4" width="139.9" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="525.9" y="121.8" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.4%</text>
+<text x="368.0" y="157.1" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_weighted_avg</text>
+<rect x="380" y="137.7" width="139.9" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="525.9" y="157.1" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.4%</text>
+<text x="368.0" y="192.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">a_investor_allocation_share_pct</text>
+<rect x="380" y="173.0" width="142.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="528.3" y="192.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.9%</text>
+<text x="368.0" y="227.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">a_investor_subscription_share_pct</text>
+<rect x="380" y="208.3" width="142.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="528.3" y="227.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.9%</text>
+<text x="368.0" y="263.0" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">a_investor_allotted_accounts</text>
+<rect x="380" y="243.6" width="142.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="528.3" y="263.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.9%</text>
+<text x="368.0" y="298.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">a_investor_subscription_shares_10k</text>
+<rect x="380" y="278.9" width="142.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="528.3" y="298.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.9%</text>
+<text x="368.0" y="333.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">a_investor_allotted_shares_10k</text>
+<rect x="380" y="314.2" width="142.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="528.3" y="333.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">25.9%</text>
+<text x="368.0" y="369.0" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">a_investor_lottery_rate_pct</text>
+<rect x="380" y="349.6" width="150.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="536.3" y="369.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">27.3%</text>
+<text x="368.0" y="404.3" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">strategic_allocation_share_pct</text>
+<rect x="380" y="384.9" width="157.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="543.3" y="404.3" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">28.6%</text>
+<text x="368.0" y="439.6" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">strategic_allocation_10k</text>
+<rect x="380" y="420.2" width="157.3" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="543.3" y="439.6" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">28.6%</text>
 <text x="368.0" y="474.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">other_issue_10k</text>
 <rect x="380" y="455.5" width="549.0" height="21.2" fill="#E45756" fill-opacity="0.82"/>
 <text x="935.0" y="474.9" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">99.8%</text>

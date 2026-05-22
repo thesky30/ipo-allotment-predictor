@@ -78,6 +78,10 @@ SUPPLEMENT_SPECS = [
         "path": Path("D:/wind导出数据/北交所_补充数据.xlsx"),
         "board": "北交所",
     },
+    {
+        "path": Path("D:/wind导出数据/主板注册制上市_补充数据.xlsx"),
+        "board": "主板",
+    },
 ]
 
 # ---------------------------------------------------------------------------
@@ -272,9 +276,9 @@ REQUIRED_PREDICTION_FIELDS = [
     {
         "required_field": "主板补充数据",
         "category": "数据缺口",
-        "current_status": "当前无主板补充数据文件；主板所有询价字段为 NaN",
+        "current_status": "已补充：主板注册制上市_补充数据.xlsx，113条样本，107条有询价字段（95%覆盖）",
         "why_needed": "主板注册制后样本需要同等询价字段才能参与统一模型。",
-        "suggested_source": "需要从 Wind 补充导出主板询价字段",
+        "suggested_source": "已从补充数据获取",
     },
     {
         "required_field": "行业分类",

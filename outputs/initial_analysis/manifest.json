@@ -32,6 +32,10 @@
       {
         "path": "D:\\wind导出数据\\北交所_补充数据.xlsx",
         "board": "北交所"
+      },
+      {
+        "path": "D:\\wind导出数据\\主板注册制上市_补充数据.xlsx",
+        "board": "主板"
       }
     ]
   },
@@ -45,5 +49,5 @@
   },
   "row_count": 1643,
   "label_count": 1235,
-  "inquiry_field_count": 1130
+  "inquiry_field_count": 1235
 }
