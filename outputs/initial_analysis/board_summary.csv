@@ -1,0 +1,4 @@
+﻿board,sample_count,label_count,date_min,date_max,median_offline_oversubscription,mean_offline_oversubscription,median_log_oversubscription,median_offline_allotment_ratio_pct,median_offline_subscription_total_10k,median_offline_accounts,median_inquiry_investors,median_issue_amount_100m_yuan,missing_label_count
+主板,112,105,2023-04-10,2026-05-18,8622.7955,8376.705256190477,9.062164615026896,0.01159717,8314550.0,7437.0,539.0,9.171154999999999,7
+创业板,603,481,2020-08-24,2026-05-11,3367.4051,3426.1092195426195,8.121897726744141,0.02969646,5496420.0,6351.0,276.0,7.049,122
+科创板,611,608,2019-07-22,2026-04-24,2596.9328,2713.0317126644736,7.862086261769782,0.03850697,4700370.0,6287.0,288.5,10.07745,3

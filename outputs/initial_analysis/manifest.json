@@ -1,0 +1,33 @@
+{
+  "inputs": [
+    {
+      "path": "D:\\wind导出数据\\全部科创板_网下打新数据.xlsx",
+      "board": "科创板"
+    },
+    {
+      "path": "D:\\wind导出数据\\注册制创业板_网下打新数据.xlsx",
+      "board": "创业板"
+    },
+    {
+      "path": "D:\\wind导出数据\\全部科创板_主板.xlsx",
+      "board": "主板"
+    }
+  ],
+  "outputs": {
+    "csv": "C:\\Users\\14841\\Documents\\New project 4\\data\\processed\\ipo_offline_sample.csv",
+    "sqlite": "C:\\Users\\14841\\Documents\\New project 4\\data\\processed\\ipo_offline.db",
+    "report": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\initial_analysis_report.md",
+    "field_dictionary": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\field_dictionary.csv",
+    "missing_required_prediction_fields": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\missing_required_prediction_fields.csv",
+    "missing_by_field": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\missing_by_field.csv",
+    "descriptive_stats": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\descriptive_stats.csv",
+    "board_summary": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\board_summary.csv",
+    "year_board_counts": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\year_board_counts.csv",
+    "correlation_pre_subscription_like": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\correlation_pre_subscription_like.csv",
+    "correlation_all_fields": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\correlation_all_fields.csv",
+    "outlier_checks": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\outlier_checks.csv",
+    "figures_dir": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\initial_analysis\\figures"
+  },
+  "row_count": 1326,
+  "label_count": 1194
+}
