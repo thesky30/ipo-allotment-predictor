@@ -1,20 +1,13 @@
 {
   "generated": "2026-05-22",
-  "oos_predictions": 3120,
-  "unique_ipos": 624,
-  "models": [
-    "board_mean",
-    "board_recent_mean",
-    "ridge_basic",
-    "ridge_inquiry",
-    "lgbm_inquiry"
+  "version": "three-stage",
+  "models_saved": [
+    "board_mean_t6",
+    "lgbm_t6",
+    "ridge_t1",
+    "lgbm_t1",
+    "lgbm_t1plus"
   ],
-  "outputs": {
-    "predictions": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\baseline_models\\predictions.csv",
-    "metrics_overall": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\baseline_models\\metrics_overall.csv",
-    "metrics_by_board": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\baseline_models\\metrics_by_board.csv",
-    "metrics_by_year": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\baseline_models\\metrics_by_year.csv",
-    "feature_importance": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\baseline_models\\feature_importance.csv",
-    "report": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\baseline_models\\report.md"
-  }
+  "oos_unique_ipos": 624,
+  "feature_nodes_csv": "C:\\Users\\14841\\Documents\\New project 4\\outputs\\baseline_models\\feature_time_nodes.csv"
 }
