@@ -56,10 +56,11 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
-ROOT = Path(__file__).resolve().parents[1]
-DATA_DIR  = ROOT / "data" / "processed"
-MODEL_DIR = ROOT / "outputs" / "baseline_models" / "models"
-DB_PATH   = DATA_DIR / "ipo_offline.db"
+ROOT           = Path(__file__).resolve().parents[1]
+DATA_DIR       = ROOT / "data" / "processed"
+MODEL_DIR      = ROOT / "outputs" / "baseline_models" / "models"
+BOARD_MODEL_DIR = ROOT / "outputs" / "board_models" / "models"
+DB_PATH        = DATA_DIR / "ipo_offline.db"
 
 # ---------------------------------------------------------------------------
 # Import model classes so joblib can unpickle them.
@@ -79,6 +80,14 @@ STAGE_MODEL: dict[str, str] = {
     "T1PLUS": "lgbm_t1plus",
 }
 DEFAULT_STAGE = "T1"
+
+# Board → short code for board-specific model filenames
+BOARD_CODES: dict[str, str] = {
+    "科创板": "kcb",
+    "创业板": "cyb",
+    "主板":   "zb",
+    "北交所": "bse",
+}
 
 # Heuristic confidence labels (based on historical Spearman per board)
 _CONFIDENCE: dict[str, dict[str, str]] = {
@@ -103,13 +112,14 @@ _CONFIDENCE: dict[str, dict[str, str]] = {
 }
 
 # ---------------------------------------------------------------------------
-# Model loading (cached in module-level dict)
+# Model loading (cached in module-level dicts)
 # ---------------------------------------------------------------------------
 _model_cache: dict[str, dict] = {}
+_board_model_cache: dict[str, dict] = {}
 
 
 def _load_model(stage: str) -> dict:
-    """Load joblib model bundle. Cached after first call."""
+    """Load global joblib model bundle. Cached after first call."""
     if stage in _model_cache:
         return _model_cache[stage]
     model_name = STAGE_MODEL.get(stage.upper())
@@ -126,22 +136,56 @@ def _load_model(stage: str) -> dict:
     return bundle
 
 
+def _load_board_model(board: str, stage: str) -> dict | None:
+    """Load a board-specific model bundle if available; return None otherwise.
+
+    Board-specific models exist only for stage=T1.
+    Falls back gracefully (returns None) if the file doesn't exist.
+    """
+    if stage.upper() != "T1":
+        return None
+    code = BOARD_CODES.get(board)
+    if code is None:
+        return None
+    cache_key = f"{stage}_{code}"
+    if cache_key in _board_model_cache:
+        return _board_model_cache[cache_key]
+    path = BOARD_MODEL_DIR / f"lgbm_t1_{code}.joblib"
+    if not path.exists():
+        return None
+    bundle = joblib.load(path)
+    _board_model_cache[cache_key] = bundle
+    return bundle
+
+
 # ---------------------------------------------------------------------------
 # Core prediction logic
 # ---------------------------------------------------------------------------
 
-def _predict_row(row: pd.DataFrame, stage: str) -> dict[str, Any]:
-    """Given a single-row DataFrame with all available fields, run the model."""
+def _predict_row(
+    row:    pd.DataFrame,
+    stage:  str,
+    bundle: dict | None = None,
+) -> dict[str, Any]:
+    """Given a single-row DataFrame with all available fields, run the model.
+
+    Parameters
+    ----------
+    bundle : If provided, use this pre-loaded model bundle instead of loading
+             the global model.  Used by board-specific routing.
+    """
     stage = stage.upper()
-    bundle = _load_model(stage)
+    if bundle is None:
+        bundle = _load_model(stage)
+
     model      = bundle["model"]
     model_name = bundle["model_name"]
     features   = bundle["features"]
 
     # Build input DataFrame — fill missing columns with NaN
+    row = row.copy()
     for col in features:
         if col not in row.columns:
-            row = row.copy()
             row[col] = np.nan
 
     with warnings.catch_warnings():
@@ -150,21 +194,21 @@ def _predict_row(row: pd.DataFrame, stage: str) -> dict[str, Any]:
 
     # Convert: log(oversubscription) → oversubscription → subscription rate
     oversubscription = float(np.exp(log_pred))
-    sub_rate_pct     = 100.0 / oversubscription          # percentage
+    sub_rate_pct     = 100.0 / oversubscription
     sub_rate_display = f"{sub_rate_pct:.4f}%"
 
-    board = str(row["board"].iloc[0]) if "board" in row.columns else "未知"
+    board      = str(row["board"].iloc[0]) if "board" in row.columns else "未知"
     confidence = _CONFIDENCE.get(stage, {}).get(board, "unknown")
 
     return {
-        "stage":                     stage,
-        "model":                     model_name,
-        "log_oversubscription_pred": round(log_pred, 4),
+        "stage":                      stage,
+        "model":                      model_name,
+        "log_oversubscription_pred":  round(log_pred, 4),
         "oversubscription_ratio_pred": round(oversubscription, 1),
         "subscription_rate_pred_pct": round(sub_rate_pct, 6),
-        "subscription_rate_display": sub_rate_display,
-        "board":                     board,
-        "confidence":                confidence,
+        "subscription_rate_display":  sub_rate_display,
+        "board":                      board,
+        "confidence":                 confidence,
     }
 
 
@@ -173,20 +217,25 @@ def _predict_row(row: pd.DataFrame, stage: str) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 def predict_from_code(
-    code: str,
-    stage: str = DEFAULT_STAGE,
-    db_path: Path | str = DB_PATH,
+    code:                 str,
+    stage:                str = DEFAULT_STAGE,
+    db_path:              Path | str = DB_PATH,
+    prefer_board_model:   bool = False,
 ) -> dict[str, Any]:
     """Look up an IPO by security_code in the SQLite DB and predict.
 
     Parameters
     ----------
-    code  : Security code, e.g. "688041" or "688041.SH"
-    stage : "T1" (default, demo model) | "T6" | "T1PLUS"
+    code               : Security code, e.g. "688041" or "688041.SH"
+    stage              : "T1" (default, demo model) | "T6" | "T1PLUS"
+    prefer_board_model : If True (default), use the board-specific model
+                         for stage=T1 when available.  Set False to force
+                         the global lgbm_t1.
 
     Returns
     -------
-    dict with prediction results + metadata
+    dict with prediction results + metadata.
+    Includes "board_specific_model": True/False to show which model was used.
     """
     code = code.strip()
     # Strip exchange suffix for matching (DB stores "688041.SH"; user may pass "688041")
@@ -209,7 +258,6 @@ def predict_from_code(
     # ── stage-availability guard ────────────────────────────────────────────
     stage = stage.upper()
     if stage in ("T1", "T1PLUS"):
-        # Check if inquiry fields are present
         inq = row.get("inquiry_oversubscription_ratio", pd.Series([None]))
         if pd.isna(inq.iloc[0]):
             warnings.warn(
@@ -226,7 +274,14 @@ def predict_from_code(
                 UserWarning, stacklevel=2
             )
 
-    result = _predict_row(row, stage)
+    # ── Board-specific model routing (T1 only) ──────────────────────────────
+    board_bundle = None
+    board_val    = str(row["board"].iloc[0]) if "board" in row.columns else ""
+    if prefer_board_model:
+        board_bundle = _load_board_model(board_val, stage)
+
+    result = _predict_row(row, stage, bundle=board_bundle)
+    result["board_specific_model"] = (board_bundle is not None)
     result["security_code"] = str(row["security_code"].iloc[0]) if "security_code" in row.columns else code
     result["security_name"] = str(row["security_name"].iloc[0]) if "security_name" in row.columns else ""
 
@@ -249,8 +304,9 @@ def predict_from_code(
 # ---------------------------------------------------------------------------
 
 def predict_from_dict(
-    features: dict[str, Any],
-    stage: str = DEFAULT_STAGE,
+    features:             dict[str, Any],
+    stage:                str = DEFAULT_STAGE,
+    prefer_board_model:   bool = False,
 ) -> dict[str, Any]:
     """Predict from a feature dictionary.
 
@@ -263,14 +319,20 @@ def predict_from_dict(
                  inquiry_allotment_accounts, offer_price_yuan, issue_amount_100m_yuan,
                  total_issue_shares_10k, strategic_allocation_share_pct,
                  subscription_upper_limit_10k, recent_ipo_first_day_return_ma20
-    stage    : "T1" (default) | "T6" | "T1PLUS"
+    stage              : "T1" (default) | "T6" | "T1PLUS"
+    prefer_board_model : Use board-specific model for T1 if available.
 
     Returns
     -------
     dict with prediction results
     """
     row = pd.DataFrame([features])
-    result = _predict_row(row, stage)
+    board_bundle = None
+    if prefer_board_model:
+        board_bundle = _load_board_model(features.get("board", ""), stage)
+
+    result = _predict_row(row, stage, bundle=board_bundle)
+    result["board_specific_model"] = (board_bundle is not None)
     result["security_code"] = features.get("security_code", "unknown")
     result["security_name"] = features.get("security_name", "")
     return result
@@ -342,9 +404,10 @@ def print_result(result: dict[str, Any]) -> None:
     conf  = result.get("confidence", "")
 
     sep = "─" * 56
+    board_flag = " [板块专项]" if result.get("board_specific_model") else " [全局]"
     print(f"\n{sep}")
     print(f"  {name}  ({code})  [{board}]")
-    print(f"  模型：{model}  阶段：{stage}  置信度：{conf}")
+    print(f"  模型：{model}{board_flag}  阶段：{stage}  置信度：{conf}")
     print(sep)
     print(f"  预测网下超额认购倍数：{result['oversubscription_ratio_pred']:>10,.0f}x")
     print(f"  预测网下中签率：       {result['subscription_rate_display']:>12}")
@@ -380,6 +443,8 @@ Examples:
                    help=f"prediction stage (default: {DEFAULT_STAGE})")
     p.add_argument("--json", action="store_true",
                    help="output raw JSON instead of formatted text")
+    p.add_argument("--board-model", dest="use_board", action="store_true",
+                   help="use board-specific model (default: global model)")
     p.add_argument("--db", default=str(DB_PATH), metavar="DB_PATH",
                    help="path to SQLite database (default: data/processed/ipo_offline.db)")
     return p
@@ -388,10 +453,14 @@ Examples:
 def main() -> None:
     parser = _build_parser()
     args   = parser.parse_args()
+    prefer_board = args.use_board
 
     try:
         if args.code:
-            result = predict_from_code(args.code, stage=args.stage, db_path=args.db)
+            result = predict_from_code(
+                args.code, stage=args.stage, db_path=args.db,
+                prefer_board_model=prefer_board,
+            )
         else:
             feat_path = Path(args.features)
             if not feat_path.exists():
@@ -399,7 +468,8 @@ def main() -> None:
                 sys.exit(1)
             raw = json.loads(feat_path.read_text(encoding="utf-8"))
             raw = compute_t1_features(raw)
-            result = predict_from_dict(raw, stage=args.stage)
+            result = predict_from_dict(raw, stage=args.stage,
+                                       prefer_board_model=prefer_board)
 
         if args.json:
             print(json.dumps(result, ensure_ascii=False, indent=2))
