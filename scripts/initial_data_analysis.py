@@ -1,9 +1,20 @@
-"""Initial processing and EDA for Wind IPO offline subscription exports.
+"""Data loading, integration and EDA for Wind IPO offline subscription exports.
 
-Inputs are the three Wind-exported Excel files listed in FILE_SPECS.  Some
-Wind xlsx files contain malformed style metadata; the loader therefore creates
-temporary no-style copies before reading with pandas.  Raw source files are not
-modified.
+v2 changes (2026-05-22):
+  - 北交所_网下打新数据.xlsx added as board "北交所".
+  - Three 补充数据 files joined by security_code, supplying inquiry-time fields:
+    inquiry_subscription_total_10k, inquiry_investors_count,
+    inquiry_allotment_accounts, subscription_step/upper/lower_limit_10k,
+    quote_price_weighted_avg, quote_price_median,
+    inquiry_deadline_date, subscription_deadline_date, first_day_return_pct.
+  - 科创板 supplement additionally provides offer_price_upper/lower_yuan.
+  - 主板 has no supplement file; inquiry fields remain NaN for that board.
+  - a_investor_lottery_rate_pct absent in BSE main file; treated as optional.
+
+v1 (2026-05-21): initial EDA on 科创板 / 创业板 / 主板 only.
+
+Raw source files are never modified.  Wind xlsx files often contain malformed
+style metadata; the loader strips xl/styles.xml before reading with pandas.
 """
 
 from __future__ import annotations
@@ -24,6 +35,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data" / "processed"
 OUT_DIR = ROOT / "outputs" / "initial_analysis"
 
+# ---------------------------------------------------------------------------
+# Main file specs (one row per IPO, labels + post-subscription fields)
+# ---------------------------------------------------------------------------
 FILE_SPECS = [
     {
         "path": Path("D:/wind导出数据/全部科创板_网下打新数据.xlsx"),
@@ -40,12 +54,41 @@ FILE_SPECS = [
         "board": "主板",
         "sample_note": "主板注册制后样本",
     },
+    {
+        "path": Path("D:/wind导出数据/北交所_网下打新数据.xlsx"),
+        "board": "北交所",
+        "sample_note": "北交所全样本",
+    },
 ]
 
+# ---------------------------------------------------------------------------
+# Supplement file specs (inquiry-time fields, joined by security_code)
+# 主板 has no supplement; those rows will have NaN for all inquiry fields.
+# ---------------------------------------------------------------------------
+SUPPLEMENT_SPECS = [
+    {
+        "path": Path("D:/wind导出数据/全部科创板_网下打新_补充数据.xlsx"),
+        "board": "科创板",
+    },
+    {
+        "path": Path("D:/wind导出数据/创业板注册制上市_补充数据.xlsx"),
+        "board": "创业板",
+    },
+    {
+        "path": Path("D:/wind导出数据/北交所_补充数据.xlsx"),
+        "board": "北交所",
+    },
+]
+
+# ---------------------------------------------------------------------------
+# Column maps
+# ---------------------------------------------------------------------------
 COLUMN_MAP = {
     "证券代码": "security_code",
     "证券简称": "security_name",
+    # 北交所 uses "上市日期"; other boards use "首发上市日期"
     "首发上市日期": "listing_date_raw",
+    "上市日期": "listing_date_raw",
     "首发价格\n[单位] 元": "offer_price_yuan",
     "发行数量合计\n[单位] 万股": "total_issue_shares_10k",
     "网下发行数量(回拨前)\n[单位] 万股": "offline_issue_before_clawback_10k",
@@ -74,11 +117,37 @@ COLUMN_MAP = {
     "网下投资者获配数量\n[机构类别] A类投资者\n[单位] 万股": "a_investor_allotted_shares_10k",
     "网下投资者申购数量\n[机构类别] A类投资者\n[单位] 万股": "a_investor_subscription_shares_10k",
     "网下投资者获配家数\n[机构类别] A类投资者\n[单位] 家": "a_investor_allotted_accounts",
+    # Optional: absent in 北交所 main file
     "网下投资者中签率\n[机构类别] A类投资者\n[单位] %": "a_investor_lottery_rate_pct",
 }
 
+# Columns that are allowed to be absent in some source files.
+OPTIONAL_COLUMNS = {"a_investor_lottery_rate_pct"}
+
+SUPPLEMENT_COLUMN_MAP = {
+    "证券代码": "security_code",
+    "初步询价申购总量\n[单位] 万股": "inquiry_subscription_total_10k",
+    "初步询价询价对象家数\n[单位] 家": "inquiry_investors_count",
+    "初步询价配售对象家数\n[单位] 户": "inquiry_allotment_accounts",
+    "网下申购步长\n[单位] 万股": "subscription_step_10k",
+    "网下申购数量上限\n[单位] 万股": "subscription_upper_limit_10k",
+    "网下申购数量下限\n[单位] 万股": "subscription_lower_limit_10k",
+    "网下申报价格加权平均数\n[机构类别] 网下全部投资者": "quote_price_weighted_avg",
+    "网下申报价格中位数\n[机构类别] 网下全部投资者": "quote_price_median",
+    "初步询价截止日": "inquiry_deadline_date_raw",
+    "网下申购截止日期": "subscription_deadline_date_raw",
+    "上市首日涨跌幅\n[单位] %": "first_day_return_pct",
+    # Only in 科创板 supplement
+    "发行价格上限\n[单位] 元↓": "offer_price_upper_yuan",
+    "发行价格下限(底价)\n[单位] 元": "offer_price_lower_yuan",
+}
+
+# ---------------------------------------------------------------------------
+# Field classification by prediction-time availability
+# ---------------------------------------------------------------------------
 PREDICTION_TIME_WARNING = {
     "likely_pre_subscription": [
+        # From main files
         "offer_price_yuan",
         "total_issue_shares_10k",
         "offline_issue_before_clawback_10k",
@@ -90,8 +159,20 @@ PREDICTION_TIME_WARNING = {
         "comparable_pe_avg_ex_nonrecurring",
         "high_price_excluded_subscription_share_pct",
         "excluded_subscription_share_pct",
+        # From supplement files (inquiry-time, confirmed pre-subscription)
+        "inquiry_subscription_total_10k",
+        "inquiry_investors_count",
+        "inquiry_allotment_accounts",
+        "subscription_step_10k",
+        "subscription_upper_limit_10k",
+        "subscription_lower_limit_10k",
+        "quote_price_weighted_avg",
+        "quote_price_median",
+        "offer_price_upper_yuan",
+        "offer_price_lower_yuan",
     ],
     "label_or_post_subscription": [
+        # Labels / post-subscription results – must not enter model features
         "offline_allotment_ratio_pct",
         "offline_subscription_total_10k",
         "offline_valid_quote_subscription_10k",
@@ -105,6 +186,8 @@ PREDICTION_TIME_WARNING = {
         "online_issue_final_10k",
         "offline_issue_final_10k",
         "clawback_ratio_pct",
+        # Post-listing: use only as rolling past-IPO market heat feature
+        "first_day_return_pct",
     ],
 }
 
@@ -112,184 +195,86 @@ REQUIRED_PREDICTION_FIELDS = [
     {
         "required_field": "网下申购数量上限",
         "category": "发行安排/申购规则",
-        "current_status": "当前 Excel 未提供",
+        "current_status": "已补充：subscription_upper_limit_10k（科创板/创业板/北交所有）",
         "why_needed": "直接约束单个配售对象可申购规模，影响最终申购总量和拥挤度。",
-        "suggested_source": "发行公告、初步询价及推介公告、Wind IPO 发行明细字段",
+        "suggested_source": "已从补充数据获取",
     },
     {
         "required_field": "网下申购数量下限",
         "category": "发行安排/申购规则",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "反映参与门槛和报价/申购最小单位，可能影响小规模参与者数量。",
-        "suggested_source": "发行公告、初步询价及推介公告、Wind IPO 发行明细字段",
+        "current_status": "已补充：subscription_lower_limit_10k（科创板/创业板/北交所有）",
+        "why_needed": "反映参与门槛和报价/申购最小单位。",
+        "suggested_source": "已从补充数据获取",
     },
     {
         "required_field": "网下申购步长",
         "category": "发行安排/申购规则",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "影响申购数量离散化，后续可用于解释申购量分布。",
-        "suggested_source": "发行公告、初步询价及推介公告",
-    },
-    {
-        "required_field": "网下配售数量",
-        "category": "发行规模",
-        "current_status": "已有相近字段：网下发行数量(回拨前)、网下发行数量",
-        "why_needed": "分母端核心变量；正式预测建议优先使用回拨前网下配售数量，避免回拨后泄露。",
-        "suggested_source": "当前 Excel + 发行安排字段校验",
-    },
-    {
-        "required_field": "战略配售获配股份数",
-        "category": "战略配售",
-        "current_status": "已有相近字段：向战略投资者配售数量；缺失率约 34.0%",
-        "why_needed": "战略配售越多，留给网下/网上的份额越少，可能抬高拥挤度。",
-        "suggested_source": "当前 Excel、战略配售结果公告、发行公告",
-    },
-    {
-        "required_field": "战略配售获配股份占比",
-        "category": "战略配售",
-        "current_status": "已派生 strategic_allocation_share_pct；缺失率约 34.0%",
-        "why_needed": "比绝对股数更便于跨规模样本比较。",
-        "suggested_source": "由战略配售股数 / 发行总股数派生",
-    },
-    {
-        "required_field": "主承销商战略获配股份数",
-        "category": "战略配售/承销商",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "可衡量跟投安排和保荐承销商约束，科创板/创业板制度差异可能明显。",
-        "suggested_source": "战略配售结果公告、保荐机构跟投公告、Wind 战略配售明细",
-    },
-    {
-        "required_field": "主承销商战略获配股份占比",
-        "category": "战略配售/承销商",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "用于跨发行规模比较承销商跟投强度。",
-        "suggested_source": "由主承销商战略获配股数 / 发行总股数派生",
-    },
-    {
-        "required_field": "网下投资者分类限售配售方式",
-        "category": "限售安排",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "限售安排会影响机构参与意愿和报价/申购行为。",
-        "suggested_source": "发行公告、网下发行初步配售结果公告",
-    },
-    {
-        "required_field": "网下投资者分类配售限售比例",
-        "category": "限售安排",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "量化限售约束强弱，适合做板块制度差异特征。",
-        "suggested_source": "发行公告、网下发行初步配售结果公告",
-    },
-    {
-        "required_field": "初步询价申报价格",
-        "category": "初步询价",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "价格分布能反映机构认可度和分歧程度。",
-        "suggested_source": "初步询价结果及推迟发行公告、Wind 询价明细",
-    },
-    {
-        "required_field": "网下申报价格加权平均数",
-        "category": "初步询价",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "反映询价价格中枢，可与发行价、行业 PE 结合构造估值吸引力。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
-    },
-    {
-        "required_field": "网下申报价格中位数",
-        "category": "初步询价",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "比均值更稳健，可衡量询价价格集中位置。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
-    },
-    {
-        "required_field": "初步询价申报数量",
-        "category": "初步询价",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "预测时点最关键的需求侧变量之一。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
-    },
-    {
-        "required_field": "初步询价配售对象家数",
-        "category": "初步询价",
-        "current_status": "当前 Excel 未提供；现有网下申购配售对象家数更像申购后字段",
-        "why_needed": "预测机构参与拥挤度，但必须使用询价阶段口径，避免泄露。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
-    },
-    {
-        "required_field": "初步询价询价对象家数",
-        "category": "初步询价",
-        "current_status": "当前 Excel 未提供；现有网下申购询价对象家数需确认是否为申购后口径",
-        "why_needed": "衡量参与机构数量，是板块差异和市场热度的重要代理变量。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
+        "current_status": "已补充：subscription_step_10k（科创板/创业板/北交所有）",
+        "why_needed": "影响申购数量离散化。",
+        "suggested_source": "已从补充数据获取",
     },
     {
         "required_field": "初步询价申购总量",
         "category": "初步询价",
-        "current_status": "当前 Excel 未提供；现有网下申购总量属于标签/事后字段",
-        "why_needed": "若能在网下申购前获得，是预测超额认购倍数的核心变量。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
+        "current_status": "已补充：inquiry_subscription_total_10k（科创板/创业板基本全覆盖；北交所仅41条）",
+        "why_needed": "预测时点最关键的需求侧变量之一。",
+        "suggested_source": "已从补充数据获取",
     },
     {
-        "required_field": "初步询价申购倍数(回拨前)",
+        "required_field": "初步询价询价对象家数",
         "category": "初步询价",
-        "current_status": "当前 Excel 未提供；现有网下超额认购倍数(回拨前)属于标签",
-        "why_needed": "可作为更早阶段的需求强度特征，但要严格确认公告时间。",
-        "suggested_source": "初步询价结果公告、由初步询价申购总量 / 回拨前网下发行量派生",
+        "current_status": "已补充：inquiry_investors_count（科创板/创业板基本全覆盖）",
+        "why_needed": "衡量参与机构数量，是板块差异和市场热度的重要代理变量。",
+        "suggested_source": "已从补充数据获取",
     },
     {
-        "required_field": "网下询价市值门槛",
-        "category": "参与门槛",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "市值门槛影响可参与账户池大小，可能显著影响配售对象数量。",
-        "suggested_source": "发行公告、初步询价及推介公告",
+        "required_field": "初步询价配售对象家数",
+        "category": "初步询价",
+        "current_status": "已补充：inquiry_allotment_accounts（科创板/创业板基本全覆盖）",
+        "why_needed": "预测机构参与拥挤度。",
+        "suggested_source": "已从补充数据获取",
     },
     {
-        "required_field": "网下询价市值门槛(A类)",
-        "category": "参与门槛",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "A 类投资者口径可能与整体门槛不同，适合解释 A 类中签率。",
-        "suggested_source": "发行公告、初步询价及推介公告",
+        "required_field": "网下申报价格加权平均数",
+        "category": "初步询价",
+        "current_status": "已补充：quote_price_weighted_avg（科创板/创业板基本全覆盖）",
+        "why_needed": "反映询价价格中枢，可与发行价、行业 PE 结合构造估值吸引力。",
+        "suggested_source": "已从补充数据获取",
     },
     {
-        "required_field": "网下询价市值门槛(主题与战略)",
-        "category": "参与门槛",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "主题/战略配售相关门槛有助于解释特殊发行安排。",
-        "suggested_source": "发行公告、初步询价及推介公告",
-    },
-    {
-        "required_field": "发行价格下限(底价)",
-        "category": "发行定价",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "用于衡量最终发行价在询价区间中的位置。",
-        "suggested_source": "招股意向书、发行公告、询价公告",
+        "required_field": "网下申报价格中位数",
+        "category": "初步询价",
+        "current_status": "已补充：quote_price_median（科创板/创业板基本全覆盖）",
+        "why_needed": "比均值更稳健，可衡量询价价格集中位置。",
+        "suggested_source": "已从补充数据获取",
     },
     {
         "required_field": "发行价格上限",
         "category": "发行定价",
-        "current_status": "当前 Excel 未提供",
+        "current_status": "已补充：offer_price_upper_yuan（仅科创板有此字段）",
         "why_needed": "与底价共同刻画询价价格区间宽度。",
-        "suggested_source": "招股意向书、发行公告、询价公告",
+        "suggested_source": "已从科创板补充数据获取；创业板/主板/北交所暂缺",
     },
     {
-        "required_field": "剔除无效和最高报价后申购总量",
-        "category": "剔除后询价",
-        "current_status": "当前 Excel 未提供；仅有剔除申报量占比",
-        "why_needed": "比剔除比例更直接描述有效需求基数。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
+        "required_field": "发行价格下限(底价)",
+        "category": "发行定价",
+        "current_status": "已补充：offer_price_lower_yuan（仅科创板有此字段）",
+        "why_needed": "用于衡量最终发行价在询价区间中的位置。",
+        "suggested_source": "已从科创板补充数据获取；创业板/主板/北交所暂缺",
     },
     {
-        "required_field": "剔除无效和最高报价后配售对象",
-        "category": "剔除后询价",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "衡量剔除后真实参与账户数量，适合预测拥挤度。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
+        "required_field": "申购截止日期（时间轴）",
+        "category": "时间轴",
+        "current_status": "已补充：subscription_deadline_date（科创板/创业板基本全覆盖）",
+        "why_needed": "做真实时间序列回测必须按预测发生日排序。",
+        "suggested_source": "已从补充数据获取",
     },
     {
-        "required_field": "剔除无效和最高报价后询价对象",
-        "category": "剔除后询价",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "衡量剔除后真实参与机构数量，适合做需求侧特征。",
-        "suggested_source": "初步询价结果公告、Wind 询价统计",
+        "required_field": "主板补充数据",
+        "category": "数据缺口",
+        "current_status": "当前无主板补充数据文件；主板所有询价字段为 NaN",
+        "why_needed": "主板注册制后样本需要同等询价字段才能参与统一模型。",
+        "suggested_source": "需要从 Wind 补充导出主板询价字段",
     },
     {
         "required_field": "行业分类",
@@ -306,21 +291,18 @@ REQUIRED_PREDICTION_FIELDS = [
         "suggested_source": "发行公告、Wind IPO 承销商字段",
     },
     {
-        "required_field": "发行公告日/申购日/询价截止日",
-        "category": "时间轴",
-        "current_status": "当前 Excel 只有上市日期",
-        "why_needed": "做真实时间序列回测必须按预测发生日排序，而不是上市日。",
-        "suggested_source": "发行公告、Wind IPO 日程字段",
-    },
-    {
         "required_field": "预测时点市场热度变量",
         "category": "市场环境",
-        "current_status": "当前 Excel 未提供",
-        "why_needed": "可用近期 IPO 破发率、上市首日收益、指数涨跌、成交额等解释阶段性热度。",
-        "suggested_source": "Wind 市场数据、历史 IPO 首日表现、指数行情",
+        "current_status": "上市首日涨跌幅已补充（事后）；可基于此滚动计算近期IPO热度",
+        "why_needed": "解释阶段性打新热度，如近期破发率、近期首日均值涨幅、指数涨跌。",
+        "suggested_source": "可由 first_day_return_pct 滚动窗口派生；沪深成交量数据需单独获取",
     },
 ]
 
+
+# ---------------------------------------------------------------------------
+# I/O helpers
+# ---------------------------------------------------------------------------
 
 def strip_xlsx_styles(src: Path, dst: Path) -> None:
     """Copy an xlsx while removing the malformed styles part."""
@@ -336,29 +318,72 @@ def excel_serial_to_datetime(series: pd.Series) -> pd.Series:
     return pd.to_datetime(numeric, unit="D", origin="1899-12-30", errors="coerce")
 
 
-def read_source(spec: dict[str, object], temp_dir: Path) -> pd.DataFrame:
+def read_source(spec: dict, temp_dir: Path) -> pd.DataFrame:
     src = Path(spec["path"])
     safe = temp_dir / f"{src.stem}_nostyles.xlsx"
     strip_xlsx_styles(src, safe)
     df = pd.read_excel(safe, sheet_name=0, dtype={"证券代码": str})
     df = df.rename(columns=COLUMN_MAP)
-    missing_mapped = sorted(set(COLUMN_MAP.values()) - set(df.columns))
-    if missing_mapped:
-        raise ValueError(f"{src.name} missing expected columns: {missing_mapped}")
+
+    # Required columns: everything in COLUMN_MAP values except OPTIONAL_COLUMNS
+    required = set(COLUMN_MAP.values()) - OPTIONAL_COLUMNS - {"listing_date_raw"}
+    # listing_date_raw may come from either 首发上市日期 or 上市日期
+    if "listing_date_raw" not in df.columns:
+        raise ValueError(f"{src.name}: no listing date column found")
+    missing_required = sorted(required - set(df.columns))
+    if missing_required:
+        raise ValueError(f"{src.name} missing required columns: {missing_required}")
+
+    # Fill optional columns with NaN if absent
+    for col in OPTIONAL_COLUMNS:
+        if col not in df.columns:
+            df[col] = np.nan
+
     df["board"] = spec["board"]
     df["source_file"] = src.name
     df["sample_note"] = spec["sample_note"]
     return df
 
 
+def load_supplements(temp_dir: Path) -> pd.DataFrame:
+    """Load all supplement files and return a merged DataFrame keyed by security_code."""
+    frames = []
+    for spec in SUPPLEMENT_SPECS:
+        src = Path(spec["path"])
+        safe = temp_dir / f"{src.stem}_nostyles.xlsx"
+        strip_xlsx_styles(src, safe)
+        df = pd.read_excel(safe, sheet_name=0, dtype={"证券代码": str})
+        df = df.rename(columns=SUPPLEMENT_COLUMN_MAP)
+        # Keep only columns that are in SUPPLEMENT_COLUMN_MAP values
+        keep = [c for c in SUPPLEMENT_COLUMN_MAP.values() if c in df.columns]
+        df = df[keep].copy()
+        frames.append(df)
+
+    combined = pd.concat(frames, ignore_index=True)
+    # Drop full duplicates; keep first occurrence per security_code
+    combined = combined.drop_duplicates(subset=["security_code"], keep="first")
+    return combined
+
+
+# ---------------------------------------------------------------------------
+# Feature engineering
+# ---------------------------------------------------------------------------
+
 def add_features(df: pd.DataFrame) -> pd.DataFrame:
     out = df.copy()
+    # Coerce all non-id columns to numeric
+    id_cols = {"security_code", "security_name", "board", "source_file", "sample_note"}
     for col in out.columns:
-        if col not in {"security_code", "security_name", "board", "source_file", "sample_note"}:
+        if col not in id_cols:
             out[col] = pd.to_numeric(out[col], errors="coerce")
 
+    # Dates
     out["listing_date"] = excel_serial_to_datetime(out["listing_date_raw"])
     out["listing_year"] = out["listing_date"].dt.year
+    out["inquiry_deadline_date"] = excel_serial_to_datetime(out.get("inquiry_deadline_date_raw", pd.Series(dtype=float)))
+    out["subscription_deadline_date"] = excel_serial_to_datetime(out.get("subscription_deadline_date_raw", pd.Series(dtype=float)))
+
+    # Derived size / valuation
     out["issue_amount_100m_yuan"] = out["offer_price_yuan"] * out["total_issue_shares_10k"] / 10000
     out["offline_issue_before_share_pct"] = (
         out["offline_issue_before_clawback_10k"] / out["total_issue_shares_10k"] * 100
@@ -378,6 +403,7 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     out["pe_vs_industry"] = out["ipo_pe_diluted"] / out["industry_pe_at_ipo"]
     out["pe_vs_comparable"] = out["ipo_pe_diluted"] / out["comparable_pe_avg_ex_nonrecurring"]
 
+    # Label
     ratio = out["offline_oversubscription_ratio"]
     out["log_offline_oversubscription"] = np.where(ratio > 0, np.log(ratio), np.nan)
     out["implied_offline_lottery_rate_pct"] = np.where(ratio > 0, 100 / ratio, np.nan)
@@ -385,8 +411,52 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
         out["offline_allotment_ratio_pct"] - out["implied_offline_lottery_rate_pct"]
     )
     out["has_offline_label"] = out["offline_oversubscription_ratio"].notna()
+
+    # Inquiry-time derived features (only valid where supplement data exists)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        out["inquiry_oversubscription_ratio"] = np.where(
+            out["offline_issue_before_clawback_10k"] > 0,
+            out["inquiry_subscription_total_10k"] / out["offline_issue_before_clawback_10k"],
+            np.nan,
+        )
+        out["quote_price_vs_offer"] = np.where(
+            out["offer_price_yuan"] > 0,
+            out["quote_price_weighted_avg"] / out["offer_price_yuan"],
+            np.nan,
+        )
+        # Price position within the inquiry range (科创板 only)
+        price_range = out["offer_price_upper_yuan"] - out["offer_price_lower_yuan"]
+        out["offer_price_range_pct"] = np.where(
+            price_range > 0,
+            price_range / out["offer_price_lower_yuan"] * 100,
+            np.nan,
+        )
+        out["offer_price_position_in_range"] = np.where(
+            price_range > 0,
+            (out["offer_price_yuan"] - out["offer_price_lower_yuan"]) / price_range,
+            np.nan,
+        )
+
+    # Rolling market heat: avg first_day_return of prior 20 IPOs on same board
+    # Sorted by subscription_deadline_date where available, else listing_date.
+    sort_date = out["subscription_deadline_date"].fillna(out["listing_date"])
+    out["sort_date_for_heat"] = sort_date
+    heat_parts = []
+    for board, grp in out.groupby("board"):
+        grp = grp.sort_values("sort_date_for_heat")
+        grp["recent_ipo_first_day_return_ma20"] = (
+            grp["first_day_return_pct"].shift(1).rolling(20, min_periods=5).mean()
+        )
+        heat_parts.append(grp)
+    heat_df = pd.concat(heat_parts).sort_index()
+    out["recent_ipo_first_day_return_ma20"] = heat_df["recent_ipo_first_day_return_ma20"]
+
     return out
 
+
+# ---------------------------------------------------------------------------
+# Analysis helpers
+# ---------------------------------------------------------------------------
 
 def q01(x: pd.Series) -> float:
     return x.quantile(0.01)
@@ -399,6 +469,8 @@ def q99(x: pd.Series) -> float:
 def describe_numeric(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
     rows = []
     for col in cols:
+        if col not in df.columns:
+            continue
         s = pd.to_numeric(df[col], errors="coerce")
         rows.append(
             {
@@ -430,8 +502,6 @@ def corr_table(df: pd.DataFrame, target: str, excluded: set[str]) -> pd.DataFram
         if len(pair) < 20 or pair[c].nunique() < 2:
             continue
         pearson = pair[target].corr(pair[c], method="pearson")
-        # pandas delegates Spearman to scipy; rank correlation avoids that
-        # optional dependency and is equivalent for this EDA purpose.
         spearman = pair[target].rank().corr(pair[c].rank(), method="pearson")
         rows.append(
             {
@@ -444,6 +514,10 @@ def corr_table(df: pd.DataFrame, target: str, excluded: set[str]) -> pd.DataFram
         )
     return pd.DataFrame(rows).sort_values("abs_spearman", ascending=False)
 
+
+# ---------------------------------------------------------------------------
+# SVG charts (no matplotlib dependency)
+# ---------------------------------------------------------------------------
 
 def fmt_num(value: object, digits: int = 2) -> str:
     if pd.isna(value):
@@ -492,28 +566,28 @@ def save_svg(path: Path, width: int, height: int, body: list[str]) -> None:
 
 def svg_boxplot(df: pd.DataFrame, fig_dir: Path) -> None:
     label_df = df[df["log_offline_oversubscription"].notna()].copy()
-    boards = ["科创板", "创业板", "主板"]
-    colors = {"科创板": "#4C78A8", "创业板": "#F58518", "主板": "#54A24B"}
+    boards = ["科创板", "创业板", "主板", "北交所"]
+    colors = {"科创板": "#4C78A8", "创业板": "#F58518", "主板": "#54A24B", "北交所": "#B279A2"}
     stats = []
     for board in boards:
         s = label_df.loc[label_df["board"] == board, "log_offline_oversubscription"].dropna()
-        if s.empty:
+        if len(s) < 5:
             continue
         stats.append(
             {
                 "board": board,
-                "min": s.quantile(0.01),
+                "min": s.quantile(0.05),
                 "q1": s.quantile(0.25),
                 "median": s.median(),
                 "q3": s.quantile(0.75),
-                "max": s.quantile(0.99),
+                "max": s.quantile(0.95),
                 "n": len(s),
             }
         )
     if not stats:
         return
 
-    width, height = 900, 520
+    width, height = 960, 520
     left, right, top, bottom = 90, 40, 70, 85
     plot_w, plot_h = width - left - right, height - top - bottom
     ymin = min(s["min"] for s in stats)
@@ -521,8 +595,8 @@ def svg_boxplot(df: pd.DataFrame, fig_dir: Path) -> None:
     yscale = linear_scale(ymin, ymax, top + plot_h, top)
     x_positions = np.linspace(left + 120, left + plot_w - 120, len(stats))
     body = [
-        svg_text(width / 2, 32, "Label Distribution by Board", 20, "middle", "700"),
-        svg_text(width / 2, 55, "log(offline oversubscription), whiskers = p01 / p99", 12, "middle"),
+        svg_text(width / 2, 32, "Label Distribution by Board (v2)", 20, "middle", "700"),
+        svg_text(width / 2, 55, "log(offline oversubscription), whiskers = p05 / p95", 12, "middle"),
         f'<line x1="{left}" y1="{top + plot_h}" x2="{left + plot_w}" y2="{top + plot_h}" stroke="#333"/>',
         f'<line x1="{left}" y1="{top}" x2="{left}" y2="{top + plot_h}" stroke="#333"/>',
     ]
@@ -532,17 +606,17 @@ def svg_boxplot(df: pd.DataFrame, fig_dir: Path) -> None:
         body.append(f'<line x1="{left}" y1="{y:.1f}" x2="{left + plot_w}" y2="{y:.1f}" stroke="#ddd"/>')
         body.append(svg_text(left - 10, y + 4, f"{value:.1f}", 11, "end"))
 
-    box_w = 90
+    box_w = 80
     for x, row in zip(x_positions, stats):
         c = colors[row["board"]]
         y_min, y_q1, y_med, y_q3, y_max = [yscale(row[k]) for k in ["min", "q1", "median", "q3", "max"]]
         body.extend(
             [
                 f'<line x1="{x:.1f}" y1="{y_min:.1f}" x2="{x:.1f}" y2="{y_max:.1f}" stroke="{c}" stroke-width="2"/>',
-                f'<line x1="{x - box_w / 3:.1f}" y1="{y_min:.1f}" x2="{x + box_w / 3:.1f}" y2="{y_min:.1f}" stroke="{c}" stroke-width="2"/>',
-                f'<line x1="{x - box_w / 3:.1f}" y1="{y_max:.1f}" x2="{x + box_w / 3:.1f}" y2="{y_max:.1f}" stroke="{c}" stroke-width="2"/>',
-                f'<rect x="{x - box_w / 2:.1f}" y="{y_q3:.1f}" width="{box_w}" height="{y_q1 - y_q3:.1f}" fill="{c}" fill-opacity="0.25" stroke="{c}" stroke-width="2"/>',
-                f'<line x1="{x - box_w / 2:.1f}" y1="{y_med:.1f}" x2="{x + box_w / 2:.1f}" y2="{y_med:.1f}" stroke="{c}" stroke-width="3"/>',
+                f'<line x1="{x - box_w/3:.1f}" y1="{y_min:.1f}" x2="{x + box_w/3:.1f}" y2="{y_min:.1f}" stroke="{c}" stroke-width="2"/>',
+                f'<line x1="{x - box_w/3:.1f}" y1="{y_max:.1f}" x2="{x + box_w/3:.1f}" y2="{y_max:.1f}" stroke="{c}" stroke-width="2"/>',
+                f'<rect x="{x - box_w/2:.1f}" y="{y_q3:.1f}" width="{box_w}" height="{y_q1 - y_q3:.1f}" fill="{c}" fill-opacity="0.25" stroke="{c}" stroke-width="2"/>',
+                f'<line x1="{x - box_w/2:.1f}" y1="{y_med:.1f}" x2="{x + box_w/2:.1f}" y2="{y_med:.1f}" stroke="{c}" stroke-width="3"/>',
             ]
         )
         body.append(svg_text(x, top + plot_h + 28, row["board"], 13, "middle", "700"))
@@ -561,17 +635,17 @@ def svg_yearly_trend(df: pd.DataFrame, fig_dir: Path) -> None:
     )
     if trend.empty:
         return
-    boards = ["科创板", "创业板", "主板"]
-    colors = {"科创板": "#4C78A8", "创业板": "#F58518", "主板": "#54A24B"}
+    boards = ["科创板", "创业板", "主板", "北交所"]
+    colors = {"科创板": "#4C78A8", "创业板": "#F58518", "主板": "#54A24B", "北交所": "#B279A2"}
     width, height = 980, 560
-    left, right, top, bottom = 90, 160, 70, 85
+    left, right, top, bottom = 90, 180, 70, 85
     plot_w, plot_h = width - left - right, height - top - bottom
     xmin, xmax = int(trend["listing_year"].min()), int(trend["listing_year"].max())
     ymin, ymax = 0, float(trend["offline_oversubscription_ratio"].max() * 1.1)
     xscale = linear_scale(xmin, xmax, left, left + plot_w)
     yscale = linear_scale(ymin, ymax, top + plot_h, top)
     body = [
-        svg_text(width / 2, 32, "Median Offline Oversubscription by Listing Year", 20, "middle", "700"),
+        svg_text(width / 2, 32, "Median Offline Oversubscription by Listing Year (v2)", 20, "middle", "700"),
         f'<line x1="{left}" y1="{top + plot_h}" x2="{left + plot_w}" y2="{top + plot_h}" stroke="#333"/>',
         f'<line x1="{left}" y1="{top}" x2="{left}" y2="{top + plot_h}" stroke="#333"/>',
     ]
@@ -589,11 +663,13 @@ def svg_yearly_trend(df: pd.DataFrame, fig_dir: Path) -> None:
         if sub.empty:
             continue
         points = [(xscale(y), yscale(v)) for y, v in zip(sub["listing_year"], sub["offline_oversubscription_ratio"])]
-        path = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
-        body.append(f'<polyline points="{path}" fill="none" stroke="{colors[board]}" stroke-width="3"/>')
+        path_d = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+        body.append(f'<polyline points="{path_d}" fill="none" stroke="{colors[board]}" stroke-width="3"/>')
         for x, y in points:
             body.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4" fill="{colors[board]}"/>')
     for idx, board in enumerate(boards):
+        if board not in trend["board"].values:
+            continue
         y = top + 20 + idx * 28
         body.append(f'<rect x="{left + plot_w + 35}" y="{y - 10}" width="16" height="16" fill="{colors[board]}"/>')
         body.append(svg_text(left + plot_w + 58, y + 3, board, 12))
@@ -603,16 +679,16 @@ def svg_yearly_trend(df: pd.DataFrame, fig_dir: Path) -> None:
 
 
 def svg_missing_bar(missing: pd.DataFrame, fig_dir: Path) -> None:
-    top_missing = missing[missing["missing_count"] > 0].head(14).iloc[::-1]
+    top_missing = missing[missing["missing_count"] > 0].head(16).iloc[::-1]
     if top_missing.empty:
         return
-    width, height = 980, 620
-    left, right, top, bottom = 360, 50, 60, 55
+    width, height = 980, 680
+    left, right, top, bottom = 380, 50, 60, 55
     plot_w, plot_h = width - left - right, height - top - bottom
     xscale = linear_scale(0, 100, left, left + plot_w)
     row_h = plot_h / len(top_missing)
     body = [
-        svg_text(width / 2, 32, "Top Missing Fields", 20, "middle", "700"),
+        svg_text(width / 2, 32, "Top Missing Fields (v2)", 20, "middle", "700"),
         f'<line x1="{left}" y1="{top + plot_h}" x2="{left + plot_w}" y2="{top + plot_h}" stroke="#333"/>',
     ]
     for tick in [0, 25, 50, 75, 100]:
@@ -630,18 +706,18 @@ def svg_missing_bar(missing: pd.DataFrame, fig_dir: Path) -> None:
 
 
 def svg_corr_bar(corr_pre: pd.DataFrame, fig_dir: Path) -> None:
-    view = corr_pre.head(12).iloc[::-1]
+    view = corr_pre.head(14).iloc[::-1]
     if view.empty:
         return
-    width, height = 980, 620
-    left, right, top, bottom = 390, 50, 60, 65
+    width, height = 980, 680
+    left, right, top, bottom = 420, 50, 60, 65
     plot_w, plot_h = width - left - right, height - top - bottom
     xscale = linear_scale(-1, 1, left, left + plot_w)
     zero = xscale(0)
     row_h = plot_h / len(view)
     body = [
-        svg_text(width / 2, 32, "Top Single-Field Spearman Correlations", 20, "middle", "700"),
-        svg_text(width / 2, 52, "pre-subscription-like fields only; not a causal test", 12, "middle"),
+        svg_text(width / 2, 32, "Top Spearman Correlations (pre-subscription fields, v2)", 20, "middle", "700"),
+        svg_text(width / 2, 52, "not a causal test; excludes post-subscription leakage", 12, "middle"),
         f'<line x1="{zero:.1f}" y1="{top}" x2="{zero:.1f}" y2="{top + plot_h}" stroke="#333"/>',
     ]
     for tick in [-1, -0.5, 0, 0.5, 1]:
@@ -662,6 +738,10 @@ def svg_corr_bar(corr_pre: pd.DataFrame, fig_dir: Path) -> None:
     save_svg(fig_dir / "top_pre_subscription_correlations.svg", width, height, body)
 
 
+# ---------------------------------------------------------------------------
+# Report
+# ---------------------------------------------------------------------------
+
 def make_report(
     df: pd.DataFrame,
     board_summary: pd.DataFrame,
@@ -677,6 +757,8 @@ def make_report(
     label_n = int(label_df["has_offline_label"].sum())
     date_min = df["listing_date"].min().date()
     date_max = df["listing_date"].max().date()
+
+    has_supplement = df["inquiry_subscription_total_10k"].notna().sum()
 
     exact_identity = (
         label_df["offline_lottery_gap_pct_point"].abs().dropna().quantile(0.95)
@@ -697,297 +779,178 @@ def make_report(
         top = corr_pre.iloc[0]
         direction = "正相关" if top["spearman_corr"] > 0 else "负相关"
         interesting.append(
-            f"- 在较像预测前可用的字段里，`{top['feature']}` 与标签的 Spearman 相关绝对值最高，"
+            f"- 预测前可用字段中，`{top['feature']}` 与标签的 Spearman 相关绝对值最高，"
             f"为 {fmt_num(top['spearman_corr'], 3)}，方向为{direction}。"
         )
     if pd.notna(exact_identity):
         interesting.append(
             f"- `网下申购配售比例` 与 `100 / 网下超额认购倍数` 基本互为倒数，"
-            f"二者差异的 95% 分位仅 {fmt_num(exact_identity, 6)} 个百分点；建模时二者只能作为标签/校验，不能同时做输入。"
-        )
-    if "offline_allotment_accounts" in corr_all["feature"].values:
-        row = corr_all[corr_all["feature"] == "offline_allotment_accounts"].iloc[0]
-        interesting.append(
-            f"- 配售对象家数越多，竞争越拥挤：`offline_allotment_accounts` 与 log 超额认购倍数的 Spearman "
-            f"约 {fmt_num(row['spearman_corr'], 3)}。但这个字段更像申购后结果，需确认预测时点。"
+            f"二者差异的 95% 分位仅 {fmt_num(exact_identity, 6)} 个百分点；建模时只能作为标签。"
         )
 
-    missing_top = missing[missing["missing_count"] > 0].head(8)
+    missing_top = missing[missing["missing_count"] > 0].head(10)
 
-    report = f"""# 初步数据处理与分析报告
+    report = f"""# 初步数据处理与分析报告（v2）
 
-生成日期：2026-05-21
+生成日期：2026-05-22
 
-## 1. SQL / SQLite 是否值得用
+## 变更说明（相对 v1）
 
-值得用，但定位应是“中间层和回测查询层”，不是替代 pandas / sklearn 的建模层。
+- 新增北交所（北交所_网下打新数据.xlsx），样本扩展至四个板块。
+- 合并三份补充数据（科创板/创业板/北交所），新增初步询价阶段字段：
+  询价申购总量、询价/配售对象家数、申购步长/上下限、申报价格均值/中位数、
+  询价截止日、申购截止日、上市首日涨跌幅。
+- 科创板补充数据额外包含发行价格上限/下限（底价）。
+- 主板暂无补充数据；主板询价字段全为 NaN。
+- 北交所大部分样本不适用询价机制；询价字段有效样本仅约 41 条。
 
-- 当前 3 个 Excel 合计 {total_n:,} 行、字段不多，单机 pandas 已经足够快。
-- SQLite `.db` 的价值在于：统一字段名、保留原始来源、方便按板块/年份/时间窗口滚动取数、让后续网页或回测服务直接查询。
-- 建议流程：Excel 原始层 -> 清洗后的 `ipo_offline_sample` 表 -> 特征/标签视图 -> pandas/sklearn 建模。
-- 不建议一开始把所有特征工程都写进 SQL；复杂统计、缺失处理、分位裁剪、时间序列回测仍用 Python 更顺手。
-
-本次已生成 SQLite 数据库：`data/processed/ipo_offline.db`，核心表为 `ipo_offline_sample`。
-
-如环境安装了 matplotlib，脚本会在 `outputs/initial_analysis/figures/` 额外生成可视化图片；当前 bundled Python 未包含该依赖时会自动跳过。
-
-## 2. 样本概况
+## 1. 样本概况
 
 - 总样本：{total_n:,} 条。
 - 有网下超额认购倍数标签：{label_n:,} 条，占 {label_n / total_n:.1%}。
+- 有初步询价补充字段：{has_supplement:,} 条。
 - 上市日期范围：{date_min} 至 {date_max}。
-- 当前覆盖：科创板、注册制创业板、主板注册制后样本；尚未包含北交所。
 
 {markdown_table(board_summary, digits=2)}
 
-## 3. 年份与板块分布
+## 2. 年份与板块分布
 
 {markdown_table(year_board, max_rows=30, digits=0)}
 
-## 4. 标签描述性统计
+## 3. 标签描述性统计
 
 核心标签为 `log_offline_oversubscription = log(网下超额认购倍数)`。
 
 {markdown_table(label_desc, max_rows=20, digits=4)}
 
-## 5. 可能对预测有用的规律
+## 4. 预测前可用字段相关性（含新增询价字段）
 
-### 预测前较可能可用字段的相关性
+以下排除申购后泄露字段，仅展示可能在预测时点可见的字段：
 
-以下仅是单变量相关，不代表因果，也没有经过严格时间序列验证：
+{markdown_table(corr_pre[['feature', 'n', 'spearman_corr', 'pearson_corr']].head(14), digits=4)}
 
-{markdown_table(corr_pre[['feature', 'n', 'spearman_corr', 'pearson_corr']].head(12), digits=4)}
+## 5. 全字段相关性（含事后字段，供理解机制）
 
-### 全字段相关性，包括明显事后字段
+{markdown_table(corr_all[['feature', 'n', 'spearman_corr', 'pearson_corr']].head(14), digits=4)}
 
-这些字段可用于理解标签形成机制，但正式预测时要谨慎排除泄露：
-
-{markdown_table(corr_all[['feature', 'n', 'spearman_corr', 'pearson_corr']].head(12), digits=4)}
-
-## 6. 有趣的数据结论
+## 6. 主要结论
 
 {chr(10).join(interesting)}
 
-## 7. 缺少哪些数据
-
-当前 Excel 缺少项目文档中许多“初步询价结束后、网下申购前”更理想的输入字段，尤其是：
-
-- 网下申购数量上限、下限、步长。
-- 初步询价申报价格明细、加权平均数、中位数。
-- 初步询价申报数量、初步询价配售对象家数、询价对象家数。
-- 初步询价申购总量、初步询价申购倍数（回拨前）。
-- 网下询价市值门槛及 A 类/主题与战略门槛。
-- 发行价格下限/上限。
-- 剔除无效和最高报价后的申购总量、配售对象、询价对象。
-- 主承销商战略获配股份数/占比。
-- 行业、保荐机构/主承销商、发行日/申购日、发行阶段市场热度等上下文变量。
-
-当前字段缺失率最高的字段如下：
+## 7. 字段缺失情况
 
 {markdown_table(missing_top[['field', 'missing_count', 'missing_rate']], digits=4)}
 
-## 8. 异常值与数据质量提示
+## 8. 异常值检查
 
 {markdown_table(outliers, max_rows=20, digits=4)}
 
-## 9. 建模建议
+## 9. 建模建议（v2）
 
-- 第一版基线可以用 `log_offline_oversubscription` 做标签，并同时保留 `board` 类别特征。
-- 先建立三个不泄露的基线：板块滚动均值、年份/板块滚动均值、只用发行规模/价格/PE/战略配售/剔除比例的 Ridge 或树模型。
-- `offline_subscription_total_10k`、`offline_allotment_accounts`、`offline_allotment_ratio_pct` 等字段预测力很强，但多数属于申购后/配售后信息，应作为标签或事后解释，不应进入正式预测输入。
-- 科创板、创业板、主板中位水平差异较明显，后续必须分板块评估；统一模型要加入板块特征，且建议做板块残差校准。
-- 下一步最关键不是换模型，而是补齐真正预测时点可见的初步询价字段。
+- 询价阶段字段（inquiry_subscription_total_10k、inquiry_investors_count 等）现已可用，
+  是最有价值的新增特征，建议优先加入 Ridge 和 LightGBM 基线。
+- inquiry_oversubscription_ratio（初步询价超额认购倍数）理论上是最强预测因子，
+  但必须确认其发布时点确实早于网下申购截止。
+- recent_ipo_first_day_return_ma20 已基于过去 20 只 IPO 首日涨幅滚动计算，可作为
+  市场热度代理变量，不引入未来数据。
+- 北交所标签覆盖率仅约 13%（41/316），短期内建议与其他板块合并训练并单独评估误差，
+  不单独建模。
+- 主板仍无询价补充字段，如需统一模型需补齐或使用缺失值插补策略。
 """
     return report
 
 
-def make_figures(df: pd.DataFrame, missing: pd.DataFrame, corr_pre: pd.DataFrame) -> None:
-    """Create lightweight chart files for reports and slides.
-
-    SVG charts use only the Python standard library.  PNG charts are attempted
-    only when matplotlib exists in the runtime.
-    """
-    fig_dir = OUT_DIR / "figures"
-    fig_dir.mkdir(parents=True, exist_ok=True)
-    svg_boxplot(df, fig_dir)
-    svg_yearly_trend(df, fig_dir)
-    svg_missing_bar(missing, fig_dir)
-    svg_corr_bar(corr_pre, fig_dir)
-
-    try:
-        import matplotlib.pyplot as plt
-    except Exception as exc:  # pragma: no cover - optional dependency
-        (fig_dir / "README.txt").write_text(
-            "SVG figures were generated with the standard-library fallback.\n"
-            f"PNG figures were skipped because matplotlib is unavailable: {exc}\n",
-            encoding="utf-8",
-        )
-        print(f"Generated SVG figures. Skip PNG figures because matplotlib is unavailable: {exc}")
-        return
-
-    board_order = ["科创板", "创业板", "主板"]
-    board_label = {"科创板": "STAR", "创业板": "ChiNext", "主板": "Main"}
-
-    label_df = df[df["log_offline_oversubscription"].notna()].copy()
-    data = [
-        label_df.loc[label_df["board"] == board, "log_offline_oversubscription"].dropna()
-        for board in board_order
-        if (label_df["board"] == board).any()
-    ]
-    labels = [board_label[b] for b in board_order if (label_df["board"] == b).any()]
-    plt.figure(figsize=(8, 5))
-    plt.boxplot(data, tick_labels=labels, showfliers=False)
-    plt.ylabel("log offline oversubscription")
-    plt.title("Label Distribution by Board")
-    plt.tight_layout()
-    plt.savefig(fig_dir / "label_distribution_by_board.png", dpi=160)
-    plt.close()
-
-    trend = (
-        label_df.groupby(["listing_year", "board"])["offline_oversubscription_ratio"]
-        .median()
-        .reset_index()
-        .dropna()
-    )
-    plt.figure(figsize=(9, 5))
-    for board in board_order:
-        sub = trend[trend["board"] == board].sort_values("listing_year")
-        if sub.empty:
-            continue
-        plt.plot(
-            sub["listing_year"],
-            sub["offline_oversubscription_ratio"],
-            marker="o",
-            label=board_label[board],
-        )
-    plt.ylabel("median offline oversubscription")
-    plt.xlabel("listing year")
-    plt.title("Median Offline Oversubscription by Year")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(fig_dir / "yearly_median_oversubscription.png", dpi=160)
-    plt.close()
-
-    top_missing = missing[missing["missing_count"] > 0].head(12).iloc[::-1]
-    plt.figure(figsize=(9, 6))
-    plt.barh(top_missing["field"], top_missing["missing_rate"] * 100)
-    plt.xlabel("missing rate (%)")
-    plt.title("Top Missing Fields")
-    plt.tight_layout()
-    plt.savefig(fig_dir / "top_missing_fields.png", dpi=160)
-    plt.close()
-
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
 
 def main() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    fig_dir = OUT_DIR / "figures"
+    fig_dir.mkdir(parents=True, exist_ok=True)
 
     with TemporaryDirectory() as td:
         temp_dir = Path(td)
         frames = [read_source(spec, temp_dir) for spec in FILE_SPECS]
+        supplements = load_supplements(temp_dir)
+
     raw = pd.concat(frames, ignore_index=True)
+
+    # Join supplement fields (left join to preserve all main rows)
+    sup_cols = [c for c in supplements.columns if c != "security_code"]
+    raw = raw.merge(supplements[["security_code"] + sup_cols], on="security_code", how="left")
+
     df = add_features(raw)
 
-    # Keep a stable, human-readable column order for downstream work.
+    # Stable column order
     front_cols = [
-        "security_code",
-        "security_name",
-        "board",
-        "listing_date",
-        "listing_year",
-        "source_file",
-        "sample_note",
+        "security_code", "security_name", "board",
+        "listing_date", "listing_year",
+        "inquiry_deadline_date", "subscription_deadline_date",
+        "source_file", "sample_note",
     ]
     other_cols = [c for c in df.columns if c not in front_cols]
     df = df[front_cols + other_cols]
 
+    # --- Outputs ---
     csv_path = DATA_DIR / "ipo_offline_sample.csv"
     db_path = DATA_DIR / "ipo_offline.db"
-    field_dict_path = OUT_DIR / "field_dictionary.csv"
-    missing_path = OUT_DIR / "missing_by_field.csv"
-    desc_path = OUT_DIR / "descriptive_stats.csv"
-    corr_pre_path = OUT_DIR / "correlation_pre_subscription_like.csv"
-    corr_all_path = OUT_DIR / "correlation_all_fields.csv"
-    board_summary_path = OUT_DIR / "board_summary.csv"
-    year_board_path = OUT_DIR / "year_board_counts.csv"
-    report_path = OUT_DIR / "initial_analysis_report.md"
 
-    df.to_csv(csv_path, index=False, encoding="utf-8-sig")
-    db_df = df.copy()
-    db_df["listing_date"] = db_df["listing_date"].dt.strftime("%Y-%m-%d")
+    df_for_csv = df.copy()
+    for dcol in ["listing_date", "inquiry_deadline_date", "subscription_deadline_date"]:
+        if dcol in df_for_csv.columns:
+            df_for_csv[dcol] = df_for_csv[dcol].dt.strftime("%Y-%m-%d")
+    df_for_csv.to_csv(csv_path, index=False, encoding="utf-8-sig")
+
+    db_df = df_for_csv.copy()
     with sqlite3.connect(db_path) as conn:
         db_df.to_sql("ipo_offline_sample", conn, if_exists="replace", index=False)
         pd.DataFrame(
-            [
-                {"category": key, "field": field}
-                for key, fields in PREDICTION_TIME_WARNING.items()
-                for field in fields
-            ]
-        ).to_sql("field_time_classification_draft", conn, if_exists="replace", index=False)
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_ipo_board_year ON ipo_offline_sample(board, listing_year)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_ipo_listing_date ON ipo_offline_sample(listing_date)")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_ipo_security_code ON ipo_offline_sample(security_code)")
+            [{"category": key, "field": field}
+             for key, fields in PREDICTION_TIME_WARNING.items()
+             for field in fields]
+        ).to_sql("field_time_classification", conn, if_exists="replace", index=False)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_board_year ON ipo_offline_sample(board, listing_year)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_listing_date ON ipo_offline_sample(listing_date)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_sub_date ON ipo_offline_sample(subscription_deadline_date)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_security_code ON ipo_offline_sample(security_code)")
 
+    # Field dictionary
+    all_maps = {**COLUMN_MAP, **SUPPLEMENT_COLUMN_MAP}
     field_dict = pd.DataFrame(
-        [
-            {"raw_field": raw_col, "clean_field": clean_col}
-            for raw_col, clean_col in COLUMN_MAP.items()
-        ]
+        [{"raw_field": r, "clean_field": c} for r, c in all_maps.items()]
     )
-    field_dict.to_csv(field_dict_path, index=False, encoding="utf-8-sig")
+    field_dict.to_csv(OUT_DIR / "field_dictionary.csv", index=False, encoding="utf-8-sig")
 
-    required_missing = pd.DataFrame(REQUIRED_PREDICTION_FIELDS)
-    required_missing_path = OUT_DIR / "missing_required_prediction_fields.csv"
-    required_missing.to_csv(required_missing_path, index=False, encoding="utf-8-sig")
+    # Required fields status
+    pd.DataFrame(REQUIRED_PREDICTION_FIELDS).to_csv(
+        OUT_DIR / "missing_required_prediction_fields.csv", index=False, encoding="utf-8-sig"
+    )
 
+    # Missing rate
     missing = (
-        df.isna()
-        .sum()
-        .rename("missing_count")
-        .reset_index()
-        .rename(columns={"index": "field"})
+        df.isna().sum().rename("missing_count").reset_index().rename(columns={"index": "field"})
     )
     missing["missing_rate"] = missing["missing_count"] / len(df)
     missing = missing.sort_values(["missing_rate", "missing_count"], ascending=False)
-    missing.to_csv(missing_path, index=False, encoding="utf-8-sig")
+    missing.to_csv(OUT_DIR / "missing_by_field.csv", index=False, encoding="utf-8-sig")
 
-    numeric_cols = [
-        "offline_oversubscription_ratio",
-        "log_offline_oversubscription",
-        "offline_allotment_ratio_pct",
-        "implied_offline_lottery_rate_pct",
-        "offline_oversubscription_ratio_before_clawback",
-        "offline_subscription_total_10k",
-        "offline_valid_quote_subscription_10k",
-        "offline_issue_before_clawback_10k",
-        "offline_issue_final_10k",
-        "offer_price_yuan",
-        "issue_amount_100m_yuan",
-        "strategic_allocation_share_pct",
-        "clawback_ratio_pct",
-        "ipo_pe_diluted",
-        "pe_vs_industry",
-        "offline_allotment_accounts",
-        "offline_inquiry_investors",
-        "a_investor_lottery_rate_pct",
-    ]
-    desc = describe_numeric(df, numeric_cols)
-    desc.to_csv(desc_path, index=False, encoding="utf-8-sig")
-
+    # Board summary
     board_summary = (
         df.groupby("board", dropna=False)
         .agg(
             sample_count=("security_code", "size"),
             label_count=("has_offline_label", "sum"),
+            inquiry_field_count=("inquiry_subscription_total_10k", lambda s: int(s.notna().sum())),
             date_min=("listing_date", "min"),
             date_max=("listing_date", "max"),
             median_offline_oversubscription=("offline_oversubscription_ratio", "median"),
             mean_offline_oversubscription=("offline_oversubscription_ratio", "mean"),
             median_log_oversubscription=("log_offline_oversubscription", "median"),
             median_offline_allotment_ratio_pct=("offline_allotment_ratio_pct", "median"),
-            median_offline_subscription_total_10k=("offline_subscription_total_10k", "median"),
-            median_offline_accounts=("offline_allotment_accounts", "median"),
-            median_inquiry_investors=("offline_inquiry_investors", "median"),
+            median_inquiry_subscription_total_10k=("inquiry_subscription_total_10k", "median"),
+            median_inquiry_investors_count=("inquiry_investors_count", "median"),
             median_issue_amount_100m_yuan=("issue_amount_100m_yuan", "median"),
             missing_label_count=("offline_oversubscription_ratio", lambda s: int(s.isna().sum())),
         )
@@ -995,104 +958,114 @@ def main() -> None:
     )
     board_summary["date_min"] = board_summary["date_min"].dt.strftime("%Y-%m-%d")
     board_summary["date_max"] = board_summary["date_max"].dt.strftime("%Y-%m-%d")
-    board_summary.to_csv(board_summary_path, index=False, encoding="utf-8-sig")
+    board_summary.to_csv(OUT_DIR / "board_summary.csv", index=False, encoding="utf-8-sig")
 
+    # Year-board counts
     year_board = (
         df.pivot_table(
-            index="listing_year",
-            columns="board",
-            values="security_code",
-            aggfunc="count",
-            fill_value=0,
+            index="listing_year", columns="board",
+            values="security_code", aggfunc="count", fill_value=0,
         )
         .reset_index()
         .sort_values("listing_year")
     )
-    year_board.to_csv(year_board_path, index=False, encoding="utf-8-sig")
+    year_board.to_csv(OUT_DIR / "year_board_counts.csv", index=False, encoding="utf-8-sig")
+
+    # Descriptive stats
+    numeric_cols = [
+        "offline_oversubscription_ratio", "log_offline_oversubscription",
+        "offline_allotment_ratio_pct", "offline_oversubscription_ratio_before_clawback",
+        "a_investor_lottery_rate_pct", "offer_price_yuan", "issue_amount_100m_yuan",
+        "strategic_allocation_share_pct", "ipo_pe_diluted", "pe_vs_industry",
+        "excluded_subscription_share_pct",
+        "inquiry_subscription_total_10k", "inquiry_investors_count",
+        "inquiry_allotment_accounts", "inquiry_oversubscription_ratio",
+        "quote_price_weighted_avg", "quote_price_median", "quote_price_vs_offer",
+        "offer_price_upper_yuan", "offer_price_lower_yuan",
+        "recent_ipo_first_day_return_ma20",
+    ]
+    describe_numeric(df, numeric_cols).to_csv(OUT_DIR / "descriptive_stats.csv", index=False, encoding="utf-8-sig")
 
     label_desc = describe_numeric(
         df,
-        [
-            "offline_oversubscription_ratio",
-            "log_offline_oversubscription",
-            "offline_allotment_ratio_pct",
-            "offline_oversubscription_ratio_before_clawback",
-            "a_investor_lottery_rate_pct",
-        ],
+        ["offline_oversubscription_ratio", "log_offline_oversubscription",
+         "offline_allotment_ratio_pct", "offline_oversubscription_ratio_before_clawback",
+         "a_investor_lottery_rate_pct"],
     )
 
+    # Correlation tables
     leakage_or_labels = set(PREDICTION_TIME_WARNING["label_or_post_subscription"]) | {
-        "listing_date_raw",
-        "listing_year",
-        "has_offline_label",
-        "offline_lottery_gap_pct_point",
-        "implied_offline_lottery_rate_pct",
+        "listing_date_raw", "listing_year", "has_offline_label",
+        "offline_lottery_gap_pct_point", "implied_offline_lottery_rate_pct",
+        "inquiry_deadline_date_raw", "subscription_deadline_date_raw",
+        "sort_date_for_heat",
     }
     corr_pre = corr_table(df, "log_offline_oversubscription", leakage_or_labels)
     corr_all = corr_table(
-        df,
-        "log_offline_oversubscription",
-        {"listing_date_raw", "listing_year", "has_offline_label"},
+        df, "log_offline_oversubscription",
+        {"listing_date_raw", "listing_year", "has_offline_label",
+         "inquiry_deadline_date_raw", "subscription_deadline_date_raw",
+         "sort_date_for_heat"},
     )
-    corr_pre.to_csv(corr_pre_path, index=False, encoding="utf-8-sig")
-    corr_all.to_csv(corr_all_path, index=False, encoding="utf-8-sig")
+    corr_pre.to_csv(OUT_DIR / "correlation_pre_subscription_like.csv", index=False, encoding="utf-8-sig")
+    corr_all.to_csv(OUT_DIR / "correlation_all_fields.csv", index=False, encoding="utf-8-sig")
 
+    # Outlier checks
     outlier_rows = []
     for col in [
-        "offline_oversubscription_ratio",
-        "offline_allotment_ratio_pct",
-        "offline_subscription_total_10k",
-        "offer_price_yuan",
-        "issue_amount_100m_yuan",
-        "ipo_pe_diluted",
-        "clawback_ratio_pct",
+        "offline_oversubscription_ratio", "offline_allotment_ratio_pct",
+        "offer_price_yuan", "issue_amount_100m_yuan", "ipo_pe_diluted",
+        "inquiry_subscription_total_10k", "inquiry_investors_count",
     ]:
+        if col not in df.columns:
+            continue
         s = df[col].dropna()
-        if s.empty:
+        if len(s) < 10:
             continue
         lo, hi = s.quantile([0.01, 0.99])
-        outlier_rows.append(
-            {
-                "field": col,
-                "p01": lo,
-                "p99": hi,
-                "below_p01_count": int((df[col] < lo).sum()),
-                "above_p99_count": int((df[col] > hi).sum()),
-                "min_security": df.loc[df[col].idxmin(), "security_name"] if df[col].notna().any() else "",
-                "min": s.min(),
-                "max_security": df.loc[df[col].idxmax(), "security_name"] if df[col].notna().any() else "",
-                "max": s.max(),
-            }
-        )
+        outlier_rows.append({
+            "field": col, "p01": lo, "p99": hi,
+            "below_p01_count": int((df[col] < lo).sum()),
+            "above_p99_count": int((df[col] > hi).sum()),
+            "min_security": df.loc[df[col].idxmin(), "security_name"] if df[col].notna().any() else "",
+            "min": s.min(),
+            "max_security": df.loc[df[col].idxmax(), "security_name"] if df[col].notna().any() else "",
+            "max": s.max(),
+        })
     outliers = pd.DataFrame(outlier_rows)
     outliers.to_csv(OUT_DIR / "outlier_checks.csv", index=False, encoding="utf-8-sig")
-    make_figures(df, missing, corr_pre)
 
+    # SVG figures
+    svg_boxplot(df, fig_dir)
+    svg_yearly_trend(df, fig_dir)
+    svg_missing_bar(missing, fig_dir)
+    svg_corr_bar(corr_pre, fig_dir)
+
+    # Report
     report = make_report(df, board_summary, year_board, missing, label_desc, corr_pre, corr_all, outliers)
-    report_path.write_text(report, encoding="utf-8")
+    (OUT_DIR / "initial_analysis_report.md").write_text(report, encoding="utf-8")
 
+    # Manifest
     manifest = {
-        "inputs": [{"path": str(spec["path"]), "board": spec["board"]} for spec in FILE_SPECS],
+        "version": "v2",
+        "generated": "2026-05-22",
+        "inputs": {
+            "main_files": [{"path": str(s["path"]), "board": s["board"]} for s in FILE_SPECS],
+            "supplement_files": [{"path": str(s["path"]), "board": s["board"]} for s in SUPPLEMENT_SPECS],
+        },
         "outputs": {
             "csv": str(csv_path),
             "sqlite": str(db_path),
-            "report": str(report_path),
-            "field_dictionary": str(field_dict_path),
-            "missing_required_prediction_fields": str(required_missing_path),
-            "missing_by_field": str(missing_path),
-            "descriptive_stats": str(desc_path),
-            "board_summary": str(board_summary_path),
-            "year_board_counts": str(year_board_path),
-            "correlation_pre_subscription_like": str(corr_pre_path),
-            "correlation_all_fields": str(corr_all_path),
-            "outlier_checks": str(OUT_DIR / "outlier_checks.csv"),
-            "figures_dir": str(OUT_DIR / "figures"),
+            "report": str(OUT_DIR / "initial_analysis_report.md"),
+            "field_dictionary": str(OUT_DIR / "field_dictionary.csv"),
+            "board_summary": str(OUT_DIR / "board_summary.csv"),
+            "figures_dir": str(fig_dir),
         },
         "row_count": int(len(df)),
         "label_count": int(df["has_offline_label"].sum()),
+        "inquiry_field_count": int(df["inquiry_subscription_total_10k"].notna().sum()),
     }
     (OUT_DIR / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
-
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
 
 

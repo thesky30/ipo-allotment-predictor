@@ -1,53 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="620" viewBox="0 0 980 620">
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="680" viewBox="0 0 980 680">
 <rect width="100%" height="100%" fill="white"/>
-<text x="490.0" y="32.0" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" font-weight="700" fill="#222">Top Single-Field Spearman Correlations</text>
-<text x="490.0" y="52.0" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" font-weight="400" fill="#222">pre-subscription-like fields only; not a causal test</text>
-<line x1="660.0" y1="60" x2="660.0" y2="555" stroke="#333"/>
-<line x1="390.0" y1="60" x2="390.0" y2="555" stroke="#e6e6e6"/>
-<text x="390.0" y="577.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">-1.0</text>
-<line x1="525.0" y1="60" x2="525.0" y2="555" stroke="#e6e6e6"/>
-<text x="525.0" y="577.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">-0.5</text>
-<line x1="660.0" y1="60" x2="660.0" y2="555" stroke="#e6e6e6"/>
-<text x="660.0" y="577.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">0.0</text>
-<line x1="795.0" y1="60" x2="795.0" y2="555" stroke="#e6e6e6"/>
-<text x="795.0" y="577.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">0.5</text>
-<line x1="930.0" y1="60" x2="930.0" y2="555" stroke="#e6e6e6"/>
-<text x="930.0" y="577.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">1.0</text>
-<text x="378.0" y="90.9" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">pe_vs_comparable</text>
-<rect x="593.2" y="68.2" width="66.8" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="587.2" y="90.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.25</text>
-<text x="378.0" y="132.2" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">a_investor_allotted_shares_10k</text>
-<rect x="577.8" y="109.5" width="82.2" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="571.8" y="132.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.30</text>
-<text x="378.0" y="173.4" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">offer_price_yuan</text>
-<rect x="565.9" y="150.8" width="94.1" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="559.9" y="173.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.35</text>
-<text x="378.0" y="214.7" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">a_investor_subscription_shares_10k</text>
-<rect x="660.0" y="192.0" width="107.4" height="24.8" fill="#4C78A8" fill-opacity="0.86"/>
-<text x="773.4" y="214.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.40</text>
-<text x="378.0" y="255.9" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">pe_vs_industry</text>
-<rect x="548.0" y="233.2" width="112.0" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="542.0" y="255.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.41</text>
-<text x="378.0" y="297.2" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">a_investor_subscription_share_pct</text>
-<rect x="542.9" y="274.5" width="117.1" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="536.9" y="297.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.43</text>
-<text x="378.0" y="338.4" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">issue_pb</text>
-<rect x="535.0" y="315.8" width="125.0" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="529.0" y="338.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.46</text>
-<text x="378.0" y="379.7" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">issue_amount_100m_yuan</text>
-<rect x="534.9" y="357.0" width="125.1" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="528.9" y="379.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.46</text>
-<text x="378.0" y="420.9" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">excluded_subscription_share_pct</text>
-<rect x="532.4" y="398.2" width="127.6" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="526.4" y="420.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.47</text>
-<text x="378.0" y="462.2" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">ipo_pe_diluted</text>
-<rect x="529.1" y="439.5" width="130.9" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="523.1" y="462.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.48</text>
-<text x="378.0" y="503.4" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">offline_issue_final_share_pct</text>
-<rect x="527.8" y="480.8" width="132.2" height="24.8" fill="#F58518" fill-opacity="0.86"/>
-<text x="521.8" y="503.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.49</text>
-<text x="378.0" y="544.7" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">a_investor_allotted_accounts</text>
-<rect x="660.0" y="522.0" width="201.7" height="24.8" fill="#4C78A8" fill-opacity="0.86"/>
-<text x="867.7" y="544.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.75</text>
-<text x="490.0" y="604.0" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" font-weight="400" fill="#222">Spearman correlation with log offline oversubscription</text>
+<text x="490.0" y="32.0" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" font-weight="700" fill="#222">Top Spearman Correlations (pre-subscription fields, v2)</text>
+<text x="490.0" y="52.0" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" font-weight="400" fill="#222">not a causal test; excludes post-subscription leakage</text>
+<line x1="675.0" y1="60" x2="675.0" y2="615" stroke="#333"/>
+<line x1="420.0" y1="60" x2="420.0" y2="615" stroke="#e6e6e6"/>
+<text x="420.0" y="637.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">-1.0</text>
+<line x1="547.5" y1="60" x2="547.5" y2="615" stroke="#e6e6e6"/>
+<text x="547.5" y="637.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">-0.5</text>
+<line x1="675.0" y1="60" x2="675.0" y2="615" stroke="#e6e6e6"/>
+<text x="675.0" y="637.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">0.0</text>
+<line x1="802.5" y1="60" x2="802.5" y2="615" stroke="#e6e6e6"/>
+<text x="802.5" y="637.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">0.5</text>
+<line x1="930.0" y1="60" x2="930.0" y2="615" stroke="#e6e6e6"/>
+<text x="930.0" y="637.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">1.0</text>
+<text x="408.0" y="89.7" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">issue_amount_100m_yuan</text>
+<rect x="587.3" y="67.9" width="87.7" height="23.8" fill="#F58518" fill-opacity="0.86"/>
+<text x="581.3" y="89.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.34</text>
+<text x="408.0" y="129.4" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">a_investor_subscription_share_pct</text>
+<rect x="584.9" y="107.6" width="90.1" height="23.8" fill="#F58518" fill-opacity="0.86"/>
+<text x="578.9" y="129.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.35</text>
+<text x="408.0" y="169.0" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">recent_ipo_first_day_return_ma20</text>
+<rect x="675.0" y="147.2" width="95.8" height="23.8" fill="#4C78A8" fill-opacity="0.86"/>
+<text x="776.8" y="169.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.38</text>
+<text x="408.0" y="208.7" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">inquiry_investors_count</text>
+<rect x="675.0" y="186.9" width="98.4" height="23.8" fill="#4C78A8" fill-opacity="0.86"/>
+<text x="779.4" y="208.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.39</text>
+<text x="408.0" y="248.3" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">inquiry_subscription_total_10k</text>
+<rect x="675.0" y="226.5" width="104.1" height="23.8" fill="#4C78A8" fill-opacity="0.86"/>
+<text x="785.1" y="248.3" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.41</text>
+<text x="408.0" y="287.9" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">issue_pb</text>
+<rect x="569.7" y="266.1" width="105.3" height="23.8" fill="#F58518" fill-opacity="0.86"/>
+<text x="563.7" y="287.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.41</text>
+<text x="408.0" y="327.6" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">pe_vs_industry</text>
+<rect x="569.2" y="305.8" width="105.8" height="23.8" fill="#F58518" fill-opacity="0.86"/>
+<text x="563.2" y="327.6" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.41</text>
+<text x="408.0" y="367.2" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">offline_issue_final_share_pct</text>
+<rect x="568.2" y="345.4" width="106.8" height="23.8" fill="#F58518" fill-opacity="0.86"/>
+<text x="562.2" y="367.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.42</text>
+<text x="408.0" y="406.9" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">ipo_pe_diluted</text>
+<rect x="567.8" y="385.1" width="107.2" height="23.8" fill="#F58518" fill-opacity="0.86"/>
+<text x="561.8" y="406.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.42</text>
+<text x="408.0" y="446.5" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">a_investor_subscription_shares_10k</text>
+<rect x="675.0" y="424.7" width="110.3" height="23.8" fill="#4C78A8" fill-opacity="0.86"/>
+<text x="791.3" y="446.5" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.43</text>
+<text x="408.0" y="486.2" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">excluded_subscription_share_pct</text>
+<rect x="550.8" y="464.4" width="124.2" height="23.8" fill="#F58518" fill-opacity="0.86"/>
+<text x="544.8" y="486.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">-0.49</text>
+<text x="408.0" y="525.8" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">inquiry_allotment_accounts</text>
+<rect x="675.0" y="504.0" width="169.3" height="23.8" fill="#4C78A8" fill-opacity="0.86"/>
+<text x="850.3" y="525.8" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.66</text>
+<text x="408.0" y="565.4" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">a_investor_allotted_accounts</text>
+<rect x="675.0" y="543.6" width="194.2" height="23.8" fill="#4C78A8" fill-opacity="0.86"/>
+<text x="875.2" y="565.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.76</text>
+<text x="408.0" y="605.1" font-family="Arial, sans-serif" font-size="10" text-anchor="end" font-weight="400" fill="#222">inquiry_oversubscription_ratio</text>
+<rect x="675.0" y="583.3" width="221.7" height="23.8" fill="#4C78A8" fill-opacity="0.86"/>
+<text x="902.7" y="605.1" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">0.87</text>
+<text x="490.0" y="664.0" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" font-weight="400" fill="#222">Spearman correlation with log offline oversubscription</text>
 </svg>

@@ -2,6 +2,7 @@
 证券代码,security_code
 证券简称,security_name
 首发上市日期,listing_date_raw
+上市日期,listing_date_raw
 "首发价格
 [单位] 元",offer_price_yuan
 "发行数量合计
@@ -61,3 +62,27 @@
 "网下投资者中签率
 [机构类别] A类投资者
 [单位] %",a_investor_lottery_rate_pct
+"初步询价申购总量
+[单位] 万股",inquiry_subscription_total_10k
+"初步询价询价对象家数
+[单位] 家",inquiry_investors_count
+"初步询价配售对象家数
+[单位] 户",inquiry_allotment_accounts
+"网下申购步长
+[单位] 万股",subscription_step_10k
+"网下申购数量上限
+[单位] 万股",subscription_upper_limit_10k
+"网下申购数量下限
+[单位] 万股",subscription_lower_limit_10k
+"网下申报价格加权平均数
+[机构类别] 网下全部投资者",quote_price_weighted_avg
+"网下申报价格中位数
+[机构类别] 网下全部投资者",quote_price_median
+初步询价截止日,inquiry_deadline_date_raw
+网下申购截止日期,subscription_deadline_date_raw
+"上市首日涨跌幅
+[单位] %",first_day_return_pct
+"发行价格上限
+[单位] 元↓",offer_price_upper_yuan
+"发行价格下限(底价)
+[单位] 元",offer_price_lower_yuan

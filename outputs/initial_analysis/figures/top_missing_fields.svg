@@ -1,58 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="980" height="620" viewBox="0 0 980 620">
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="680" viewBox="0 0 980 680">
 <rect width="100%" height="100%" fill="white"/>
-<text x="490.0" y="32.0" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" font-weight="700" fill="#222">Top Missing Fields</text>
-<line x1="360" y1="565" x2="930" y2="565" stroke="#333"/>
-<line x1="360.0" y1="60" x2="360.0" y2="565" stroke="#e6e6e6"/>
-<text x="360.0" y="587.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">0%</text>
-<line x1="502.5" y1="60" x2="502.5" y2="565" stroke="#e6e6e6"/>
-<text x="502.5" y="587.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">25%</text>
-<line x1="645.0" y1="60" x2="645.0" y2="565" stroke="#e6e6e6"/>
-<text x="645.0" y="587.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">50%</text>
-<line x1="787.5" y1="60" x2="787.5" y2="565" stroke="#e6e6e6"/>
-<text x="787.5" y="587.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">75%</text>
-<line x1="930.0" y1="60" x2="930.0" y2="565" stroke="#e6e6e6"/>
-<text x="930.0" y="587.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">100%</text>
-<text x="348.0" y="87.1" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_inquiry_investors</text>
-<rect x="360" y="67.2" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="87.1" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="123.1" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_allotment_accounts</text>
-<rect x="360" y="103.3" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="123.1" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="159.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_oversubscription_ratio_before_clawback</text>
-<rect x="360" y="139.4" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="159.2" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="195.3" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_oversubscription_ratio</text>
-<rect x="360" y="175.4" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="195.3" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="231.3" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_valid_quote_subscription_10k</text>
-<rect x="360" y="211.5" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="231.3" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="267.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_subscription_total_10k</text>
-<rect x="360" y="247.6" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="267.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="303.5" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_allotment_ratio_pct</text>
-<rect x="360" y="283.6" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="303.5" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="339.6" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">excluded_subscription_share_pct</text>
-<rect x="360" y="319.7" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="339.6" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="375.6" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">high_price_excluded_subscription_share_pct</text>
-<rect x="360" y="355.8" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="375.6" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="411.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_issue_final_10k</text>
-<rect x="360" y="391.9" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="411.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="447.8" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offline_issue_before_clawback_10k</text>
-<rect x="360" y="427.9" width="56.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="422.7" y="447.8" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">10.0%</text>
-<text x="348.0" y="483.8" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">strategic_allocation_share_pct</text>
-<rect x="360" y="464.0" width="193.9" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="559.9" y="483.8" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">34.0%</text>
-<text x="348.0" y="519.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">strategic_allocation_10k</text>
-<rect x="360" y="500.1" width="193.9" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="559.9" y="519.9" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">34.0%</text>
-<text x="348.0" y="556.0" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">other_issue_10k</text>
-<rect x="360" y="536.1" width="568.7" height="21.6" fill="#E45756" fill-opacity="0.82"/>
-<text x="934.7" y="556.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">99.8%</text>
-<text x="490.0" y="604.0" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" font-weight="400" fill="#222">missing rate</text>
+<text x="490.0" y="32.0" font-family="Arial, sans-serif" font-size="20" text-anchor="middle" font-weight="700" fill="#222">Top Missing Fields (v2)</text>
+<line x1="380" y1="625" x2="930" y2="625" stroke="#333"/>
+<line x1="380.0" y1="60" x2="380.0" y2="625" stroke="#e6e6e6"/>
+<text x="380.0" y="647.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">0%</text>
+<line x1="517.5" y1="60" x2="517.5" y2="625" stroke="#e6e6e6"/>
+<text x="517.5" y="647.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">25%</text>
+<line x1="655.0" y1="60" x2="655.0" y2="625" stroke="#e6e6e6"/>
+<text x="655.0" y="647.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">50%</text>
+<line x1="792.5" y1="60" x2="792.5" y2="625" stroke="#e6e6e6"/>
+<text x="792.5" y="647.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">75%</text>
+<line x1="930.0" y1="60" x2="930.0" y2="625" stroke="#e6e6e6"/>
+<text x="930.0" y="647.0" font-family="Arial, sans-serif" font-size="11" text-anchor="middle" font-weight="400" fill="#222">100%</text>
+<text x="368.0" y="86.5" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_lower_limit_10k</text>
+<rect x="380" y="67.1" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="86.5" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="121.8" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_upper_limit_10k</text>
+<rect x="380" y="102.4" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="121.8" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="157.1" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_step_10k</text>
+<rect x="380" y="137.7" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="157.1" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="192.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_allotment_accounts</text>
+<rect x="380" y="173.0" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="192.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="227.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_investors_count</text>
+<rect x="380" y="208.3" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="227.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="263.0" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_subscription_total_10k</text>
+<rect x="380" y="243.6" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="263.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="298.4" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">subscription_deadline_date</text>
+<rect x="380" y="278.9" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="298.4" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="333.7" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">inquiry_deadline_date</text>
+<rect x="380" y="314.2" width="171.7" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="557.7" y="333.7" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.2%</text>
+<text x="368.0" y="369.0" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_vs_offer</text>
+<rect x="380" y="349.6" width="175.1" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="561.1" y="369.0" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.8%</text>
+<text x="368.0" y="404.3" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_median</text>
+<rect x="380" y="384.9" width="175.1" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="561.1" y="404.3" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.8%</text>
+<text x="368.0" y="439.6" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">quote_price_weighted_avg</text>
+<rect x="380" y="420.2" width="175.1" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="561.1" y="439.6" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">31.8%</text>
+<text x="368.0" y="474.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">other_issue_10k</text>
+<rect x="380" y="455.5" width="549.0" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="935.0" y="474.9" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">99.8%</text>
+<text x="368.0" y="510.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offer_price_position_in_range</text>
+<rect x="380" y="490.8" width="550.0" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="936.0" y="510.2" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">100.0%</text>
+<text x="368.0" y="545.5" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offer_price_range_pct</text>
+<rect x="380" y="526.1" width="550.0" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="936.0" y="545.5" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">100.0%</text>
+<text x="368.0" y="580.9" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offer_price_lower_yuan</text>
+<rect x="380" y="561.4" width="550.0" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="936.0" y="580.9" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">100.0%</text>
+<text x="368.0" y="616.2" font-family="Arial, sans-serif" font-size="11" text-anchor="end" font-weight="400" fill="#222">offer_price_upper_yuan</text>
+<rect x="380" y="596.8" width="550.0" height="21.2" fill="#E45756" fill-opacity="0.82"/>
+<text x="936.0" y="616.2" font-family="Arial, sans-serif" font-size="11" text-anchor="start" font-weight="400" fill="#222">100.0%</text>
+<text x="490.0" y="664.0" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" font-weight="400" fill="#222">missing rate</text>
 </svg>
