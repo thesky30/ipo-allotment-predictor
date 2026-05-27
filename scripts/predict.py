@@ -33,10 +33,11 @@ Output
 
 Stages
 ------
-T6    : Before inquiry opens. Uses only prospectus-level data (申购决策期).
-T1    : After inquiry closes, before subscription opens. The DEMO model.
+T6    : Official production stage before inquiry opens.
+        Uses only prospectus / inquiry-announcement / historical-market data.
+T1    : Research-only stage after inquiry closes, before subscription opens.
         Uses inquiry results (询价结果) including oversubscription ratio.
-T1PLUS: After clawback announcement. Most accurate but requires post-sub data.
+T1PLUS: Research-only stage after clawback announcement; requires post-sub data.
 """
 
 from __future__ import annotations
@@ -79,7 +80,7 @@ STAGE_MODEL: dict[str, str] = {
     "T1":     "lgbm_t1",
     "T1PLUS": "lgbm_t1plus",
 }
-DEFAULT_STAGE = "T1"
+DEFAULT_STAGE = "T6"
 
 # Board → short code for board-specific model filenames
 BOARD_CODES: dict[str, str] = {
@@ -266,7 +267,7 @@ def predict_from_code(
     Parameters
     ----------
     code               : Security code, e.g. "688041" or "688041.SH"
-    stage              : "T1" (default, demo model) | "T6" | "T1PLUS"
+    stage              : "T6" (default, official pre-inquiry model) | "T1" | "T1PLUS"
     prefer_board_model : If True (default), use the board-specific model
                          for stage=T1 when available.  Set False to force
                          the global lgbm_t1.
@@ -391,7 +392,7 @@ def predict_from_dict(
                  inquiry_allotment_accounts, offer_price_yuan, issue_amount_100m_yuan,
                  total_issue_shares_10k, strategic_allocation_share_pct,
                  subscription_upper_limit_10k, recent_ipo_first_day_return_ma20
-    stage              : "T1" (default) | "T6" | "T1PLUS"
+    stage              : "T6" (default, official pre-inquiry model) | "T1" | "T1PLUS"
     prefer_board_model : Use board-specific model for T1 if available.
 
     Returns
@@ -634,7 +635,8 @@ def _build_parser() -> argparse.ArgumentParser:
 Examples:
   python predict.py --code 688041
   python predict.py --code 300257 --stage T6
-  python predict.py --features my_ipo.json --stage T1
+  python predict.py --features my_ipo.json --stage T6
+  python predict.py --features my_ipo.json --stage T1  # research only
   python predict.py --code 688041 --json        # output raw JSON
         """,
     )

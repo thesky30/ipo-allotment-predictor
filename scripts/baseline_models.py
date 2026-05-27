@@ -5,12 +5,12 @@ Timeline
 T-6  申购决策   Investor allocates capital before inquiry opens.
                 Only prospectus / inquiry-announcement fields available.
 T-1  回拨前预测  After inquiry closes; inquiry results published; subscription not yet open.
-                This is the DEMO MODEL stage (no offline subscription data).
+                Research-only stage; not valid for the confirmed production node.
 T+1  回拨后预测  After subscription closes; clawback ratio announced.
 
 Every feature is tagged with its information-release node (T-6 / T-1 / T+1).
 Model-1 (T-6)   : FEATS_T6 only.
-Model-2A (T-1)  : FEATS_T6 + FEATS_T1_DELTA  ← demo model.
+Model-2A (T-1)  : FEATS_T6 + FEATS_T1_DELTA  ← research comparison only.
 Model-2B (T+1)  : FEATS_T6 + FEATS_T1_DELTA + FEATS_T1PLUS_DELTA.
 
 OOS backtest: expanding window ordered by subscription_deadline_date.
@@ -162,7 +162,7 @@ CAT_COLS = ["board"]
 
 STAGE_LABEL = {
     "T6":     "模型一 (T-6)   申购决策期",
-    "T1":     "模型二-A (T-1) 回拨前 [演示模型]",
+    "T1":     "模型二-A (T-1) 回拨前 [研究对照]",
     "T1PLUS": "模型二-B (T+1) 回拨后",
 }
 
@@ -506,12 +506,12 @@ def make_report(
 
 | 时间节点 | 含义 | 可用信息 |
 |---|---|---|
-| T-6 | 申购决策期 | 招股书、询价公告（申购上下限/步长）、行业PE、历史热度 |
-| T-1 | 回拨前预测 | T-6全部 + 询价结果（申购总量、机构数、价格分布、最终发行价）|
-| T+1 | 回拨后预测 | T-1全部 + 回拨比例 |
+| T-6 | 询价前正式预测 | 招股书、询价公告（申购上下限/步长）、行业PE、历史热度 |
+| T-1 | 询价后研究对照 | T-6全部 + 询价结果（申购总量、机构数、价格分布、最终发行价）|
+| T+1 | 回拨后研究对照 | T-1全部 + 回拨比例 |
 | T+2 | 目标变量 | 网下超额认购倍数（禁止作为输入）|
 
-演示模型 = **T-1 LightGBM**（不使用任何网下申购数据）
+正式模型 = **T-6 LightGBM**（不使用任何询价结果、回拨、网下申购或配售数据）
 
 ## OOS 整体指标
 
@@ -520,13 +520,13 @@ def make_report(
 > 最佳模型：**{best['model']}** [{best['stage']}]
 > Spearman={_fmt(best['spearman'])} MAE={_fmt(best['mae'])}
 >
-> 演示模型（lgbm_t1）：Spearman={_fmt(demo_row.get('spearman', float('nan')))} MAE={_fmt(demo_row.get('mae', float('nan')))}
+> 正式询价前模型（lgbm_t6）：Spearman={_fmt(metrics_overall.loc[metrics_overall['model']=='lgbm_t6', 'spearman'].iloc[0])} MAE={_fmt(metrics_overall.loc[metrics_overall['model']=='lgbm_t6', 'mae'].iloc[0])}
 
 ## 分板块 OOS 指标
 
 {_md(metrics_board)}
 
-## T-6 vs T-1 vs T+1 信息增益
+## 询价前 vs 询价后/回拨后信息增益（研究对照）
 
 | 阶段跃升 | Spearman 提升 | 含义 |
 |---|---|---|

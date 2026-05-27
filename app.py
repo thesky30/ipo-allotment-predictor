@@ -26,6 +26,8 @@ from predict import (                       # noqa: E402
     DB_PATH,
 )
 
+OFFICIAL_STAGE = "T6"
+
 # ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="IPO网下中签率预测",
@@ -165,10 +167,11 @@ def show_result(res: dict) -> None:
                   delta=f"log误差 {res['prediction_error_log']:.3f}")
 
     # Interpretation hint
-    st.caption(
-        f"ℹ️ 网下中签率 = 1 ÷ 超额认购倍数  ·  "
-        f"T-1 演示模型仅使用询价结果，不含任何网下申购数据"
-    )
+    if stage == OFFICIAL_STAGE:
+        stage_note = "正式预测口径：询价开始前，不使用询价结果、回拨、申购或配售数据"
+    else:
+        stage_note = "研究对照口径：包含询价后信息，不作为领导确认后的正式预测口径"
+    st.caption(f"网下中签率 = 1 ÷ 超额认购倍数 · {stage_note}")
 
 
 def show_explanation(exp: dict) -> None:
@@ -250,9 +253,9 @@ def _looks_like_code(s: str) -> bool:
 
 # ── Stage info ────────────────────────────────────────────────────────────────
 STAGE_INFO = {
-    "T1":     "**T-1 演示模型**（推荐）— 询价完成后，申购开始前。使用询价结果。",
-    "T6":     "**T-6 早期模型** — 询价开始前。仅用招股书/行业PE等信息。精度较低。",
-    "T1PLUS": "**T+1 回拨后模型** — 申购完成、回拨比例公告后。精度最高。",
+    "T6":     "**询价前正式模型**（推荐）— 核心业务口径。仅使用询价开始前已可获得的信息。",
+    "T1":     "**询价后研究模型** — 使用询价结果，仅用于历史对照和信息增益分析。",
+    "T1PLUS": "**回拨后研究模型** — 使用回拨后信息，仅用于上界参考。",
 }
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
@@ -260,20 +263,20 @@ with st.sidebar:
     st.header("⚙️ 设置")
     stage = st.radio(
         "预测阶段",
-        options=["T1", "T6", "T1PLUS"],
+        options=["T6", "T1", "T1PLUS"],
         index=0,
-        format_func=lambda s: {"T1": "T-1 演示（推荐）",
-                               "T6": "T-6 早期",
-                               "T1PLUS": "T+1 回拨后"}[s],
+        format_func=lambda s: {"T6": "询价前正式（推荐）",
+                               "T1": "询价后研究",
+                               "T1PLUS": "回拨后研究"}[s],
     )
     st.markdown(STAGE_INFO[stage])
     st.divider()
-    st.caption("模型：LightGBM · 特征：询价结果+发行结构+市场热度\n\n"
-               "OOS Spearman（T-1）：全局 0.951\n科创板 0.984 · 创业板 0.979")
+    st.caption("正式模型：LightGBM · 特征：发行结构+申购规则+估值+历史市场热度\n\n"
+               "OOS Spearman（询价前 T-6）：全局 0.512")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 st.title("📊 A股IPO 网下中签率预测")
-st.caption("基于LightGBM三阶段模型 · 演示版本")
+st.caption("基于LightGBM询价前正式模型 · 询价后/回拨后模型仅作研究对照")
 
 tab_code, tab_manual, tab_recent = st.tabs(["股票代码查询", "手动输入特征", "近期IPO参考"])
 
@@ -324,48 +327,71 @@ with tab_code:
 # ── Tab 2: Manual feature input ────────────────────────────────────────────────
 with tab_manual:
     st.markdown("#### 手动输入新IPO特征")
-    st.caption("适用于尚未入库的新IPO。仅T-1演示模型需要询价结果字段。")
+    st.caption("适用于尚未入库的新IPO。正式预测只填写询价前可获得字段；询价结果和回拨字段不参与正式模型。")
 
     with st.form("manual_form"):
         c1, c2 = st.columns(2)
         board_sel = c1.selectbox("板块 *", ["科创板", "创业板", "主板", "北交所"])
-        offer_price = c2.number_input("最终发行价（元）", min_value=0.0, value=0.0, step=0.01)
+        total_shares = c2.number_input("发行总股数（万股）", min_value=0.0, value=0.0)
 
         c3, c4 = st.columns(2)
-        inq_total = c3.number_input("询价申购总量（万股）", min_value=0.0, value=0.0)
-        offline_before = c4.number_input("回拨前网下发行量（万股）", min_value=0.0, value=0.0)
+        offline_before = c3.number_input("网下发行量（回拨前，万股）", min_value=0.0, value=0.0)
+        online_before = c4.number_input("网上发行量（回拨前，万股）", min_value=0.0, value=0.0)
 
         c5, c6 = st.columns(2)
-        investors = c5.number_input("参与询价投资者数（家）", min_value=0, value=0, step=1)
-        allot_accts = c6.number_input("配售对象数（个）", min_value=0, value=0, step=1)
+        sub_upper = c5.number_input("网下申购上限（万股）", min_value=0.0, value=0.0)
+        sub_lower = c6.number_input("网下申购下限（万股）", min_value=0.0, value=0.0)
 
         c7, c8 = st.columns(2)
-        issue_amt = c7.number_input("募集资金总额（亿元）", min_value=0.0, value=0.0, step=0.1)
-        total_shares = c8.number_input("发行总股数（万股）", min_value=0.0, value=0.0)
+        sub_step = c7.number_input("网下申购步长（万股）", min_value=0.0, value=0.0)
+        strategic_pct = c8.number_input("战略配售占比（%）", min_value=0.0, value=0.0, step=0.1)
 
         c9, c10 = st.columns(2)
-        mkt_heat = c9.number_input("近20只同板块IPO首日涨幅均值（%）", value=0.0, step=0.1,
-                                    help="recent_ipo_first_day_return_ma20；留0则模型自行推算")
-        quote_avg = c10.number_input("询价加权均价（元，可选）", min_value=0.0, value=0.0, step=0.01)
+        industry_pe = c9.number_input("发行时行业市盈率", min_value=0.0, value=0.0, step=0.1)
+        mkt_heat = c10.number_input("近20只IPO首日涨幅均值（%）", value=0.0, step=0.1,
+                                    help="recent_ipo_first_day_return_ma20；留0则模型按缺失值处理")
+
+        research_raw: dict = {}
+        if stage != OFFICIAL_STAGE:
+            st.markdown("##### 研究模型附加字段")
+            r1, r2 = st.columns(2)
+            offer_price = r1.number_input("最终发行价（元）", min_value=0.0, value=0.0, step=0.01)
+            inq_total = r2.number_input("询价申购总量（万股）", min_value=0.0, value=0.0)
+            r3, r4 = st.columns(2)
+            investors = r3.number_input("参与询价投资者数（家）", min_value=0, value=0, step=1)
+            allot_accts = r4.number_input("询价配售对象数（个）", min_value=0, value=0, step=1)
+            r5, r6 = st.columns(2)
+            issue_amt = r5.number_input("募集资金总额（亿元）", min_value=0.0, value=0.0, step=0.1)
+            quote_avg = r6.number_input("询价加权均价（元）", min_value=0.0, value=0.0, step=0.01)
+            research_raw = {
+                "offer_price_yuan": offer_price or None,
+                "inquiry_subscription_total_10k": inq_total or None,
+                "inquiry_investors_count": investors or None,
+                "inquiry_allotment_accounts": allot_accts or None,
+                "issue_amount_100m_yuan": issue_amt or None,
+                "quote_price_weighted_avg": quote_avg or None,
+            }
 
         submitted = st.form_submit_button("预测", type="primary")
 
     if submitted:
         raw: dict = {
             "board":                          board_sel,
-            "offer_price_yuan":               offer_price or None,
-            "inquiry_subscription_total_10k": inq_total or None,
             "offline_issue_before_clawback_10k": offline_before or None,
-            "inquiry_investors_count":        investors or None,
-            "inquiry_allotment_accounts":     allot_accts or None,
-            "issue_amount_100m_yuan":         issue_amt or None,
+            "online_issue_before_clawback_10k": online_before or None,
+            "subscription_upper_limit_10k":   sub_upper or None,
+            "subscription_lower_limit_10k":   sub_lower or None,
+            "subscription_step_10k":          sub_step or None,
+            "strategic_allocation_share_pct": strategic_pct or None,
+            "industry_pe_at_ipo":             industry_pe or None,
             "total_issue_shares_10k":         total_shares or None,
             "recent_ipo_first_day_return_ma20": mkt_heat if mkt_heat != 0.0 else None,
-            "quote_price_weighted_avg":       quote_avg or None,
         }
+        raw.update(research_raw)
         # Remove None values; compute derived features
         raw = {k: v for k, v in raw.items() if v is not None}
-        raw = compute_t1_features(raw)
+        if stage != OFFICIAL_STAGE:
+            raw = compute_t1_features(raw)
 
         with st.spinner("预测中…"):
             try:
