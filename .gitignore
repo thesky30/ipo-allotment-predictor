@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor / tooling
+.claude/
+.vscode/
+.idea/
+.DS_Store
+
+# OS
+Thumbs.db
+
+# Local secrets / environment
+.env
+.env.*
+!.env.example
+
+# Raw/private data exports
+data/raw/
+data/external/
+*.xlsx
+*.xls
+
+# Temporary inspection outputs
+outputs/peek_*.json
+
+# Generated presentation/html bundles
+reveal/
+*_slides.html
+*.html
+
+# Runtime artifacts
+*.log

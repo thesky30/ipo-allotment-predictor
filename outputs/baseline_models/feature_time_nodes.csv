@@ -15,6 +15,10 @@ offer_price_range_pct,T-6,派生（科创板）,发行定价,True,True,True,Fals
 comparable_pe_avg_ex_nonrecurring,T-6,招股书,估值,True,True,True,False
 industry_pe_at_ipo,T-6,市场数据,估值,True,True,True,False
 recent_ipo_first_day_return_ma20,T-6,历史IPO数据派生（滚动）,市场热度,True,True,True,False
+market_turnover_ma20,T-6,Tushare 沪深成交额派生（滚动）,市场流动性,True,True,True,False
+market_return_ma20,T-6,Tushare 沪深300派生（滚动）,市场情绪,True,True,True,False
+concurrent_ipo_count,T-6,申购日历派生,批次竞争,True,True,True,False
+same_board_break_rate_ma10,T-6,历史IPO首日涨幅派生（滚动）,市场热度,True,True,True,False
 offer_price_yuan,T-1,定价公告,发行定价,False,True,True,False
 ipo_pe_diluted,T-1,基于最终发行价,估值,False,True,True,False
 issue_pb,T-1,基于最终发行价,估值,False,True,True,False

@@ -252,12 +252,15 @@ Spearman 排名相关
 
 ## 当前待办
 
-- [ ] 确认 Wind 数据导出字段和文件格式。
-- [ ] 建立字段字典。
-- [ ] 建立注册制后样本筛选规则。
-- [ ] 完成主板、创业板、科创板、北交所样本切分。
-- [ ] 完成第一版 EDA。
-- [ ] 构造 `log(网下超额认购倍数)` 标签。
+- [x] 确认 Wind 数据导出字段和文件格式。
+- [x] 建立字段字典。
+- [x] 建立注册制后样本筛选规则。
+- [x] 完成主板、创业板、科创板、北交所样本切分。
+- [x] 完成第一版 EDA。
+- [x] 构造 `log(网下超额认购倍数)` 标签。
+- [x] 建立三阶段（T-6 / T-1 / T+1）预测模型与时间序列回测。
+- [x] 比较统一模型与板块专属模型。
+- [x] 部署 Streamlit 网页演示。
 
 ## 2026-05-21 初步 EDA 记录
 
@@ -316,6 +319,160 @@ outputs/initial_analysis/figures/top_pre_subscription_correlations.svg
 - [ ] 搭建时间序列回测框架。
 - [ ] 比较统一模型、板块模型和板块校准模型。
 - [ ] 设计网页预测工具原型。
+
+## 2026-05-22 开发进展：三阶段模型 + 网页演示已上线
+
+第一轮端到端流程（取数 → 分析 → 建模 → 回测 → 部署）已全部跑通。
+
+### 三阶段时点框架
+
+为彻底杜绝未来数据泄露，所有特征按“信息释放时点”打标签，并据此构造三个模型：
+
+| 阶段 | 时点 | 可用信息 | 用途 |
+| --- | --- | --- | --- |
+| T-6 | 申购决策期 | 招股书、询价公告、行业 PE、历史市场热度、市场流动性/情绪、批次竞争 | 早期参考 |
+| **T-1** | **回拨前（演示模型）** | T-6 全部 + 询价结果（询价超额认购倍数、机构家数、报价分布、最终发行价） | **主力演示模型** |
+| T+1 | 回拨后 | T-1 全部 + 回拨比例 | 事后校验 / 上界参考 |
+| T+2 | — | 网下超额认购倍数（目标变量） | 永不作为输入 |
+
+演示模型为 **T-1 LightGBM**，全程不使用任何网下申购、配售、上市后数据。
+
+### 回测结果（扩张窗口 OOS，按申购截止日排序）
+
+| 模型 | 阶段 | n | MAE | R² | Spearman |
+| --- | --- | --- | --- | --- | --- |
+| board_mean_t6 | T-6 | 624 | 0.370 | 0.529 | 0.270 |
+| lgbm_t6 | T-6 | 624 | 0.348 | 0.612 | 0.512 |
+| ridge_t1 | T-1 | 624 | 0.309 | 0.125 | 0.736 |
+| **lgbm_t1（演示）** | **T-1** | 624 | **0.115** | **0.903** | **0.953** |
+| lgbm_t1plus | T+1 | 624 | 0.108 | 0.918 | 0.970 |
+
+- 演示模型逐年 OOS Spearman：2022=0.984 / 2023=0.894 / 2024=0.941 / 2025=0.975 / 2026=0.985。
+- 分板块 OOS Spearman（T-1）：科创板 0.986、创业板 0.979、北交所 0.886（n=6）、主板 0.640。
+- 板块专属模型未优于统一模型（主板 -0.23、创业板 -0.02、科创板 +0.001），统一模型 + 板块特征 + 跨板块学习为当前最优方案。
+- 已补充 4 个 T-6 市场环境特征（见下）。`market_turnover_ma20`（沪深两市近 20 日日均成交额）在 lgbm_t6 中重要性排名第 2；T-6 整体 Spearman 0.488→0.512、演示模型 0.951→0.953、T+1 0.967→0.970，均小幅提升。
+
+### 运行方式
+
+```bash
+# 0.（可选，一次性）市场流动性/情绪特征数据
+#    从 Wind 导出万得全A(881001.WI) 日成交额 amt + 涨跌幅 pct_chg，转换为 market_daily.csv
+python scripts/convert_wind_market.py --in "D:/wind导出数据/全A成交额及涨跌幅数据.xlsx"
+
+# 1. 数据清洗与 EDA（生成 SQLite 与分析产出）
+python scripts/initial_data_analysis.py
+
+# 2. 三阶段建模 + 回测 + 保存模型
+python scripts/baseline_models.py
+
+# 3. 板块专项模型对比（可选）
+python scripts/board_models.py
+
+# 4. 命令行预测
+python scripts/predict.py --code 688041 --stage T1
+
+# 5. 启动网页演示
+streamlit run app.py
+```
+
+### 代码与产出物
+
+```text
+scripts/convert_wind_market.py     Wind 市场日度导出 → market_daily.csv（市场流动性特征）
+scripts/initial_data_analysis.py   数据清洗 + EDA
+scripts/baseline_models.py         三阶段建模 + 时间序列回测
+scripts/board_models.py            板块专项模型对比
+scripts/predict.py                 模型加载与预测（CLI / API / 板块路由）
+app.py                             Streamlit 网页演示
+data/processed/ipo_offline.db      清洗后 SQLite（回测/查询层）
+outputs/initial_analysis/          EDA 报告、字段字典、相关性、缺失率
+outputs/baseline_models/           回测指标、特征重要性、序列化模型、报告
+outputs/board_models/              板块对比指标与报告
+项目汇报_新股网下中签率预测.md      面向领导的汇报文档
+需要完善的部分.md                  后续开发 backlog（待完善增强项）
+```
+
+> 后续待完善项（市场流动性特征、SHAP 解释、增量数据入库、按股票名称预测）详见 `需要完善的部分.md`。
+
+### 已知限制
+
+- 主板询价字段已基本补齐，但有标签样本仅约 105 条，受小样本上限制约 OOS 偏弱（约 0.64），进一步提升空间有限，暂不作为优先项。
+- 北交所有标签样本仅 41 条且受机制限制难再扩充，暂与其他板块合并训练、单独评估，未独立建模。
+- 网页对“已入库历史股票”的查询为样本内结果（偏乐观）；真实无泄漏成绩见回测产出 `outputs/baseline_models/predictions.csv`。
+
+## GitHub 协作与部署
+
+### 仓库内容边界
+
+建议提交到 GitHub 的核心内容：
+
+- `app.py`：Streamlit 网页演示入口。
+- `scripts/`：数据清洗、市场数据转换、建模、回测、预测 API/CLI。
+- `data/processed/`：可直接复现 demo 的轻量处理后数据。
+- `outputs/initial_analysis/`：字段字典、EDA 报告和关键图表。
+- `outputs/baseline_models/`：三阶段模型、回测指标、特征重要性和预测明细。
+- `outputs/board_models/`：板块模型对比产出。
+- `README.md`、`AGENTS.md`、`需要完善的部分.md`：项目说明、协作规则和 backlog。
+- `requirements.txt`：Python 依赖。
+
+不建议提交：
+
+- Wind/Tushare 原始导出 Excel、个人下载路径和未脱敏数据。
+- `.venv/`、`__pycache__/`、`.claude/`、编辑器配置和本地日志。
+- `outputs/peek_*.json` 等临时探查文件。
+- `reveal/`、`*_slides.html`、一次性 HTML 构建产物。
+
+### 新机器启动
+
+```bash
+git clone <你的GitHub仓库地址>
+cd <仓库目录>
+
+python -m venv .venv
+.venv/Scripts/activate  # Windows
+pip install -r requirements.txt
+
+streamlit run app.py
+```
+
+命令行预测：
+
+```bash
+python scripts/predict.py --code 688041 --stage T1
+```
+
+重新生成数据和模型：
+
+```bash
+python scripts/initial_data_analysis.py
+python scripts/baseline_models.py
+python scripts/board_models.py
+```
+
+### 推送到 GitHub
+
+第一次推送时：
+
+```bash
+git add .gitignore .gitattributes README.md AGENTS.md requirements.txt app.py scripts data/README.md data/processed outputs/README.md outputs/initial_analysis outputs/baseline_models outputs/board_models 需要完善的部分.md
+git commit -m "Prepare IPO predictor repo for collaboration"
+git branch -M main
+git remote add origin <你的GitHub仓库地址>
+git push -u origin main
+```
+
+后续协作：
+
+```bash
+git pull --rebase
+git checkout -b codex/<任务名>
+# 修改代码、数据或报告
+git add <相关文件>
+git commit -m "<简短说明>"
+git push -u origin codex/<任务名>
+```
+
+重要规则：任何新增字段、特征、模型或回测规则，都要同步更新 `README.md` / `AGENTS.md`，并说明是否属于预测前可用变量，避免未来数据泄露。
 
 ## 文档维护规则
 

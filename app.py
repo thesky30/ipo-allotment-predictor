@@ -20,6 +20,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from predict import (                       # noqa: E402
     predict_from_code,
     predict_from_dict,
+    resolve_code_by_name,
+    explain_prediction,
     compute_t1_features,
     DB_PATH,
 )
@@ -97,6 +99,22 @@ def _load_recent(n: int = 30) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+@st.cache_data(show_spinner=False)
+def _fetch_row(code: str) -> pd.DataFrame:
+    """Fetch a full DB row by security code (for SHAP explanation)."""
+    import sqlite3
+    code_bare = code.split(".")[0]
+    try:
+        with sqlite3.connect(str(DB_PATH)) as conn:
+            return pd.read_sql(
+                "SELECT * FROM ipo_offline_sample "
+                "WHERE security_code = ? OR security_code LIKE ? LIMIT 1",
+                conn, params=(code, code_bare + ".%"),
+            )
+    except Exception:
+        return pd.DataFrame()
+
+
 # ── Result display ────────────────────────────────────────────────────────────
 def _conf_html(conf: str) -> str:
     cls = {"high": "conf-high", "medium": "conf-medium", "low": "conf-low"}.get(conf, "")
@@ -153,6 +171,83 @@ def show_result(res: dict) -> None:
     )
 
 
+def show_explanation(exp: dict) -> None:
+    """Render a SHAP contribution waterfall as Chinese-safe HTML bars."""
+    contribs = exp.get("contributions", [])
+    if not contribs:
+        return
+    max_abs = max((abs(c["shap"]) for c in contribs), default=1.0) or 1.0
+    base = exp["base_value"]
+    pred = exp["predicted"]
+    over = float(np.exp(pred))
+
+    rows = []
+    for c in contribs:
+        s   = c["shap"]
+        pct = abs(s) / max_abs * 100.0
+        color = "#d9534f" if s >= 0 else "#3b82c4"   # red = pushes up, blue = pushes down
+        sign  = "+" if s >= 0 else "−"
+        val   = c["value"]
+        if val is None:
+            val_s = ""
+        elif isinstance(val, float):
+            val_s = f"（{val:,.3g}）"
+        else:
+            val_s = f"（{val}）"
+        rows.append(
+            f'<div style="display:flex;align-items:center;margin:3px 0;font-size:0.85rem;">'
+            f'<div style="width:48%;text-align:right;padding-right:8px;color:#333;">'
+            f'{c["label"]}<span style="color:#aaa;">{val_s}</span></div>'
+            f'<div style="width:10%;text-align:right;padding-right:6px;color:{color};'
+            f'font-weight:600;">{sign}{abs(s):.2f}</div>'
+            f'<div style="width:42%;"><div style="height:13px;width:{pct:.0f}%;'
+            f'background:{color};border-radius:3px;opacity:0.85;"></div></div>'
+            f'</div>'
+        )
+
+    html = (
+        f'<div style="margin:0.2em 0 0.6em;color:#555;font-size:0.85rem;">'
+        f'基准值（训练均值, log）= {base:.2f}　→　预测值（log）= {pred:.2f}'
+        f'（超额认购 {over:,.0f}×）</div>'
+        + "".join(rows)
+        + '<div style="margin-top:8px;color:#999;font-size:0.78rem;">'
+          '🔴 正贡献＝推高超额认购倍数（即压低中签率）　·　🔵 负贡献＝相反</div>'
+    )
+    st.markdown(html, unsafe_allow_html=True)
+
+
+def _try_explain(explain_input, stage: str) -> None:
+    """Best-effort SHAP explanation block; never breaks the main result."""
+    try:
+        exp = explain_prediction(explain_input, stage=stage)
+        with st.expander("📊 预测解释：各特征贡献（SHAP）", expanded=True):
+            show_explanation(exp)
+    except Exception as e:
+        st.caption(f"（解释暂不可用：{e}）")
+
+
+def run_and_show(code: str, stage: str) -> None:
+    """Predict by code and render, with consistent error handling."""
+    with st.spinner("预测中…"):
+        try:
+            res = predict_from_code(code, stage=stage, prefer_board_model=False)
+            show_result(res)
+            row = _fetch_row(res["security_code"])
+            if not row.empty:
+                _try_explain(row, stage)
+        except ValueError as e:
+            st.error(str(e))
+        except FileNotFoundError as e:
+            st.error(f"模型文件未找到：{e}")
+        except Exception as e:
+            st.error(f"预测出错：{e}")
+
+
+def _looks_like_code(s: str) -> bool:
+    """True if input is a numeric code (optionally with exchange suffix)."""
+    return s.strip().split(".")[0].isdigit()
+
+
 # ── Stage info ────────────────────────────────────────────────────────────────
 STAGE_INFO = {
     "T1":     "**T-1 演示模型**（推荐）— 询价完成后，申购开始前。使用询价结果。",
@@ -182,39 +277,49 @@ st.caption("基于LightGBM三阶段模型 · 演示版本")
 
 tab_code, tab_manual, tab_recent = st.tabs(["股票代码查询", "手动输入特征", "近期IPO参考"])
 
-# ── Tab 1: Code lookup ────────────────────────────────────────────────────────
+# ── Tab 1: Code / name lookup ──────────────────────────────────────────────────
 with tab_code:
-    st.markdown("#### 输入股票代码")
-    st.caption("支持6位代码（688XXX / 300XXX / 00XXXX / 8XXXXX）或带后缀（688041.SH）")
+    st.markdown("#### 输入股票代码或名称")
+    st.caption("支持6位代码（688XXX / 300XXX / 00XXXX / 8XXXXX）、带后缀（688041.SH），"
+               "或股票名称（如 禾迈股份）")
 
     col_inp, col_btn = st.columns([4, 1])
     with col_inp:
-        code_input = st.text_input(
-            "股票代码",
-            placeholder="例：688041  或  300257",
+        query_input = st.text_input(
+            "股票代码或名称",
+            placeholder="例：688041  /  300257  /  禾迈股份",
             label_visibility="collapsed",
         )
     with col_btn:
         predict_btn = st.button("预测", type="primary", use_container_width=True)
 
     if predict_btn:
-        if not code_input.strip():
-            st.warning("请输入股票代码")
+        q = query_input.strip()
+        st.session_state.pop("name_candidates", None)
+        if not q:
+            st.warning("请输入股票代码或名称")
+        elif _looks_like_code(q):
+            run_and_show(q, stage)
         else:
-            with st.spinner("预测中…"):
-                try:
-                    res = predict_from_code(
-                        code_input.strip(),
-                        stage=stage,
-                        prefer_board_model=False,
-                    )
-                    show_result(res)
-                except ValueError as e:
-                    st.error(str(e))
-                except FileNotFoundError as e:
-                    st.error(f"模型文件未找到：{e}")
-                except Exception as e:
-                    st.error(f"预测出错：{e}")
+            cands = resolve_code_by_name(q)
+            if not cands:
+                st.error(f"未找到名称包含“{q}”的股票。新股请使用“手动输入特征”。")
+            elif len(cands) == 1:
+                run_and_show(cands[0]["security_code"], stage)
+            else:
+                st.session_state["name_candidates"] = cands
+
+    # Disambiguation: multiple name matches pending
+    cands = st.session_state.get("name_candidates")
+    if cands:
+        st.info(f"找到 {len(cands)} 只名称匹配的股票，请选择后预测：")
+        labels = [f'{c["security_name"]}　{c["security_code"]}　{c["board"]}' for c in cands]
+        sel = st.selectbox(
+            "选择股票", options=list(range(len(cands))),
+            format_func=lambda i: labels[i],
+        )
+        if st.button("确认预测", type="primary", key="confirm_name"):
+            run_and_show(cands[sel]["security_code"], stage)
 
 # ── Tab 2: Manual feature input ────────────────────────────────────────────────
 with tab_manual:
@@ -266,6 +371,7 @@ with tab_manual:
             try:
                 res = predict_from_dict(raw, stage=stage, prefer_board_model=False)
                 show_result(res)
+                _try_explain(raw, stage)
             except Exception as e:
                 st.error(f"预测出错：{e}")
 
@@ -285,13 +391,14 @@ with tab_recent:
             "offline_allotment_ratio_pct":    "网下中签率(%)",
         })
         df_ref["网下中签率(%)"] = pd.to_numeric(df_ref["网下中签率(%)"], errors="coerce")
-        df_ref["网下超额认购倍数"] = pd.to_numeric(df_ref["网下超额认购倍数"], errors="coerce")
+        df_ref["网下超额认购倍数"] = pd.to_numeric(df_ref["网下超额认购倍数"], errors="coerce").round(0)
         st.dataframe(
-            df_ref.style.format({
-                "网下超额认购倍数": "{:,.0f}",
-                "网下中签率(%)":   "{:.4f}",
-            }),
+            df_ref,
             use_container_width=True,
             hide_index=True,
+            column_config={
+                "网下超额认购倍数": st.column_config.NumberColumn(format="localized"),
+                "网下中签率(%)":   st.column_config.NumberColumn(format="%.4f"),
+            },
         )
         st.caption(f"共 {len(df_ref)} 条记录 · 按上市日期降序排列")

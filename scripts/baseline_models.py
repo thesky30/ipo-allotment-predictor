@@ -95,6 +95,10 @@ FEATURE_NODES: dict[str, dict] = {
     "comparable_pe_avg_ex_nonrecurring":    {"node": "T-6", "src": "招股书",               "cat": "估值"},
     "industry_pe_at_ipo":                   {"node": "T-6", "src": "市场数据",              "cat": "估值"},
     "recent_ipo_first_day_return_ma20":     {"node": "T-6", "src": "历史IPO数据派生（滚动）","cat": "市场热度"},
+    "market_turnover_ma20":                 {"node": "T-6", "src": "Tushare 沪深成交额派生（滚动）","cat": "市场流动性"},
+    "market_return_ma20":                   {"node": "T-6", "src": "Tushare 沪深300派生（滚动）",  "cat": "市场情绪"},
+    "concurrent_ipo_count":                 {"node": "T-6", "src": "申购日历派生",              "cat": "批次竞争"},
+    "same_board_break_rate_ma10":           {"node": "T-6", "src": "历史IPO首日涨幅派生（滚动）","cat": "市场热度"},
 
     # ── T-1 : inquiry-result announcement (after inquiry, before subscription) ─
     "offer_price_yuan":                     {"node": "T-1", "src": "定价公告",              "cat": "发行定价"},

@@ -166,15 +166,66 @@ y = log(网下超额认购倍数)
 - 回测结果应保存为结构化文件，便于后续生成图表和报告。
 - 网页部署前应固定一个可复现实验版本，记录模型文件、特征列表和训练样本范围。
 
-## 待办
+## 当前开发进展（截至 2026-05-22）
 
-- [ ] 明确 Wind 字段导出方式和原始数据文件格式。
-- [ ] 建立字段字典和字段分层表。
-- [ ] 确定注册制样本过滤规则。
-- [ ] 完成板块划分逻辑。
-- [ ] 完成第一版数据质量分析。
-- [ ] 建立基准模型。
-- [ ] 建立树模型和特征重要性分析。
-- [ ] 建立时间序列回测框架。
-- [ ] 比较统一模型、板块模型和校准模型。
-- [ ] 设计网页输入输出交互。
+整体五步路线已全部跑通一轮，从取数到网页演示均已落地，进入“可演示 + 可迭代”阶段。
+
+### 已完成
+
+- [x] 明确 Wind 字段导出方式和原始数据文件格式（4 份网下打新 Excel + 3 份询价补充）。
+- [x] 建立字段字典和字段分层表（`outputs/initial_analysis/field_dictionary.csv`、`outputs/baseline_models/feature_time_nodes.csv`）。
+- [x] 确定注册制样本过滤规则并完成板块划分（主板 2023+、创业板 2020+、科创板全量、北交所单列）。
+- [x] 完成第一版数据质量分析（`scripts/initial_data_analysis.py` → `outputs/initial_analysis/`）。
+- [x] 建立基准模型（板块均值 `board_mean_t6`）。
+- [x] 建立树模型与特征重要性分析（LightGBM 三阶段 + Ridge 对照）。
+- [x] 建立时间序列回测框架（扩张窗口，按申购截止日排序，切分点 2022/2023/2024/2025）。
+- [x] 比较统一模型与板块专属模型（`scripts/board_models.py`，结论：统一模型≥板块专属）。
+- [x] 设计并实现网页输入输出交互（`app.py`，Streamlit，三种输入方式 + 三阶段切换）。
+
+### 核心架构：三阶段时点框架
+
+所有特征按信息释放时点打标签（`FEATURE_NODES`，见 `scripts/baseline_models.py`），严格隔离未来数据：
+
+| 阶段 | 时点 | 可用信息 | 模型 |
+|---|---|---|---|
+| T-6 | 申购决策期 | 招股书 / 询价公告 / 行业 PE / 历史热度 | `lgbm_t6`、`board_mean_t6` |
+| **T-1** | **回拨前（演示模型）** | T-6 全部 + 询价结果（询价超额认购、机构数、价格分布、最终发行价） | **`lgbm_t1`** |
+| T+1 | 回拨后 | T-1 全部 + 回拨比例 | `lgbm_t1plus` |
+| T+2 | 目标变量 | 网下超额认购倍数 | 永不作为输入 |
+
+演示模型固定为 **T-1 LightGBM**，不使用任何网下申购/配售/上市后数据。
+
+### 关键结论（供后续 Agent 参考，避免重复踩坑）
+
+- 询价结果是预测价值的主要来源：OOS Spearman 从 T-6 的 0.49 跃升到 T-1 的 0.95。
+- LightGBM 显著优于 Ridge（T-1 OOS Spearman 0.95 vs 0.74），关系高度非线性。
+- 统一模型（含 board 特征 + 跨板块学习）≥ 板块专属模型；主板因样本少（约 105）单独建模反而更差，**不要默认分板块就更好**。
+- `recent_ipo_first_day_return_ma20` 已按“过去 20 只已上市 IPO 首日涨幅”滚动计算，向后看、无泄漏。
+- 已补充 4 个 T-6 市场环境特征（2026-05-25）：`market_turnover_ma20`（沪深两市/全A 近20日日均成交额，来源 Wind 万得全A，经 `scripts/convert_wind_market.py` 转换）、`market_return_ma20`（近20日涨跌幅）、`concurrent_ipo_count`（申购截止日 ±7 天批次竞争）、`same_board_break_rate_ma10`（同板块已上市近10只破发率）。全部严格向后看；`market_turnover_ma20` 在 lgbm_t6 中重要性排名第 2。OOS：T-6 0.488→0.512、T-1 演示 0.951→0.953、T+1 0.967→0.970。市场两列对 T-6 的增益有时间区制敏感性，整体净正向。
+- 保存的全量模型对“已入库历史股票”的逐股查询属样本内（偏乐观）；某只股票的真实无泄漏成绩须查 `outputs/baseline_models/predictions.csv`（回测产出）。
+
+### 代码与产出物地图
+
+```text
+scripts/convert_wind_market.py     Wind 市场日度导出 → data/processed/market_daily.csv
+scripts/fetch_market_data.py       （备用）Tushare 拉成交额/指数 → data/processed/market_daily.csv
+scripts/initial_data_analysis.py   数据清洗 + EDA  → data/processed/ + outputs/initial_analysis/
+scripts/baseline_models.py         三阶段建模 + 回测 → outputs/baseline_models/
+scripts/board_models.py            板块专项模型对比 → outputs/board_models/
+scripts/model_classes.py           可被 joblib 反序列化的模型类（稳定 pickle 路径）
+scripts/predict.py                 加载模型预测（CLI + Python API + 板块路由）
+app.py                             Streamlit 网页演示
+data/processed/ipo_offline.db      清洗后 SQLite（回测/查询中间层）
+outputs/*/models/*.joblib          序列化模型 + 特征列表
+```
+
+### 后续待办
+
+> 详细的待完善增强项（市场流动性特征、SHAP 解释、增量数据入库、按名称预测）见 `需要完善的部分.md`。
+
+- [~] 主板/北交所精度优化：数据已基本齐全，受样本量（主板约 105、北交所有标签 41）与板块机制限制，进一步提升空间有限，暂缓、不作为优先项。
+- [ ] 增加策略层评估：按预测中签率排序的申购优先级、分档命中率、模拟收益。
+- [ ] 在网页中加入历史相似新股检索与影响因素解释区。
+- [ ] 形成 Word 课题报告与 PPT 答辩稿（汇报文档已在 `项目汇报_新股网下中签率预测.md`）。
+- [ ] 录制产品 demo（`streamlit run app.py` 后录屏，覆盖按名称查询/手动输入/三阶段切换，产出 demo.mp4 + 关键截图）。
+- [ ] 升级 Anaconda 环境 jinja2（≥3.1.2）或继续使用 `column_config` 规避 Styler 依赖。

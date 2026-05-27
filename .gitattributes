@@ -1,0 +1,9 @@
+* text=auto
+
+*.py text eol=lf
+*.md text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.svg text eol=lf
+*.joblib binary
+*.db binary

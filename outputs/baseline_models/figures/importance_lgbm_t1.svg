@@ -2,40 +2,40 @@
 <rect width="100%" height="100%" fill="white"/>
 <text x="430" y="30" font-family="Arial,sans-serif" font-size="17" text-anchor="middle" font-weight="700" fill="#222">Feature Importance — lgbm_t1</text>
 <text x="430" y="50" font-family="Arial,sans-serif" font-size="11" text-anchor="middle" fill="#666">gain; colour = information node</text>
-<text x="312" y="79" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__total_issue_shares_10k</text>
+<text x="312" y="79" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">cat__board_北交所</text>
 <rect x="320" y="62" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
-<text x="312" y="104" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__online_issue_before_clawback_10k</text>
+<text x="312" y="104" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__offline_issue_before_clawback_10k</text>
 <rect x="320" y="88" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
 <text x="312" y="129" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__recent_ipo_first_day_return_ma20</text>
 <rect x="320" y="112" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
-<text x="312" y="154" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__quote_price_vs_offer</text>
-<rect x="320" y="138" width="2" height="20" fill="#54A24B" fill-opacity="0.85"/>
-<text x="312" y="179" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__offline_issue_before_clawback_10k</text>
+<text x="312" y="154" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__subscription_upper_limit_10k</text>
+<rect x="320" y="138" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
+<text x="312" y="179" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__market_turnover_ma20</text>
 <rect x="320" y="162" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
 <text x="312" y="204" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">cat__board_创业板</text>
 <rect x="320" y="188" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
-<text x="312" y="229" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__subscription_upper_limit_10k</text>
+<text x="312" y="229" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__offline_issue_before_share_pct</text>
 <rect x="320" y="212" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
-<text x="312" y="254" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__high_price_excluded_subscription_share_pct</text>
+<text x="312" y="254" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__quote_price_vs_offer</text>
 <rect x="320" y="238" width="2" height="20" fill="#54A24B" fill-opacity="0.85"/>
-<text x="312" y="279" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__offline_issue_before_share_pct</text>
-<rect x="320" y="262" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
+<text x="312" y="279" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__high_price_excluded_subscription_share_pct</text>
+<rect x="320" y="262" width="2" height="20" fill="#54A24B" fill-opacity="0.85"/>
 <text x="312" y="304" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">cat__board_科创板</text>
 <rect x="320" y="288" width="2" height="20" fill="#4C78A8" fill-opacity="0.85"/>
 <text x="312" y="329" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__inquiry_subscription_total_10k</text>
-<rect x="320" y="312" width="4" height="20" fill="#54A24B" fill-opacity="0.85"/>
+<rect x="320" y="312" width="2" height="20" fill="#54A24B" fill-opacity="0.85"/>
 <text x="312" y="354" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">cat__board_主板</text>
-<rect x="320" y="338" width="5" height="20" fill="#4C78A8" fill-opacity="0.85"/>
+<rect x="320" y="338" width="3" height="20" fill="#4C78A8" fill-opacity="0.85"/>
 <text x="312" y="379" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__subscription_step_10k</text>
-<rect x="320" y="362" width="6" height="20" fill="#4C78A8" fill-opacity="0.85"/>
+<rect x="320" y="362" width="4" height="20" fill="#4C78A8" fill-opacity="0.85"/>
 <text x="312" y="404" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__issue_amount_100m_yuan</text>
-<rect x="320" y="388" width="11" height="20" fill="#54A24B" fill-opacity="0.85"/>
+<rect x="320" y="388" width="7" height="20" fill="#54A24B" fill-opacity="0.85"/>
 <text x="312" y="429" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__excluded_subscription_share_pct</text>
-<rect x="320" y="412" width="24" height="20" fill="#54A24B" fill-opacity="0.85"/>
+<rect x="320" y="412" width="21" height="20" fill="#54A24B" fill-opacity="0.85"/>
 <text x="312" y="454" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__inquiry_investors_count</text>
-<rect x="320" y="438" width="50" height="20" fill="#54A24B" fill-opacity="0.85"/>
+<rect x="320" y="438" width="47" height="20" fill="#54A24B" fill-opacity="0.85"/>
 <text x="312" y="479" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__inquiry_allotment_accounts</text>
-<rect x="320" y="462" width="287" height="20" fill="#54A24B" fill-opacity="0.85"/>
+<rect x="320" y="462" width="230" height="20" fill="#54A24B" fill-opacity="0.85"/>
 <text x="312" y="504" font-family="Arial,sans-serif" font-size="11" text-anchor="end" fill="#333">num__inquiry_oversubscription_ratio</text>
 <rect x="320" y="488" width="436" height="20" fill="#54A24B" fill-opacity="0.85"/>
 <rect x="740" y="60" width="14" height="14" fill="#4C78A8"/>
