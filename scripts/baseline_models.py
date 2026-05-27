@@ -496,8 +496,6 @@ def make_report(
     imp_df: pd.DataFrame,
 ) -> str:
     best = metrics_overall.sort_values("spearman", ascending=False).iloc[0]
-    demo = metrics_overall[metrics_overall["stage"] == "T1"].sort_values("spearman", ascending=False)
-    demo_row = demo.iloc[0] if not demo.empty else best
     return f"""# 三阶段模型回测报告
 
 生成日期：2026-05-22
@@ -583,7 +581,7 @@ def main() -> None:
         # stage T-6
         ("board_mean_t6", "T6",     FEATS_T6,     lambda: BoardMeanModel()),
         ("lgbm_t6",       "T6",     FEATS_T6,     lambda: make_lgbm(FEATS_T6)),
-        # stage T-1  (demo)
+        # stage T-1  (research comparison)
         ("ridge_t1",      "T1",     FEATS_T1,     lambda: make_ridge(FEATS_T1)),
         ("lgbm_t1",       "T1",     FEATS_T1,     lambda: make_lgbm(FEATS_T1)),
         # stage T+1
