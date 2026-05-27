@@ -1,31 +1,31 @@
-"""IPO offline subscription rate predictor — demo interface.
+"""IPO offline subscription rate predictor — CLI/API interface.
 
 Usage
 -----
 CLI (look up from database):
     python predict.py --code 688XXX
-    python predict.py --code 688XXX --stage T1
     python predict.py --code 688XXX --stage T6
+    python predict.py --code 688XXX --stage T1  # research only
 
 CLI (supply raw features for a new IPO not yet in DB):
     python predict.py --features features.json
-    python predict.py --features features.json --stage T1
+    python predict.py --features features.json --stage T6
 
 Python API:
     from scripts.predict import predict_from_code, predict_from_dict
 
     result = predict_from_code("688041")
-    result = predict_from_dict({"board": "科创板", "inquiry_oversubscription_ratio": 18.5, ...})
+    result = predict_from_dict({"board": "科创板", "total_issue_shares_10k": 4000, ...})
 
 Output
 ------
 {
   "security_code": "...",
   "security_name": "...",
-  "stage": "T1",
-  "model": "lgbm_t1",
-  "log_oversubscription_pred": 7.82,
-  "oversubscription_ratio_pred": 2491,
+  "stage": "T6",
+  "model": "lgbm_t6",
+  "log_oversubscription_pred": 8.12,
+  "oversubscription_ratio_pred": 3362,
   "subscription_rate_pred_pct": 0.04013,   # 1 / oversubscription * 100
   "subscription_rate_display": "0.040%",
   "confidence": "high"                     # heuristic based on board
