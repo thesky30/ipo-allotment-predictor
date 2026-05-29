@@ -396,23 +396,27 @@ streamlit run app.py
 ### 代码与产出物
 
 ```text
-scripts/convert_wind_market.py     Wind 市场日度导出 → market_daily.csv（市场流动性特征）
-scripts/initial_data_analysis.py   数据清洗 + EDA
-scripts/baseline_models.py         三阶段建模 + 时间序列回测
-scripts/board_models.py            板块专项模型对比
-scripts/factor_insights.py         询价前因子洞察 + 板块/时期特征报告
-scripts/predict.py                 模型加载与预测（CLI / API / 板块路由）
-app.py                             Streamlit 网页演示
-data/processed/ipo_offline.db      清洗后 SQLite（回测/查询层）
-outputs/initial_analysis/          EDA 报告、字段字典、相关性、缺失率
-outputs/baseline_models/           回测指标、特征重要性、序列化模型、报告
-outputs/board_models/              板块对比指标与报告
-outputs/factor_insights/           因子IC、分组、SHAP贡献、板块时期画像和领导速览报告
-项目汇报_新股网下中签率预测.md      面向领导的汇报文档
-需要完善的部分.md                  后续开发 backlog（待完善增强项）
+scripts/convert_wind_market.py           Wind 市场日度导出 → market_daily.csv（市场流动性特征）
+scripts/initial_data_analysis.py         数据清洗 + EDA
+scripts/baseline_models.py               三阶段建模 + 时间序列回测
+scripts/board_models.py                  板块专项模型对比
+scripts/factor_insights.py               询价前因子洞察 + 板块/时期特征报告
+scripts/process_company_factors.py       公司基本面因子处理
+scripts/process_board_industry_market.py  板块/行业/承销商滚动因子
+scripts/build_new_factor_research.py     新因子 IC、分组收益分析
+scripts/predict.py                       模型加载与预测（CLI / API / 板块路由）
+scripts/model_classes.py                 可被 joblib 反序列化的模型类
+app.py                                   Streamlit 网页演示
+data/processed/ipo_offline.db            清洗后 SQLite（回测/查询层）
+outputs/initial_analysis/                EDA 报告、字段字典、相关性、缺失率
+outputs/baseline_models/                 回测指标、特征重要性、序列化模型、报告
+outputs/board_models/                    板块对比指标与报告
+outputs/factor_insights/                 因子IC、分组、SHAP贡献、板块时期画像和领导速览报告
+outputs/new_factor_research/             新增因子研究（IC、分组收益）
+需要完善的部分.md                        后续开发 backlog（待完善增强项）
 ```
 
-> 后续待完善项（市场流动性特征、SHAP 解释、增量数据入库、按股票名称预测）详见 `需要完善的部分.md`。
+> 后续待办项（增量数据入库、录制 demo、公网部署等）详见 `需要完善的部分.md`。
 
 ### 已知限制
 
@@ -432,6 +436,8 @@ outputs/factor_insights/           因子IC、分组、SHAP贡献、板块时期
 - `outputs/initial_analysis/`：字段字典、EDA 报告和关键图表。
 - `outputs/baseline_models/`：三阶段模型、回测指标、特征重要性和预测明细。
 - `outputs/board_models/`：板块模型对比产出。
+- `outputs/factor_insights/`：因子 IC、SHAP 贡献、板块时期画像和领导速览报告。
+- `outputs/new_factor_research/`：新增因子研究产出。
 - `README.md`、`AGENTS.md`、`需要完善的部分.md`：项目说明、协作规则和 backlog。
 - `requirements.txt`：Python 依赖。
 
@@ -445,8 +451,8 @@ outputs/factor_insights/           因子IC、分组、SHAP贡献、板块时期
 ### 新机器启动
 
 ```bash
-git clone <你的GitHub仓库地址>
-cd <仓库目录>
+git clone https://github.com/thesky30/ipo-allotment-predictor.git
+cd ipo-allotment-predictor
 
 python -m venv .venv
 .venv/Scripts/activate  # Windows
@@ -478,7 +484,7 @@ python scripts/board_models.py
 git add .gitignore .gitattributes README.md AGENTS.md requirements.txt app.py scripts data/README.md data/processed outputs/README.md outputs/initial_analysis outputs/baseline_models outputs/board_models 需要完善的部分.md
 git commit -m "Prepare IPO predictor repo for collaboration"
 git branch -M main
-git remote add origin <你的GitHub仓库地址>
+git remote add origin https://github.com/thesky30/ipo-allotment-predictor.git
 git push -u origin main
 ```
 
