@@ -274,69 +274,7 @@ Spearman 排名相关
 - [x] 比较统一模型与板块专属模型。
 - [x] 部署 Streamlit 网页演示。
 
-## 2026-05-21 初步 EDA 记录
-
-本次处理了 3 个 Wind 导出文件：
-
-```text
-D:/wind导出数据/全部科创板_网下打新数据.xlsx
-D:/wind导出数据/注册制创业板_网下打新数据.xlsx
-D:/wind导出数据/全部科创板_主板.xlsx
-```
-
-处理脚本：
-
-```text
-scripts/initial_data_analysis.py
-```
-
-主要输出：
-
-```text
-data/processed/ipo_offline_sample.csv
-data/processed/ipo_offline.db
-outputs/initial_analysis/initial_analysis_report.md
-outputs/initial_analysis/field_dictionary.csv
-outputs/initial_analysis/missing_required_prediction_fields.csv
-outputs/initial_analysis/missing_by_field.csv
-outputs/initial_analysis/descriptive_stats.csv
-outputs/initial_analysis/board_summary.csv
-outputs/initial_analysis/year_board_counts.csv
-outputs/initial_analysis/correlation_pre_subscription_like.csv
-outputs/initial_analysis/correlation_all_fields.csv
-outputs/initial_analysis/outlier_checks.csv
-outputs/initial_analysis/figures/label_distribution_by_board.svg
-outputs/initial_analysis/figures/yearly_median_oversubscription.svg
-outputs/initial_analysis/figures/top_missing_fields.svg
-outputs/initial_analysis/figures/top_pre_subscription_correlations.svg
-```
-
-样本概况：
-
-- 合计 1,326 条 IPO 样本。
-- 科创板 611 条，创业板 603 条，主板注册制后 112 条。
-- 有 `网下超额认购倍数` 标签的样本 1,194 条。
-- 上市日期范围为 2019-07-22 至 2026-05-18。
-- 当前尚未纳入北交所。
-
-初步结论：
-
-- SQLite 适合作为清洗后数据中间层和回测查询层，当前已生成 `ipo_offline_sample` 表；建模和复杂特征工程仍建议使用 Python。
-- 板块差异明显：主板注册制后网下超额认购倍数中位数约 8,622.80 倍，创业板约 3,367.41 倍，科创板约 2,596.93 倍，后续必须分板块评估。
-- `网下申购配售比例` 与 `100 / 网下超额认购倍数` 基本互为倒数，只能作为标签或校验字段，不能作为正式预测输入。
-- 当前 Excel 中很多强相关字段属于申购后或配售后信息，例如网下申购总量、配售对象家数、配售比例，后续建模时要严格排除泄露。
-- 下一步最关键的数据缺口是初步询价阶段可见字段，包括申购上限/下限/步长、初步询价申报数量、询价对象家数、市值门槛、剔除最高报价后对象数量等。
-- [ ] 建立第一版基准模型。
-- [ ] 建立树模型并输出特征重要性。
-- [ ] 搭建时间序列回测框架。
-- [ ] 比较统一模型、板块模型和板块校准模型。
-- [ ] 设计网页预测工具原型。
-
-## 2026-05-22 开发进展：三阶段模型 + 网页演示已上线
-
-第一轮端到端流程（取数 → 分析 → 建模 → 回测 → 部署）已全部跑通。
-
-2026-05-27 与领导确认后，正式预测节点从“询价完成后、申购前”调整为“询价开始前”。因此当前网页和 CLI 默认使用 T-6 模型；T-1/T+1 只保留为研究对照。
+## 技术架构与模型结果
 
 ### 三阶段时点框架
 
@@ -344,12 +282,12 @@ outputs/initial_analysis/figures/top_pre_subscription_correlations.svg
 
 | 阶段 | 时点 | 可用信息 | 用途 |
 | --- | --- | --- | --- |
-| **T-6** | **询价前正式预测** | 招股书、询价公告、行业 PE、历史市场热度、市场流动性/情绪、批次竞争 | **当前网页默认模型** |
+| **T-6** | **询价前正式预测** | 发行结构、申购规则、行业 PE、市场流动性/情绪、批次竞争、同板块破发率、市值门槛、预计募资额、营收及 CAGR、板块滚动行情、主承销商历史表现、行业历史 IPO 热度 | **当前网页默认模型** |
 | T-1 | 询价后研究对照 | T-6 全部 + 询价结果（询价超额认购倍数、机构家数、报价分布、最终发行价） | 信息增益分析 / 历史对照 |
 | T+1 | 回拨后研究对照 | T-1 全部 + 回拨比例 | 事后校验 / 上界参考 |
 | T+2 | — | 网下超额认购倍数（目标变量） | 永不作为输入 |
 
-网页默认使用 **T-6 LightGBM** 作为正式预测口径：询价开始前即可运行，不使用询价结果、网下申购、配售、回拨或上市后数据。T-1 / T+1 保留为研究对照模型，用于展示信息逐步释放后的预测上界，不作为当前正式预测口径。
+正式预测节点为"询价开始前"。网页和 CLI 默认使用 **T-6 LightGBM**，不使用询价结果、网下申购、配售、回拨或上市后数据。T-1 / T+1 仅作为研究对照，用于展示信息逐步释放后的预测上界。
 
 ### 回测结果（扩张窗口 OOS，按申购截止日排序）
 
@@ -361,11 +299,11 @@ outputs/initial_analysis/figures/top_pre_subscription_correlations.svg
 | lgbm_t1（研究对照） | T-1 | 624 | 0.109 | 0.913 | 0.961 |
 | lgbm_t1plus | T+1 | 624 | 0.102 | 0.920 | 0.965 |
 
-- 正式模型（T-6）OOS Spearman 为 0.619；询价结果释放后的 T-1/T+1 仍只作为研究对照，不作为正式预测口径。
+- 正式模型（T-6）OOS Spearman 为 0.619；T-1/T+1 仅作为研究对照，不作为正式预测口径。
 - 分板块 OOS Spearman（T-1）：科创板 0.986、创业板 0.979、北交所 0.886（n=6）、主板 0.640。
-- 板块专属模型未优于统一模型（主板 -0.23、创业板 -0.02、科创板 +0.001），统一模型 + 板块特征 + 跨板块学习为当前最优方案。
-- 已补充 4 个 T-6 市场环境特征（见下）。`market_turnover_ma20`（沪深两市近 20 日日均成交额）在 lgbm_t6 中重要性排名第 2；T-6 整体 Spearman 0.488→0.512、T-1 研究对照 0.951→0.953、T+1 0.967→0.970，均小幅提升。
-- 2026-05-29 新增并纳入确定口径 T-6 因子：网下询价市值门槛、预计募资额、近一年营收、三年营收 CAGR、板块滚动行情、主承销商历史表现、申万一级行业代码历史 IPO 热度。暂未纳入 `issue_pb_factor`、发行价格区间、行业行情滚动因子等口径仍需确认或缺映射的数据。
+- 板块专属模型未优于统一模型，统一模型 + 板块特征 + 跨板块学习为当前最优方案。
+- T-6 特征覆盖：发行结构与申购规则、行业 PE 与估值、市场流动性（`market_turnover_ma20`，重要性排名第 2）与情绪、同板块破发率、批次竞争强度、网下询价市值门槛、预计募资额、近一年营收与三年营收 CAGR、板块滚动行情、主承销商历史表现、申万一级行业历史 IPO 热度。
+- 暂未纳入的因子：`issue_pb_factor`（可能依赖最终发行价）、发行价格区间（数据全空）、行业行情滚动因子（缺申万代码-名称映射）。
 
 ### 运行方式
 
