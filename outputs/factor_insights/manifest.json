@@ -1,0 +1,34 @@
+{
+  "generated": "2026-05-28",
+  "official_stage": "T6",
+  "outputs": [
+    "factor_insights_report.md",
+    "board_period_profile.csv",
+    "factor_ic.csv",
+    "factor_group_returns.csv",
+    "factor_contribution_by_board_year.csv",
+    "board_monthly_oversub_turnover.csv",
+    "figures/*.svg"
+  ],
+  "factors": [
+    "market_turnover_ma20",
+    "market_turnover_pct_rank_1y",
+    "market_turnover_ma20_over_ma60",
+    "market_return_ma20",
+    "recent_ipo_first_day_return_ma20",
+    "same_board_break_rate_ma10",
+    "concurrent_ipo_count",
+    "same_board_concurrent_ipo_count",
+    "concurrent_offline_issue_sum_10k",
+    "total_issue_shares_10k",
+    "offline_issue_before_clawback_10k",
+    "offline_issue_before_share_pct",
+    "strategic_allocation_share_pct",
+    "subscription_upper_limit_10k",
+    "subscription_lower_limit_10k",
+    "subscription_step_10k",
+    "industry_pe_at_ipo",
+    "comparable_pe_avg_ex_nonrecurring",
+    "offer_price_range_pct"
+  ]
+}

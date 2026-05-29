@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="360" viewBox="0 0 760 360">
+<rect width="100%" height="100%" fill="white"/>
+<text x="380.0" y="30.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="#333">市场成交额分组 vs 实际网下中签率</text>
+<rect x="110.9" y="55.0" width="71.9" height="230.0" fill="#54a24b"/>
+<text x="146.8" y="307.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="middle" fill="#333">Q1低</text>
+<text x="146.8" y="49.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="11" font-weight="400" text-anchor="middle" fill="#333">0.049</text>
+<rect x="226.9" y="142.5" width="71.9" height="142.5" fill="#54a24b"/>
+<text x="262.8" y="307.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="middle" fill="#333">Q2</text>
+<text x="262.8" y="136.5" font-family="Arial,Microsoft YaHei,sans-serif" font-size="11" font-weight="400" text-anchor="middle" fill="#333">0.030</text>
+<rect x="342.9" y="141.1" width="71.9" height="143.9" fill="#54a24b"/>
+<text x="378.8" y="307.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="middle" fill="#333">Q3</text>
+<text x="378.8" y="135.1" font-family="Arial,Microsoft YaHei,sans-serif" font-size="11" font-weight="400" text-anchor="middle" fill="#333">0.031</text>
+<rect x="458.9" y="129.7" width="71.9" height="155.3" fill="#54a24b"/>
+<text x="494.8" y="307.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="middle" fill="#333">Q4</text>
+<text x="494.8" y="123.7" font-family="Arial,Microsoft YaHei,sans-serif" font-size="11" font-weight="400" text-anchor="middle" fill="#333">0.033</text>
+<rect x="574.9" y="168.3" width="71.9" height="116.7" fill="#54a24b"/>
+<text x="610.8" y="307.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="middle" fill="#333">Q5高</text>
+<text x="610.8" y="162.3" font-family="Arial,Microsoft YaHei,sans-serif" font-size="11" font-weight="400" text-anchor="middle" fill="#333">0.025</text>
+<text x="25.0" y="75.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">中签率(%)</text>
+</svg>

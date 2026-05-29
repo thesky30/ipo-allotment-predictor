@@ -37,5 +37,8 @@ class _ColSelector:
         return self
 
     def predict(self, X: pd.DataFrame) -> np.ndarray:
-        avail = [c for c in self._avail if c in X.columns]
-        return self._pipe.predict(X[avail])
+        X_use = X.copy()
+        for c in self._avail:
+            if c not in X_use.columns:
+                X_use[c] = np.nan
+        return self._pipe.predict(X_use[self._avail])

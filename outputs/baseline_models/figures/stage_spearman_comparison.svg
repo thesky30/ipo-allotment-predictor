@@ -13,20 +13,20 @@
 <line x1="720" y1="70" x2="720" y2="270" stroke="#e6e6e6"/>
 <text x="720" y="288" font-family="Arial,sans-serif" font-size="11" text-anchor="middle" fill="#666">1.00</text>
 <text x="232" y="99" font-family="Arial,sans-serif" font-size="12" text-anchor="end" fill="#333">ridge_t1  [T1]</text>
-<rect x="240" y="74" width="353" height="31" fill="#54A24B" fill-opacity="0.85"/>
-<text x="599" y="99" font-family="Arial,sans-serif" font-size="11" fill="#333">0.7364</text>
+<rect x="240" y="74" width="322" height="31" fill="#54A24B" fill-opacity="0.85"/>
+<text x="568" y="99" font-family="Arial,sans-serif" font-size="11" fill="#333">0.6711</text>
 <text x="232" y="139" font-family="Arial,sans-serif" font-size="12" text-anchor="end" fill="#333">lgbm_t1  [T1]</text>
-<rect x="240" y="114" width="457" height="31" fill="#54A24B" fill-opacity="0.85"/>
-<text x="703" y="139" font-family="Arial,sans-serif" font-size="11" fill="#333">0.9531</text>
+<rect x="240" y="114" width="461" height="31" fill="#54A24B" fill-opacity="0.85"/>
+<text x="707" y="139" font-family="Arial,sans-serif" font-size="11" fill="#333">0.9606</text>
 <text x="232" y="179" font-family="Arial,sans-serif" font-size="12" text-anchor="end" fill="#333">lgbm_t1plus  [T1PLUS]</text>
-<rect x="240" y="154" width="466" height="31" fill="#F58518" fill-opacity="0.85"/>
-<text x="712" y="179" font-family="Arial,sans-serif" font-size="11" fill="#333">0.9700</text>
+<rect x="240" y="154" width="463" height="31" fill="#F58518" fill-opacity="0.85"/>
+<text x="709" y="179" font-family="Arial,sans-serif" font-size="11" fill="#333">0.9645</text>
 <text x="232" y="219" font-family="Arial,sans-serif" font-size="12" text-anchor="end" fill="#333">board_mean_t6  [T6]</text>
 <rect x="240" y="194" width="130" height="31" fill="#4C78A8" fill-opacity="0.85"/>
 <text x="376" y="219" font-family="Arial,sans-serif" font-size="11" fill="#333">0.2700</text>
 <text x="232" y="259" font-family="Arial,sans-serif" font-size="12" text-anchor="end" fill="#333">lgbm_t6  [T6]</text>
-<rect x="240" y="234" width="246" height="31" fill="#4C78A8" fill-opacity="0.85"/>
-<text x="492" y="259" font-family="Arial,sans-serif" font-size="11" fill="#333">0.5117</text>
+<rect x="240" y="234" width="297" height="31" fill="#4C78A8" fill-opacity="0.85"/>
+<text x="543" y="259" font-family="Arial,sans-serif" font-size="11" fill="#333">0.6195</text>
 <rect x="660" y="70" width="14" height="14" fill="#4C78A8"/>
 <text x="678" y="81" font-family="Arial,sans-serif" font-size="12" fill="#333">T6</text>
 <rect x="660" y="92" width="14" height="14" fill="#54A24B"/>

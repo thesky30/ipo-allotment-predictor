@@ -16,9 +16,31 @@ comparable_pe_avg_ex_nonrecurring,T-6,招股书,估值,True,True,True,False
 industry_pe_at_ipo,T-6,市场数据,估值,True,True,True,False
 recent_ipo_first_day_return_ma20,T-6,历史IPO数据派生（滚动）,市场热度,True,True,True,False
 market_turnover_ma20,T-6,Tushare 沪深成交额派生（滚动）,市场流动性,True,True,True,False
+market_turnover_pct_rank_1y,T-6,市场成交额滚动分位,市场流动性,True,True,True,False
+market_turnover_ma20_over_ma60,T-6,市场成交额短长均线比,市场流动性,True,True,True,False
 market_return_ma20,T-6,Tushare 沪深300派生（滚动）,市场情绪,True,True,True,False
 concurrent_ipo_count,T-6,申购日历派生,批次竞争,True,True,True,False
+same_board_concurrent_ipo_count,T-6,申购日历派生,批次竞争,True,True,True,False
+concurrent_offline_issue_sum_10k,T-6,申购日历派生,批次竞争,True,True,True,False
 same_board_break_rate_ma10,T-6,历史IPO首日涨幅派生（滚动）,市场热度,True,True,True,False
+offline_market_value_threshold_10k_yuan,T-6,询价公告,申购规则,True,True,True,False
+expected_fundraising_100m_yuan,T-6,询价公告/招股书,发行规模,True,True,True,False
+log_expected_fundraising,T-6,预计募资额派生,发行规模,True,True,True,False
+latest_revenue_100m_yuan,T-6,招股书财务摘要,公司规模,True,True,True,False
+log_latest_revenue,T-6,近一年营收额派生,公司规模,True,True,True,False
+revenue_cagr_3y_pct,T-6,招股书财务摘要,成长,True,True,True,False
+board_turnover_ma20,T-6,板块行情严格向前滚动,板块流动性,True,True,True,False
+board_turnover_pct_rank_1y,T-6,板块成交额滚动分位,板块流动性,True,True,True,False
+board_turnover_ma20_over_ma60,T-6,板块成交额短长均线比,板块流动性,True,True,True,False
+board_return_ma20,T-6,板块行情严格向前滚动,板块情绪,True,True,True,False
+underwriter_prior_ipo_count,T-6,主承销商历史已发生IPO,承销商声誉,True,True,True,False
+underwriter_prior_log_oversub_mean,T-6,主承销商历史已发生IPO,承销商声誉,True,True,True,False
+underwriter_prior_first_day_return_mean,T-6,主承销商历史已上市IPO,承销商声誉,True,True,True,False
+underwriter_prior_break_rate,T-6,主承销商历史已上市IPO,承销商声誉,True,True,True,False
+sw_l1_prior_ipo_count,T-6,申万一级代码历史已发生IPO,行业历史热度,True,True,True,False
+sw_l1_prior_log_oversub_mean,T-6,申万一级代码历史已发生IPO,行业历史热度,True,True,True,False
+sw_l1_prior_first_day_return_mean,T-6,申万一级代码历史已上市IPO,行业历史热度,True,True,True,False
+sw_l1_prior_break_rate,T-6,申万一级代码历史已上市IPO,行业历史热度,True,True,True,False
 offer_price_yuan,T-1,定价公告,发行定价,False,True,True,False
 ipo_pe_diluted,T-1,基于最终发行价,估值,False,True,True,False
 issue_pb,T-1,基于最终发行价,估值,False,True,True,False

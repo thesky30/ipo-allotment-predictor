@@ -15,6 +15,7 @@ a_investor_allocation_share_pct,425,0.25867315885575165
 quote_price_weighted_avg,418,0.25441265976871574
 quote_price_median,418,0.25441265976871574
 quote_price_vs_offer,418,0.25441265976871574
+concurrent_offline_issue_sum_10k,416,0.25319537431527694
 inquiry_deadline_date,408,0.2483262325015216
 subscription_deadline_date,408,0.2483262325015216
 offline_issue_before_clawback_10k,408,0.2483262325015216
@@ -45,6 +46,7 @@ implied_offline_lottery_rate_pct,408,0.2483262325015216
 offline_lottery_gap_pct_point,408,0.2483262325015216
 inquiry_oversubscription_ratio,408,0.2483262325015216
 concurrent_ipo_count,408,0.2483262325015216
+same_board_concurrent_ipo_count,408,0.2483262325015216
 underwriting_ratio_pct,326,0.19841752891052952
 comparable_pe_avg_ex_nonrecurring,129,0.07851491174680462
 pe_vs_comparable,129,0.07851491174680462
@@ -69,6 +71,8 @@ total_issue_shares_10k,8,0.004869141813755326
 issue_amount_100m_yuan,8,0.004869141813755326
 sort_date_for_heat,8,0.004869141813755326
 market_turnover_ma20,8,0.004869141813755326
+market_turnover_pct_rank_1y,8,0.004869141813755326
+market_turnover_ma20_over_ma60,8,0.004869141813755326
 market_return_ma20,8,0.004869141813755326
 security_code,4,0.002434570906877663
 board,0,0.0

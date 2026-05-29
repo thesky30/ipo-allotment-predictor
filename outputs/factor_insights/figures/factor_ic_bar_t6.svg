@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="478" viewBox="0 0 860 478">
+<rect width="100%" height="100%" fill="white"/>
+<text x="430.0" y="28.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="#333">T-6 因子 |IC| 排名</text>
+<text x="258.0" y="70.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">recent_ipo_first_day_return_ma20</text>
+<rect x="270" y="52" width="500.0" height="22" fill="#2f7ebc" rx="2"/>
+<text x="778.0" y="69.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.374</text>
+<text x="258.0" y="104.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">subscription_step_10k</text>
+<rect x="270" y="86" width="408.1" height="22" fill="#2f7ebc" rx="2"/>
+<text x="686.1" y="103.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.305</text>
+<text x="258.0" y="138.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">same_board_break_rate_ma10</text>
+<rect x="270" y="120" width="402.8" height="22" fill="#2f7ebc" rx="2"/>
+<text x="680.8" y="137.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.301</text>
+<text x="258.0" y="172.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">market_turnover_ma20</text>
+<rect x="270" y="154" width="393.0" height="22" fill="#2f7ebc" rx="2"/>
+<text x="671.0" y="171.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.294</text>
+<text x="258.0" y="206.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">same_board_concurrent_ipo_count</text>
+<rect x="270" y="188" width="321.1" height="22" fill="#2f7ebc" rx="2"/>
+<text x="599.1" y="205.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.240</text>
+<text x="258.0" y="240.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">subscription_lower_limit_10k</text>
+<rect x="270" y="222" width="304.6" height="22" fill="#2f7ebc" rx="2"/>
+<text x="582.6" y="239.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.228</text>
+<text x="258.0" y="274.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">comparable_pe_avg_ex_nonrecurring</text>
+<rect x="270" y="256" width="272.6" height="22" fill="#2f7ebc" rx="2"/>
+<text x="550.6" y="273.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.204</text>
+<text x="258.0" y="308.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">strategic_allocation_share_pct</text>
+<rect x="270" y="290" width="235.5" height="22" fill="#2f7ebc" rx="2"/>
+<text x="513.5" y="307.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.176</text>
+<text x="258.0" y="342.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">concurrent_ipo_count</text>
+<rect x="270" y="324" width="224.3" height="22" fill="#2f7ebc" rx="2"/>
+<text x="502.3" y="341.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.168</text>
+<text x="258.0" y="376.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">offline_issue_before_share_pct</text>
+<rect x="270" y="358" width="215.3" height="22" fill="#2f7ebc" rx="2"/>
+<text x="493.3" y="375.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.161</text>
+<text x="258.0" y="410.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">concurrent_offline_issue_sum_10k</text>
+<rect x="270" y="392" width="112.5" height="22" fill="#2f7ebc" rx="2"/>
+<text x="390.5" y="409.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.084</text>
+<text x="258.0" y="444.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="end" fill="#333">market_turnover_pct_rank_1y</text>
+<rect x="270" y="426" width="111.0" height="22" fill="#2f7ebc" rx="2"/>
+<text x="389.0" y="443.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="400" text-anchor="start" fill="#333">0.083</text>
+</svg>

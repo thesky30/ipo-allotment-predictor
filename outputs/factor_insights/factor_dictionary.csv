@@ -1,0 +1,20 @@
+﻿factor,factor_group,time_node,source,category,window,backward_looking,expected_direction
+market_turnover_ma20,市场流动性因子,T-6,market_daily.csv 向后看滚动20日均值,市场流动性,20 trading days,yes,流动性越高，资金越活跃，可能推高超额认购、压低中签率
+market_turnover_pct_rank_1y,市场流动性因子,T-6,market_daily.csv 成交额20日均值的一年滚动分位,市场流动性,252 trading days,yes,高分位流动性可能对应更拥挤的网下申购
+market_turnover_ma20_over_ma60,市场流动性因子,T-6,market_daily.csv 成交额20日均值/60日均值-1,市场流动性,20 vs 60 trading days,yes,短期成交额放大可能代表情绪升温和资金活跃
+market_return_ma20,市场情绪因子,T-6,market_daily.csv 市场指数20日涨跌幅,市场情绪,20 trading days,yes,市场上涨可能增强申购热度
+recent_ipo_first_day_return_ma20,市场情绪因子,T-6,同板块过去20只已上市IPO首日涨幅,市场热度,20 prior IPOs,yes,新股赚钱效应越强，申购越拥挤
+same_board_break_rate_ma10,市场情绪因子,T-6,同板块过去10只已上市IPO破发比例,市场热度,10 prior IPOs,yes,破发率越高，申购意愿可能下降
+concurrent_ipo_count,IPO供给拥挤因子,T-6,申购日历±7天全市场IPO数量,批次竞争,±7 calendar days,calendar_known,IPO越拥挤，可能分流资金；也可能代表热发行窗口
+same_board_concurrent_ipo_count,IPO供给拥挤因子,T-6,申购日历±7天同板块IPO数量,批次竞争,±7 calendar days,calendar_known,同板块供给拥挤可能分流同类资金
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,T-6,申购日历±7天其他IPO回拨前网下发行量合计,批次竞争,±7 calendar days,calendar_known,同窗口可申购供给越大，单只拥挤度可能缓和
+total_issue_shares_10k,发行供给因子,T-6,招股书/发行安排,发行结构,static,yes,发行规模越大，供给越多，中签率可能更高
+offline_issue_before_clawback_10k,发行供给因子,T-6,发行安排公告,发行结构,static,yes,网下初始发行量越大，中签率可能更高
+offline_issue_before_share_pct,发行供给因子,T-6,发行安排派生,发行结构,static,yes,网下初始占比越高，供给越充分
+strategic_allocation_share_pct,发行供给因子,T-6,发行安排派生,战略配售,static,yes,战略配售占比高可能压缩可网下分配供给
+subscription_upper_limit_10k,申购规则因子,T-6,询价及推介公告,申购规则,static,yes,申购上限影响机构可申购规模和拥挤度
+subscription_lower_limit_10k,申购规则因子,T-6,询价及推介公告,申购规则,static,yes,申购下限反映参与门槛
+subscription_step_10k,申购规则因子,T-6,询价及推介公告,申购规则,static,yes,申购步长影响报价/申购离散度
+industry_pe_at_ipo,估值因子,T-6,发行时行业市盈率,估值,static,yes,行业估值环境影响新股吸引力
+comparable_pe_avg_ex_nonrecurring,估值因子,T-6,招股书可比公司估值,估值,static,yes,可比估值影响询价前吸引力判断
+offer_price_range_pct,估值因子,T-6,询价公告价格区间派生,发行定价,static,yes,询价区间宽度反映定价不确定性

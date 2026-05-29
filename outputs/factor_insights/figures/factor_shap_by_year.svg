@@ -1,0 +1,182 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="493" viewBox="0 0 1640 493">
+<rect width="100%" height="100%" fill="white"/>
+<text x="820.0" y="30.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="#333">各年份T-6因子SHAP贡献</text>
+<text x="222.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">board</text>
+<text x="367.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">market_turnover_ma20</text>
+<text x="512.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">market_turnover_ma20_over_ma60</text>
+<text x="657.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">offline_issue_before_clawback_10k</text>
+<text x="802.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">offline_issue_before_share_pct</text>
+<text x="947.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">recent_ipo_first_day_return_ma20</text>
+<text x="1092.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">same_board_concurrent_ipo_count</text>
+<text x="1237.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">subscription_lower_limit_10k</text>
+<text x="1382.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">subscription_step_10k</text>
+<text x="1527.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">subscription_upper_limit_10k</text>
+<text x="138.0" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2019.0</text>
+<rect x="150" y="70" width="143" height="44" fill="#e7f4f9" stroke="#fff"/>
+<text x="222.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.051</text>
+<rect x="295" y="70" width="143" height="44" fill="#2c7fb8" stroke="#fff"/>
+<text x="367.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">1.111</text>
+<rect x="440" y="70" width="143" height="44" fill="#e4f2f8" stroke="#fff"/>
+<text x="512.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.064</text>
+<rect x="585" y="70" width="143" height="44" fill="#e2f1f7" stroke="#fff"/>
+<text x="657.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.080</text>
+<rect x="730" y="70" width="143" height="44" fill="#e6f4f8" stroke="#fff"/>
+<text x="802.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.053</text>
+<rect x="875" y="70" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="947.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.023</text>
+<rect x="1020" y="70" width="143" height="44" fill="#d2e7f1" stroke="#fff"/>
+<text x="1092.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.167</text>
+<rect x="1165" y="70" width="143" height="44" fill="#e5f3f8" stroke="#fff"/>
+<text x="1237.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.063</text>
+<rect x="1310" y="70" width="143" height="44" fill="#e0f0f6" stroke="#fff"/>
+<text x="1382.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.087</text>
+<rect x="1455" y="70" width="143" height="44" fill="#c3ddec" stroke="#fff"/>
+<text x="1527.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.254</text>
+<text x="138.0" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2020.0</text>
+<rect x="150" y="116" width="143" height="44" fill="#d4e8f2" stroke="#fff"/>
+<text x="222.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.160</text>
+<rect x="295" y="116" width="143" height="44" fill="#dbecf4" stroke="#fff"/>
+<text x="367.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.120</text>
+<rect x="440" y="116" width="143" height="44" fill="#deeef5" stroke="#fff"/>
+<text x="512.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.100</text>
+<rect x="585" y="116" width="143" height="44" fill="#e3f2f7" stroke="#fff"/>
+<text x="657.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.072</text>
+<rect x="730" y="116" width="143" height="44" fill="#e5f3f8" stroke="#fff"/>
+<text x="802.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.060</text>
+<rect x="875" y="116" width="143" height="44" fill="#e1f1f7" stroke="#fff"/>
+<text x="947.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.081</text>
+<rect x="1020" y="116" width="143" height="44" fill="#e6f3f8" stroke="#fff"/>
+<text x="1092.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.056</text>
+<rect x="1165" y="116" width="143" height="44" fill="#d3e8f2" stroke="#fff"/>
+<text x="1237.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.162</text>
+<rect x="1310" y="116" width="143" height="44" fill="#9cc5df" stroke="#fff"/>
+<text x="1382.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.472</text>
+<rect x="1455" y="116" width="143" height="44" fill="#e1f0f7" stroke="#fff"/>
+<text x="1527.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.082</text>
+<text x="138.0" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2021.0</text>
+<rect x="150" y="162" width="143" height="44" fill="#e7f4f9" stroke="#fff"/>
+<text x="222.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.051</text>
+<rect x="295" y="162" width="143" height="44" fill="#e0eff6" stroke="#fff"/>
+<text x="367.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.092</text>
+<rect x="440" y="162" width="143" height="44" fill="#e7f4f9" stroke="#fff"/>
+<text x="512.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.051</text>
+<rect x="585" y="162" width="143" height="44" fill="#e4f2f8" stroke="#fff"/>
+<text x="657.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.066</text>
+<rect x="730" y="162" width="143" height="44" fill="#e6f4f8" stroke="#fff"/>
+<text x="802.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.053</text>
+<rect x="875" y="162" width="143" height="44" fill="#dcedf5" stroke="#fff"/>
+<text x="947.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.110</text>
+<rect x="1020" y="162" width="143" height="44" fill="#ebf7fa" stroke="#fff"/>
+<text x="1092.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.025</text>
+<rect x="1165" y="162" width="143" height="44" fill="#e3f2f7" stroke="#fff"/>
+<text x="1237.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.070</text>
+<rect x="1310" y="162" width="143" height="44" fill="#d5e9f2" stroke="#fff"/>
+<text x="1382.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.151</text>
+<rect x="1455" y="162" width="143" height="44" fill="#e3f2f7" stroke="#fff"/>
+<text x="1527.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.072</text>
+<text x="138.0" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2022.0</text>
+<rect x="150" y="208" width="143" height="44" fill="#e6f4f8" stroke="#fff"/>
+<text x="222.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.054</text>
+<rect x="295" y="208" width="143" height="44" fill="#e4f2f8" stroke="#fff"/>
+<text x="367.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.065</text>
+<rect x="440" y="208" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="512.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.022</text>
+<rect x="585" y="208" width="143" height="44" fill="#e4f2f7" stroke="#fff"/>
+<text x="657.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.069</text>
+<rect x="730" y="208" width="143" height="44" fill="#e5f3f8" stroke="#fff"/>
+<text x="802.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.059</text>
+<rect x="875" y="208" width="143" height="44" fill="#dbedf5" stroke="#fff"/>
+<text x="947.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.115</text>
+<rect x="1020" y="208" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="1092.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.020</text>
+<rect x="1165" y="208" width="143" height="44" fill="#e2f1f7" stroke="#fff"/>
+<text x="1237.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.079</text>
+<rect x="1310" y="208" width="143" height="44" fill="#d7eaf3" stroke="#fff"/>
+<text x="1382.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.138</text>
+<rect x="1455" y="208" width="143" height="44" fill="#e2f1f7" stroke="#fff"/>
+<text x="1527.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.079</text>
+<text x="138.0" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2023.0</text>
+<rect x="150" y="254" width="143" height="44" fill="#d4e8f2" stroke="#fff"/>
+<text x="222.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.160</text>
+<rect x="295" y="254" width="143" height="44" fill="#e3f2f7" stroke="#fff"/>
+<text x="367.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.073</text>
+<rect x="440" y="254" width="143" height="44" fill="#ebf6fa" stroke="#fff"/>
+<text x="512.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.030</text>
+<rect x="585" y="254" width="143" height="44" fill="#e1f0f6" stroke="#fff"/>
+<text x="657.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.084</text>
+<rect x="730" y="254" width="143" height="44" fill="#e4f2f7" stroke="#fff"/>
+<text x="802.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.068</text>
+<rect x="875" y="254" width="143" height="44" fill="#e2f1f7" stroke="#fff"/>
+<text x="947.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.080</text>
+<rect x="1020" y="254" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="1092.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.019</text>
+<rect x="1165" y="254" width="143" height="44" fill="#e4f2f7" stroke="#fff"/>
+<text x="1237.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.069</text>
+<rect x="1310" y="254" width="143" height="44" fill="#d8eaf3" stroke="#fff"/>
+<text x="1382.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.137</text>
+<rect x="1455" y="254" width="143" height="44" fill="#e0eff6" stroke="#fff"/>
+<text x="1527.5" y="282.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.091</text>
+<text x="138.0" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2024.0</text>
+<rect x="150" y="300" width="143" height="44" fill="#bddaea" stroke="#fff"/>
+<text x="222.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.288</text>
+<rect x="295" y="300" width="143" height="44" fill="#d9ebf4" stroke="#fff"/>
+<text x="367.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.132</text>
+<rect x="440" y="300" width="143" height="44" fill="#e4f2f8" stroke="#fff"/>
+<text x="512.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.064</text>
+<rect x="585" y="300" width="143" height="44" fill="#e4f2f8" stroke="#fff"/>
+<text x="657.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.065</text>
+<rect x="730" y="300" width="143" height="44" fill="#e1f0f6" stroke="#fff"/>
+<text x="802.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.086</text>
+<rect x="875" y="300" width="143" height="44" fill="#e6f3f8" stroke="#fff"/>
+<text x="947.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.056</text>
+<rect x="1020" y="300" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="1092.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.019</text>
+<rect x="1165" y="300" width="143" height="44" fill="#e7f4f9" stroke="#fff"/>
+<text x="1237.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.051</text>
+<rect x="1310" y="300" width="143" height="44" fill="#ddeef5" stroke="#fff"/>
+<text x="1382.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.109</text>
+<rect x="1455" y="300" width="143" height="44" fill="#e5f3f8" stroke="#fff"/>
+<text x="1527.5" y="328.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.059</text>
+<text x="138.0" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2025.0</text>
+<rect x="150" y="346" width="143" height="44" fill="#b8d7e8" stroke="#fff"/>
+<text x="222.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.316</text>
+<rect x="295" y="346" width="143" height="44" fill="#d3e7f2" stroke="#fff"/>
+<text x="367.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.165</text>
+<rect x="440" y="346" width="143" height="44" fill="#e9f5f9" stroke="#fff"/>
+<text x="512.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.038</text>
+<rect x="585" y="346" width="143" height="44" fill="#e1f0f7" stroke="#fff"/>
+<text x="657.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.082</text>
+<rect x="730" y="346" width="143" height="44" fill="#e1f0f7" stroke="#fff"/>
+<text x="802.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.082</text>
+<rect x="875" y="346" width="143" height="44" fill="#deeef5" stroke="#fff"/>
+<text x="947.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.103</text>
+<rect x="1020" y="346" width="143" height="44" fill="#edf8fb" stroke="#fff"/>
+<text x="1092.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.019</text>
+<rect x="1165" y="346" width="143" height="44" fill="#e7f4f8" stroke="#fff"/>
+<text x="1237.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.052</text>
+<rect x="1310" y="346" width="143" height="44" fill="#dcedf5" stroke="#fff"/>
+<text x="1382.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.111</text>
+<rect x="1455" y="346" width="143" height="44" fill="#e1f0f6" stroke="#fff"/>
+<text x="1527.5" y="374.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.085</text>
+<text x="138.0" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">2026.0</text>
+<rect x="150" y="392" width="143" height="44" fill="#b3d3e6" stroke="#fff"/>
+<text x="222.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.345</text>
+<rect x="295" y="392" width="143" height="44" fill="#b9d7e9" stroke="#fff"/>
+<text x="367.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.310</text>
+<rect x="440" y="392" width="143" height="44" fill="#e9f5f9" stroke="#fff"/>
+<text x="512.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.039</text>
+<rect x="585" y="392" width="143" height="44" fill="#e1f0f7" stroke="#fff"/>
+<text x="657.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.083</text>
+<rect x="730" y="392" width="143" height="44" fill="#e1f1f7" stroke="#fff"/>
+<text x="802.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.081</text>
+<rect x="875" y="392" width="143" height="44" fill="#dbedf4" stroke="#fff"/>
+<text x="947.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.117</text>
+<rect x="1020" y="392" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="1092.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.020</text>
+<rect x="1165" y="392" width="143" height="44" fill="#e5f3f8" stroke="#fff"/>
+<text x="1237.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.062</text>
+<rect x="1310" y="392" width="143" height="44" fill="#cbe3ef" stroke="#fff"/>
+<text x="1382.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.207</text>
+<rect x="1455" y="392" width="143" height="44" fill="#dfeff6" stroke="#fff"/>
+<text x="1527.5" y="420.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.093</text>
+</svg>

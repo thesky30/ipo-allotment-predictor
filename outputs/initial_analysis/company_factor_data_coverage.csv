@@ -1,0 +1,22 @@
+﻿metric,value,note
+rows_after_cleaning,1323,有效证券代码行数；已剔除 Wind 页脚/空行
+matched_to_ipo_sample,1320,能与 ipo_offline_sample 按 security_code 匹配的行数
+ipo_sample_missing_company_factor,316,现有 IPO 样本中暂未在本因子表出现的代码数
+company_factor_only,3,本因子表存在、但当前 IPO 样本库没有的代码数
+non_null__security_name_factor,1323,覆盖率 100.0%
+non_null__inquiry_announcement_date,1197,覆盖率 90.5%
+non_null__inquiry_start_date,1197,覆盖率 90.5%
+non_null__sw_level1_industry_code,1323,覆盖率 100.0%
+non_null__sw_level2_industry_code,1323,覆盖率 100.0%
+non_null__offline_market_value_threshold_10k_yuan,1197,覆盖率 90.5%
+non_null__expected_fundraising_100m_yuan,1320,覆盖率 99.8%
+non_null__offer_price_upper_yuan_factor,0,覆盖率 0.0%
+non_null__offer_price_lower_yuan_factor,0,覆盖率 0.0%
+non_null__lead_underwriter,1323,覆盖率 100.0%
+non_null__sponsor,1323,覆盖率 100.0%
+non_null__ipo_pe_pre_overallotment,8,覆盖率 0.6%
+non_null__industry_pe_at_ipo_factor,1303,覆盖率 98.5%
+non_null__comparable_pe_avg_ex_nonrecurring_factor,1244,覆盖率 94.0%
+non_null__revenue_cagr_3y_pct,359,覆盖率 27.1%
+non_null__latest_revenue_100m_yuan,1314,覆盖率 99.3%
+non_null__issue_pb_factor,1320,覆盖率 99.8%

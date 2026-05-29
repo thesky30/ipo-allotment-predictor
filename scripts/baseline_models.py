@@ -96,9 +96,31 @@ FEATURE_NODES: dict[str, dict] = {
     "industry_pe_at_ipo":                   {"node": "T-6", "src": "市场数据",              "cat": "估值"},
     "recent_ipo_first_day_return_ma20":     {"node": "T-6", "src": "历史IPO数据派生（滚动）","cat": "市场热度"},
     "market_turnover_ma20":                 {"node": "T-6", "src": "Tushare 沪深成交额派生（滚动）","cat": "市场流动性"},
+    "market_turnover_pct_rank_1y":          {"node": "T-6", "src": "市场成交额滚动分位",        "cat": "市场流动性"},
+    "market_turnover_ma20_over_ma60":       {"node": "T-6", "src": "市场成交额短长均线比",      "cat": "市场流动性"},
     "market_return_ma20":                   {"node": "T-6", "src": "Tushare 沪深300派生（滚动）",  "cat": "市场情绪"},
     "concurrent_ipo_count":                 {"node": "T-6", "src": "申购日历派生",              "cat": "批次竞争"},
+    "same_board_concurrent_ipo_count":      {"node": "T-6", "src": "申购日历派生",              "cat": "批次竞争"},
+    "concurrent_offline_issue_sum_10k":     {"node": "T-6", "src": "申购日历派生",              "cat": "批次竞争"},
     "same_board_break_rate_ma10":           {"node": "T-6", "src": "历史IPO首日涨幅派生（滚动）","cat": "市场热度"},
+    "offline_market_value_threshold_10k_yuan": {"node": "T-6", "src": "询价公告",              "cat": "申购规则"},
+    "expected_fundraising_100m_yuan":       {"node": "T-6", "src": "询价公告/招股书",          "cat": "发行规模"},
+    "log_expected_fundraising":             {"node": "T-6", "src": "预计募资额派生",            "cat": "发行规模"},
+    "latest_revenue_100m_yuan":             {"node": "T-6", "src": "招股书财务摘要",            "cat": "公司规模"},
+    "log_latest_revenue":                   {"node": "T-6", "src": "近一年营收额派生",          "cat": "公司规模"},
+    "revenue_cagr_3y_pct":                  {"node": "T-6", "src": "招股书财务摘要",            "cat": "成长"},
+    "board_turnover_ma20":                  {"node": "T-6", "src": "板块行情严格向前滚动",       "cat": "板块流动性"},
+    "board_turnover_pct_rank_1y":           {"node": "T-6", "src": "板块成交额滚动分位",         "cat": "板块流动性"},
+    "board_turnover_ma20_over_ma60":        {"node": "T-6", "src": "板块成交额短长均线比",       "cat": "板块流动性"},
+    "board_return_ma20":                    {"node": "T-6", "src": "板块行情严格向前滚动",       "cat": "板块情绪"},
+    "underwriter_prior_ipo_count":          {"node": "T-6", "src": "主承销商历史已发生IPO",      "cat": "承销商声誉"},
+    "underwriter_prior_log_oversub_mean":   {"node": "T-6", "src": "主承销商历史已发生IPO",      "cat": "承销商声誉"},
+    "underwriter_prior_first_day_return_mean": {"node": "T-6", "src": "主承销商历史已上市IPO",   "cat": "承销商声誉"},
+    "underwriter_prior_break_rate":         {"node": "T-6", "src": "主承销商历史已上市IPO",      "cat": "承销商声誉"},
+    "sw_l1_prior_ipo_count":                {"node": "T-6", "src": "申万一级代码历史已发生IPO",  "cat": "行业历史热度"},
+    "sw_l1_prior_log_oversub_mean":         {"node": "T-6", "src": "申万一级代码历史已发生IPO",  "cat": "行业历史热度"},
+    "sw_l1_prior_first_day_return_mean":    {"node": "T-6", "src": "申万一级代码历史已上市IPO",  "cat": "行业历史热度"},
+    "sw_l1_prior_break_rate":               {"node": "T-6", "src": "申万一级代码历史已上市IPO",  "cat": "行业历史热度"},
 
     # ── T-1 : inquiry-result announcement (after inquiry, before subscription) ─
     "offer_price_yuan":                     {"node": "T-1", "src": "定价公告",              "cat": "发行定价"},
@@ -165,6 +187,48 @@ STAGE_LABEL = {
     "T1":     "模型二-A (T-1) 回拨前 [研究对照]",
     "T1PLUS": "模型二-B (T+1) 回拨后",
 }
+
+NEW_T6_FACTOR_COLS = [
+    "offline_market_value_threshold_10k_yuan",
+    "expected_fundraising_100m_yuan",
+    "log_expected_fundraising",
+    "latest_revenue_100m_yuan",
+    "log_latest_revenue",
+    "revenue_cagr_3y_pct",
+    "board_turnover_ma20",
+    "board_turnover_pct_rank_1y",
+    "board_turnover_ma20_over_ma60",
+    "board_return_ma20",
+    "underwriter_prior_ipo_count",
+    "underwriter_prior_log_oversub_mean",
+    "underwriter_prior_first_day_return_mean",
+    "underwriter_prior_break_rate",
+    "sw_l1_prior_ipo_count",
+    "sw_l1_prior_log_oversub_mean",
+    "sw_l1_prior_first_day_return_mean",
+    "sw_l1_prior_break_rate",
+]
+
+
+def load_modeling_data() -> pd.DataFrame:
+    with sqlite3.connect(DATA_DIR / "ipo_offline.db") as conn:
+        df = pd.read_sql("SELECT * FROM ipo_offline_sample", conn)
+        tables = pd.read_sql(
+            "SELECT name FROM sqlite_master WHERE type='table'",
+            conn,
+        )["name"].tolist()
+        if "new_factor_panel" in tables:
+            factor_cols = ["security_code", *NEW_T6_FACTOR_COLS]
+            factors = pd.read_sql(
+                f"SELECT {', '.join(factor_cols)} FROM new_factor_panel",
+                conn,
+            ).drop_duplicates(subset=["security_code"], keep="first")
+            df = df.merge(factors, on="security_code", how="left", validate="many_to_one")
+        else:
+            print("Warning: new_factor_panel not found; new T-6 factors will be NaN.")
+            for col in NEW_T6_FACTOR_COLS:
+                df[col] = np.nan
+    return df
 
 
 # ---------------------------------------------------------------------------
@@ -553,8 +617,7 @@ def main() -> None:
     fig_dir.mkdir(parents=True, exist_ok=True)
 
     # ── Load data ─────────────────────────────────────────────────────────
-    with sqlite3.connect(DATA_DIR / "ipo_offline.db") as conn:
-        df = pd.read_sql("SELECT * FROM ipo_offline_sample", conn)
+    df = load_modeling_data()
     for dcol in ["listing_date", "subscription_deadline_date"]:
         df[dcol] = pd.to_datetime(df[dcol], errors="coerce")
     df[SORT_COL] = df["subscription_deadline_date"].fillna(df["listing_date"])

@@ -120,6 +120,14 @@ FEATURE_LABELS: dict[str, str] = {
     "industry_pe_at_ipo":                 "发行时行业市盈率",
     "comparable_pe_avg_ex_nonrecurring":  "可比公司市盈率均值",
     "recent_ipo_first_day_return_ma20":   "近20只IPO首日涨幅均值(市场热度)",
+    "market_turnover_ma20":               "近20日市场成交额均值",
+    "market_turnover_pct_rank_1y":        "市场成交额一年分位",
+    "market_turnover_ma20_over_ma60":     "市场成交额20日/60日偏离",
+    "market_return_ma20":                 "近20日市场涨跌幅",
+    "concurrent_ipo_count":               "同期IPO数量",
+    "same_board_concurrent_ipo_count":    "同板块同期IPO数量",
+    "concurrent_offline_issue_sum_10k":   "同期网下发行量合计",
+    "same_board_break_rate_ma10":         "同板块近10只破发率",
     "offer_price_range_pct":              "询价区间宽度",
     "offer_price_position_in_range":      "发行价在区间中的位置",
     "clawback_ratio_pct":                 "回拨比例",
@@ -287,6 +295,18 @@ def predict_from_code(
             "WHERE security_code = ? OR security_code LIKE ? LIMIT 1",
             conn, params=(code, code_bare + ".%")
         )
+        tables = pd.read_sql(
+            "SELECT name FROM sqlite_master WHERE type='table'",
+            conn,
+        )["name"].tolist()
+        if not row.empty and "new_factor_panel" in tables:
+            extra = pd.read_sql(
+                "SELECT * FROM new_factor_panel WHERE security_code = ? LIMIT 1",
+                conn, params=(str(row["security_code"].iloc[0]),),
+            )
+            if not extra.empty:
+                add_cols = [c for c in extra.columns if c not in row.columns or c == "security_code"]
+                row = row.merge(extra[add_cols], on="security_code", how="left")
 
     if row.empty:
         raise ValueError(

@@ -271,8 +271,8 @@ with st.sidebar:
     )
     st.markdown(STAGE_INFO[stage])
     st.divider()
-    st.caption("正式模型：LightGBM · 特征：发行结构+申购规则+估值+历史市场热度\n\n"
-               "OOS Spearman（询价前 T-6）：全局 0.512")
+    st.caption("正式模型：LightGBM · 特征：发行结构+申购规则+估值+历史市场热度+新增询价前因子\n\n"
+               "OOS Spearman（询价前 T-6）：全局 0.619")
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 st.title("📊 A股IPO 网下中签率预测")

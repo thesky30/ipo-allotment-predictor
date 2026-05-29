@@ -211,6 +211,7 @@ y = log(网下超额认购倍数)
 - 统一模型（含 board 特征 + 跨板块学习）≥ 板块专属模型；主板因样本少（约 105）单独建模反而更差，**不要默认分板块就更好**。
 - `recent_ipo_first_day_return_ma20` 已按“过去 20 只已上市 IPO 首日涨幅”滚动计算，向后看、无泄漏。
 - 已补充 4 个 T-6 市场环境特征（2026-05-25）：`market_turnover_ma20`（沪深两市/全A 近20日日均成交额，来源 Wind 万得全A，经 `scripts/convert_wind_market.py` 转换）、`market_return_ma20`（近20日涨跌幅）、`concurrent_ipo_count`（申购截止日 ±7 天批次竞争）、`same_board_break_rate_ma10`（同板块已上市近10只破发率）。全部严格向后看；`market_turnover_ma20` 在 lgbm_t6 中重要性排名第 2。OOS：T-6 0.488→0.512。市场两列对 T-6 的增益有时间区制敏感性，整体净正向。
+- 已纳入一批确定口径 T-6 因子（2026-05-29）：网下询价市值门槛、预计募资额、近一年营收、三年营收 CAGR、板块滚动行情、主承销商历史表现、申万一级行业代码历史 IPO 热度。`issue_pb_factor`、发行价格区间、行业行情滚动因子暂不入模，分别因可能依赖最终价、当前全空、缺少申万代码-名称映射。重跑后正式 `lgbm_t6` OOS Spearman=0.619。
 - 保存的全量模型对“已入库历史股票”的逐股查询属样本内（偏乐观）；某只股票的真实无泄漏成绩须查 `outputs/baseline_models/predictions.csv`（回测产出）。
 
 ### 代码与产出物地图
@@ -221,11 +222,13 @@ scripts/fetch_market_data.py       （备用）Tushare 拉成交额/指数 → d
 scripts/initial_data_analysis.py   数据清洗 + EDA  → data/processed/ + outputs/initial_analysis/
 scripts/baseline_models.py         三阶段建模 + 回测 → outputs/baseline_models/
 scripts/board_models.py            板块专项模型对比 → outputs/board_models/
+scripts/factor_insights.py         询价前因子洞察 + 板块/时期画像 → outputs/factor_insights/
 scripts/model_classes.py           可被 joblib 反序列化的模型类（稳定 pickle 路径）
 scripts/predict.py                 加载模型预测（CLI + Python API + 板块路由）
 app.py                             Streamlit 网页演示
 data/processed/ipo_offline.db      清洗后 SQLite（回测/查询中间层）
 outputs/*/models/*.joblib          序列化模型 + 特征列表
+outputs/factor_insights/           因子字典、IC、五分位分组、SHAP贡献、领导速览报告和图表
 ```
 
 ### 后续待办

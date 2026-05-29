@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1060" height="309" viewBox="0 0 1060 309">
+<rect width="100%" height="100%" fill="white"/>
+<text x="530.0" y="30.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="18" font-weight="700" text-anchor="middle" fill="#333">各板块核心询价前因子画像</text>
+<text x="222.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">市场成交额</text>
+<text x="367.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">新股赚钱效应</text>
+<text x="512.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">IPO拥挤度</text>
+<text x="657.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">同板块破发率</text>
+<text x="802.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">网下发行占比</text>
+<text x="947.5" y="52.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#333">申购上限</text>
+<text x="138.0" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">主板</text>
+<rect x="150" y="70" width="143" height="44" fill="#2c7fb8" stroke="#fff"/>
+<text x="222.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">11,328.5</text>
+<rect x="295" y="70" width="143" height="44" fill="#e9f6f9" stroke="#fff"/>
+<text x="367.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">177.6</text>
+<rect x="440" y="70" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="512.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">4.0</text>
+<rect x="585" y="70" width="143" height="44" fill="#edf8fb" stroke="#fff"/>
+<text x="657.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.0</text>
+<rect x="730" y="70" width="143" height="44" fill="#ebf7fa" stroke="#fff"/>
+<text x="802.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">60.0</text>
+<rect x="875" y="70" width="143" height="44" fill="#d7eaf3" stroke="#fff"/>
+<text x="947.5" y="98.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">1,290.0</text>
+<text x="138.0" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">创业板</text>
+<rect x="150" y="116" width="143" height="44" fill="#468fc1" stroke="#fff"/>
+<text x="222.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">9,793.9</text>
+<rect x="295" y="116" width="143" height="44" fill="#eaf6fa" stroke="#fff"/>
+<text x="367.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">163.7</text>
+<rect x="440" y="116" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="512.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">12.0</text>
+<rect x="585" y="116" width="143" height="44" fill="#edf8fb" stroke="#fff"/>
+<text x="657.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.0</text>
+<rect x="730" y="116" width="143" height="44" fill="#ebf7fa" stroke="#fff"/>
+<text x="802.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">71.5</text>
+<rect x="875" y="116" width="143" height="44" fill="#dbedf5" stroke="#fff"/>
+<text x="947.5" y="144.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">1,000.0</text>
+<text x="138.0" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">北交所</text>
+<rect x="150" y="162" width="143" height="44" fill="#4b92c2" stroke="#fff"/>
+<text x="222.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">9,468.8</text>
+<rect x="295" y="162" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="367.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">26.2</text>
+<rect x="440" y="162" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="512.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">24.0</text>
+<rect x="585" y="162" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="657.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.2</text>
+<rect x="730" y="162" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="802.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">58.7</text>
+<rect x="875" y="162" width="143" height="44" fill="#dbecf4" stroke="#fff"/>
+<text x="947.5" y="190.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">1,043.5</text>
+<text x="138.0" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="end" fill="#333">科创板</text>
+<rect x="150" y="208" width="143" height="44" fill="#4f95c4" stroke="#fff"/>
+<text x="222.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">9,250.8</text>
+<rect x="295" y="208" width="143" height="44" fill="#eaf6fa" stroke="#fff"/>
+<text x="367.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">131.2</text>
+<rect x="440" y="208" width="143" height="44" fill="#ecf7fa" stroke="#fff"/>
+<text x="512.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">12.0</text>
+<rect x="585" y="208" width="143" height="44" fill="#edf8fb" stroke="#fff"/>
+<text x="657.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">0.0</text>
+<rect x="730" y="208" width="143" height="44" fill="#ebf7fa" stroke="#fff"/>
+<text x="802.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">66.5</text>
+<rect x="875" y="208" width="143" height="44" fill="#ddeef5" stroke="#fff"/>
+<text x="947.5" y="236.0" font-family="Arial,Microsoft YaHei,sans-serif" font-size="12" font-weight="700" text-anchor="middle" fill="#111">915.0</text>
+</svg>

@@ -1,0 +1,362 @@
+﻿factor,factor_group,scope,scope_value,n,spearman_ic,abs_ic,icir_by_year,status
+recent_ipo_first_day_return_ma20,市场情绪因子,all,全市场,1215,0.3741771063817943,0.3741771063817943,0.16215133540805984,ok
+subscription_step_10k,申购规则因子,all,全市场,1235,0.30538579562086143,0.30538579562086143,1.4277699282173841,ok
+same_board_break_rate_ma10,市场情绪因子,all,全市场,1153,-0.3014425127413367,0.3014425127413367,-0.5673282750067219,ok
+market_turnover_ma20,市场流动性因子,all,全市场,1235,0.2940823498920318,0.2940823498920318,-0.6105541642189518,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,all,全市场,1235,-0.2402783367379095,0.2402783367379095,-0.21366242152491768,ok
+subscription_lower_limit_10k,申购规则因子,all,全市场,1235,0.227911797983334,0.227911797983334,0.9893702418659092,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,all,全市场,1124,-0.20396780330142555,0.20396780330142555,-0.6241225278448423,ok
+strategic_allocation_share_pct,发行供给因子,all,全市场,900,0.17624502363107486,0.17624502363107486,-0.15840544989349534,ok
+concurrent_ipo_count,IPO供给拥挤因子,all,全市场,1235,-0.16787102763825587,0.16787102763825587,-0.4927184491107098,ok
+offline_issue_before_share_pct,发行供给因子,all,全市场,1235,-0.1610878478220631,0.1610878478220631,-0.875366723943296,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,all,全市场,1227,-0.08416520079748481,0.08416520079748481,-0.09690182166830152,ok
+market_turnover_pct_rank_1y,市场流动性因子,all,全市场,1235,0.08310400881889843,0.08310400881889843,-0.5252512656302104,ok
+offline_issue_before_clawback_10k,发行供给因子,all,全市场,1235,-0.06667378540248431,0.06667378540248431,-1.4413772882931366,ok
+industry_pe_at_ipo,估值因子,all,全市场,1174,-0.05585232264945121,0.05585232264945121,-0.41415219453739915,ok
+market_turnover_ma20_over_ma60,市场流动性因子,all,全市场,1235,0.05055936843525522,0.05055936843525522,0.21031009113325888,ok
+subscription_upper_limit_10k,申购规则因子,all,全市场,1235,0.03498579786746328,0.03498579786746328,-1.446722124259887,ok
+market_return_ma20,市场情绪因子,all,全市场,1235,0.0338570562404711,0.0338570562404711,-0.3894097517962589,ok
+total_issue_shares_10k,发行供给因子,all,全市场,1235,-0.030632006975416813,0.030632006975416813,-0.9271063047609835,ok
+offer_price_range_pct,估值因子,all,全市场,0,,,,insufficient_sample
+offline_issue_before_clawback_10k,发行供给因子,board,主板,105,-0.46366091469063025,0.46366091469063025,,ok
+same_board_break_rate_ma10,市场情绪因子,board,创业板,461,-0.42434282378600335,0.42434282378600335,,ok
+total_issue_shares_10k,发行供给因子,board,主板,105,-0.4018516947517557,0.4018516947517557,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,board,创业板,476,0.3953398479550708,0.3953398479550708,,ok
+subscription_upper_limit_10k,申购规则因子,board,主板,105,-0.3785491328300181,0.3785491328300181,,ok
+offline_issue_before_share_pct,发行供给因子,board,主板,105,-0.37200835228741647,0.37200835228741647,,ok
+market_turnover_ma20,市场流动性因子,board,科创板,608,0.3601447839934169,0.3601447839934169,,ok
+offline_issue_before_share_pct,发行供给因子,board,科创板,608,-0.3115043207888988,0.3115043207888988,,ok
+subscription_lower_limit_10k,申购规则因子,board,主板,105,-0.28907821517073107,0.28907821517073107,,ok
+strategic_allocation_share_pct,发行供给因子,board,主板,54,0.26225337982318986,0.26225337982318986,,ok
+market_return_ma20,市场情绪因子,board,北交所,41,-0.23909236294383618,0.23909236294383618,,ok
+offline_issue_before_clawback_10k,发行供给因子,board,科创板,608,-0.23684529048907346,0.23684529048907346,,ok
+strategic_allocation_share_pct,发行供给因子,board,创业板,213,0.23085748735406053,0.23085748735406053,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,board,北交所,41,-0.22912289353066964,0.22912289353066964,,ok
+market_turnover_pct_rank_1y,市场流动性因子,board,创业板,481,0.22590517117809977,0.22590517117809977,,ok
+strategic_allocation_share_pct,发行供给因子,board,科创板,608,0.21794821052283492,0.21794821052283492,,ok
+market_turnover_ma20,市场流动性因子,board,主板,105,0.21135463577915342,0.21135463577915342,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,board,科创板,603,0.20076965505797018,0.20076965505797018,,ok
+concurrent_ipo_count,IPO供给拥挤因子,board,北交所,41,-0.19463937588936336,0.19463937588936336,,ok
+industry_pe_at_ipo,估值因子,board,科创板,590,0.19279317642321292,0.19279317642321292,,ok
+total_issue_shares_10k,发行供给因子,board,科创板,608,-0.19207660390071254,0.19207660390071254,,ok
+total_issue_shares_10k,发行供给因子,board,北交所,41,-0.18567759967911937,0.18567759967911937,,ok
+market_turnover_ma20,市场流动性因子,board,创业板,481,0.1837560046856401,0.1837560046856401,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,board,北交所,41,-0.1817118822458106,0.1817118822458106,,ok
+strategic_allocation_share_pct,发行供给因子,board,北交所,25,-0.18063420132283428,0.18063420132283428,,ok
+offline_issue_before_clawback_10k,发行供给因子,board,北交所,41,-0.17901476562126292,0.17901476562126292,,ok
+offline_issue_before_share_pct,发行供给因子,board,北交所,41,-0.17882754399099898,0.17882754399099898,,ok
+market_turnover_pct_rank_1y,市场流动性因子,board,科创板,608,0.16323842851947148,0.16323842851947148,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,board,创业板,481,-0.16289518916784365,0.16289518916784365,,ok
+market_return_ma20,市场情绪因子,board,科创板,608,0.1582466354917878,0.1582466354917878,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,board,科创板,608,0.15404518594063912,0.15404518594063912,,ok
+industry_pe_at_ipo,估值因子,board,主板,104,0.14865769575758875,0.14865769575758875,,ok
+subscription_step_10k,申购规则因子,board,主板,105,-0.14234985450028817,0.14234985450028817,,ok
+market_turnover_pct_rank_1y,市场流动性因子,board,主板,105,0.14117330143606552,0.14117330143606552,,ok
+same_board_break_rate_ma10,市场情绪因子,board,主板,94,-0.1372159130432299,0.1372159130432299,,ok
+same_board_break_rate_ma10,市场情绪因子,board,科创板,583,-0.13458738743374757,0.13458738743374757,,ok
+market_turnover_ma20,市场流动性因子,board,北交所,41,-0.13292625884222053,0.13292625884222053,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,board,主板,103,0.12458334019945892,0.12458334019945892,,ok
+subscription_lower_limit_10k,申购规则因子,board,创业板,481,0.12453332169506419,0.12453332169506419,,ok
+subscription_lower_limit_10k,申购规则因子,board,科创板,608,0.12291769865120246,0.12291769865120246,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,board,创业板,481,0.11941237454686707,0.11941237454686707,,ok
+offline_issue_before_share_pct,发行供给因子,board,创业板,481,-0.11663858214538181,0.11663858214538181,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,board,北交所,41,-0.11498257839721256,0.11498257839721256,,ok
+offline_issue_before_clawback_10k,发行供给因子,board,创业板,481,-0.10255705603449501,0.10255705603449501,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,board,北交所,36,-0.09961389961389963,0.09961389961389963,,ok
+market_turnover_pct_rank_1y,市场流动性因子,board,北交所,41,-0.09768759835140331,0.09768759835140331,,ok
+subscription_lower_limit_10k,申购规则因子,board,北交所,41,-0.09632420682358,0.09632420682358,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,board,科创板,606,0.09436553614711428,0.09436553614711428,,ok
+concurrent_ipo_count,IPO供给拥挤因子,board,科创板,608,0.09058907508897888,0.09058907508897888,,ok
+concurrent_ipo_count,IPO供给拥挤因子,board,创业板,481,-0.08306590108694119,0.08306590108694119,,ok
+total_issue_shares_10k,发行供给因子,board,创业板,481,-0.08124505659602388,0.08124505659602388,,ok
+market_return_ma20,市场情绪因子,board,创业板,481,0.07205882713754784,0.07205882713754784,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,board,创业板,475,-0.06918131283980551,0.06918131283980551,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,board,主板,105,0.06898625264762519,0.06898625264762519,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,board,主板,100,0.06761476147614762,0.06761476147614762,,ok
+industry_pe_at_ipo,估值因子,board,创业板,480,0.055855170450022126,0.055855170450022126,,ok
+concurrent_ipo_count,IPO供给拥挤因子,board,主板,105,-0.050565503118132106,0.050565503118132106,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,board,科创板,608,-0.03425655959550727,0.03425655959550727,,ok
+subscription_upper_limit_10k,申购规则因子,board,创业板,481,-0.02985255157559049,0.02985255157559049,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,board,创业板,478,-0.021320447615953846,0.021320447615953846,,ok
+subscription_step_10k,申购规则因子,board,创业板,481,0.01643599009494428,0.01643599009494428,,ok
+subscription_upper_limit_10k,申购规则因子,board,北交所,41,-0.0162020905923345,0.0162020905923345,,ok
+subscription_upper_limit_10k,申购规则因子,board,科创板,608,0.013656594124793996,0.013656594124793996,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,board,科创板,544,0.011435915480176197,0.011435915480176197,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,board,主板,105,0.007786810917416264,0.007786810917416264,,ok
+subscription_step_10k,申购规则因子,board,科创板,608,0.007528252082182427,0.007528252082182427,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,board,主板,102,0.002957291731457555,0.002957291731457555,,ok
+market_return_ma20,市场情绪因子,board,主板,105,0.0006013229115663151,0.0006013229115663151,,ok
+same_board_break_rate_ma10,市场情绪因子,board,北交所,15,,,,insufficient_sample
+subscription_step_10k,申购规则因子,board,北交所,41,,,,insufficient_sample
+industry_pe_at_ipo,估值因子,board,北交所,0,,,,insufficient_sample
+comparable_pe_avg_ex_nonrecurring,估值因子,board,北交所,2,,,,insufficient_sample
+offer_price_range_pct,估值因子,board,主板,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,board,创业板,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,board,北交所,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,board,科创板,0,,,,insufficient_sample
+recent_ipo_first_day_return_ma20,市场情绪因子,period,2021-2022 扩容与破发阶段,557,0.6677671704068378,0.6677671704068378,,ok
+same_board_break_rate_ma10,市场情绪因子,period,2021-2022 扩容与破发阶段,557,-0.6030796103019349,0.6030796103019349,,ok
+subscription_step_10k,申购规则因子,period,2019-2020 注册制早期,296,0.525710295825264,0.525710295825264,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,period,2019-2020 注册制早期,281,0.4537431448690628,0.4537431448690628,,ok
+market_turnover_pct_rank_1y,市场流动性因子,period,2021-2022 扩容与破发阶段,557,0.41807689516423985,0.41807689516423985,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,period,2023 全面注册制切换,199,0.4084224151058322,0.4084224151058322,,ok
+market_turnover_ma20,市场流动性因子,period,2019-2020 注册制早期,296,0.3775279882168039,0.3775279882168039,,ok
+offline_issue_before_share_pct,发行供给因子,period,2024-2026 当前阶段,178,-0.37325390293534993,0.37325390293534993,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,period,2019-2020 注册制早期,296,-0.3454212748258719,0.3454212748258719,,ok
+same_board_break_rate_ma10,市场情绪因子,period,2024-2026 当前阶段,178,-0.3426480711693453,0.3426480711693453,,ok
+subscription_lower_limit_10k,申购规则因子,period,2021-2022 扩容与破发阶段,557,0.2922330312750614,0.2922330312750614,,ok
+offline_issue_before_share_pct,发行供给因子,period,2023 全面注册制切换,204,-0.29143457452502664,0.29143457452502664,,ok
+same_board_break_rate_ma10,市场情绪因子,period,2023 全面注册制切换,193,-0.28752452050514754,0.28752452050514754,,ok
+subscription_lower_limit_10k,申购规则因子,period,2019-2020 注册制早期,296,0.28087516884856556,0.28087516884856556,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,period,2021-2022 扩容与破发阶段,557,0.27731864568155923,0.27731864568155923,,ok
+market_return_ma20,市场情绪因子,period,2021-2022 扩容与破发阶段,557,0.22786629675487038,0.22786629675487038,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,period,2021-2022 扩容与破发阶段,557,0.21828838361241618,0.21828838361241618,,ok
+subscription_upper_limit_10k,申购规则因子,period,2019-2020 注册制早期,296,0.2140014016590504,0.2140014016590504,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,period,2019-2020 注册制早期,295,-0.2071309859889055,0.2071309859889055,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,period,2024-2026 当前阶段,165,-0.1986848467531647,0.1986848467531647,,ok
+offline_issue_before_clawback_10k,发行供给因子,period,2021-2022 扩容与破发阶段,557,-0.197773342250701,0.197773342250701,,ok
+total_issue_shares_10k,发行供给因子,period,2021-2022 扩容与破发阶段,557,-0.18919395088337848,0.18919395088337848,,ok
+subscription_step_10k,申购规则因子,period,2021-2022 扩容与破发阶段,557,0.17646578534187266,0.17646578534187266,,ok
+subscription_upper_limit_10k,申购规则因子,period,2021-2022 扩容与破发阶段,557,-0.17240092893110254,0.17240092893110254,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,period,2023 全面注册制切换,204,-0.17226646804672377,0.17226646804672377,,ok
+concurrent_ipo_count,IPO供给拥挤因子,period,2021-2022 扩容与破发阶段,557,0.17090418632240462,0.17090418632240462,,ok
+subscription_step_10k,申购规则因子,period,2023 全面注册制切换,204,0.17065788555246295,0.17065788555246295,,ok
+same_board_break_rate_ma10,市场情绪因子,period,2019-2020 注册制早期,225,-0.16987172241663057,0.16987172241663057,,ok
+market_turnover_ma20,市场流动性因子,period,2024-2026 当前阶段,178,0.16720829570362808,0.16720829570362808,,ok
+industry_pe_at_ipo,估值因子,period,2019-2020 注册制早期,253,0.15840379079308908,0.15840379079308908,,ok
+market_return_ma20,市场情绪因子,period,2023 全面注册制切换,204,-0.15283956400817467,0.15283956400817467,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,period,2021-2022 扩容与破发阶段,557,0.15273176721262705,0.15273176721262705,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,period,2024-2026 当前阶段,171,0.1525451796385629,0.1525451796385629,,ok
+concurrent_ipo_count,IPO供给拥挤因子,period,2019-2020 注册制早期,296,-0.14508902463320064,0.14508902463320064,,ok
+industry_pe_at_ipo,估值因子,period,2023 全面注册制切换,202,-0.14047414610906686,0.14047414610906686,,ok
+market_turnover_ma20,市场流动性因子,period,2023 全面注册制切换,204,-0.13977226968337592,0.13977226968337592,,ok
+concurrent_ipo_count,IPO供给拥挤因子,period,2023 全面注册制切换,204,-0.13943381573856153,0.13943381573856153,,ok
+market_turnover_pct_rank_1y,市场流动性因子,period,2019-2020 注册制早期,296,0.13586262851917022,0.13586262851917022,,ok
+industry_pe_at_ipo,估值因子,period,2021-2022 扩容与破发阶段,543,0.13075455528624913,0.13075455528624913,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,period,2023 全面注册制切换,204,0.12156796242301693,0.12156796242301693,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,period,2024-2026 当前阶段,178,0.11495163440395388,0.11495163440395388,,ok
+offline_issue_before_clawback_10k,发行供给因子,period,2023 全面注册制切换,204,-0.11240950818700982,0.11240950818700982,,ok
+offline_issue_before_share_pct,发行供给因子,period,2019-2020 注册制早期,296,0.10908163685983312,0.10908163685983312,,ok
+subscription_step_10k,申购规则因子,period,2024-2026 当前阶段,178,0.10520894050979814,0.10520894050979814,,ok
+industry_pe_at_ipo,估值因子,period,2024-2026 当前阶段,176,-0.10128825274340435,0.10128825274340435,,ok
+offline_issue_before_clawback_10k,发行供给因子,period,2024-2026 当前阶段,178,-0.09654255248422412,0.09654255248422412,,ok
+subscription_upper_limit_10k,申购规则因子,period,2024-2026 当前阶段,178,-0.08822378323308995,0.08822378323308995,,ok
+subscription_lower_limit_10k,申购规则因子,period,2023 全面注册制切换,204,0.08288615845468704,0.08288615845468704,,ok
+total_issue_shares_10k,发行供给因子,period,2023 全面注册制切换,204,-0.07527469557924855,0.07527469557924855,,ok
+subscription_upper_limit_10k,申购规则因子,period,2023 全面注册制切换,204,-0.07033655081688939,0.07033655081688939,,ok
+market_turnover_ma20,市场流动性因子,period,2021-2022 扩容与破发阶段,557,0.0652852294282705,0.0652852294282705,,ok
+market_turnover_pct_rank_1y,市场流动性因子,period,2023 全面注册制切换,204,-0.057557766391436144,0.057557766391436144,,ok
+offline_issue_before_share_pct,发行供给因子,period,2021-2022 扩容与破发阶段,557,-0.05658748335743771,0.05658748335743771,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,period,2024-2026 当前阶段,178,0.05250290181492432,0.05250290181492432,,ok
+strategic_allocation_share_pct,发行供给因子,period,2023 全面注册制切换,115,-0.05212392182938204,0.05212392182938204,,ok
+market_return_ma20,市场情绪因子,period,2019-2020 注册制早期,296,-0.04806130079057016,0.04806130079057016,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,period,2021-2022 扩容与破发阶段,516,-0.04711837837868745,0.04711837837868745,,ok
+subscription_lower_limit_10k,申购规则因子,period,2024-2026 当前阶段,178,0.04613976621353905,0.04613976621353905,,ok
+total_issue_shares_10k,发行供给因子,period,2019-2020 注册制早期,296,-0.043608761230896145,0.043608761230896145,,ok
+offline_issue_before_clawback_10k,发行供给因子,period,2019-2020 注册制早期,296,-0.03700750894506372,0.03700750894506372,,ok
+concurrent_ipo_count,IPO供给拥挤因子,period,2024-2026 当前阶段,178,0.02977674830225993,0.02977674830225993,,ok
+strategic_allocation_share_pct,发行供给因子,period,2021-2022 扩容与破发阶段,407,0.027343660649764456,0.027343660649764456,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,period,2019-2020 注册制早期,296,-0.024515735954519186,0.024515735954519186,,ok
+strategic_allocation_share_pct,发行供给因子,period,2024-2026 当前阶段,141,-0.02428311406146386,0.02428311406146386,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,period,2024-2026 当前阶段,178,-0.02160522560211233,0.02160522560211233,,ok
+market_return_ma20,市场情绪因子,period,2024-2026 当前阶段,178,-0.014540730698974205,0.014540730698974205,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,period,2019-2020 注册制早期,249,0.011211817180687575,0.011211817180687575,,ok
+strategic_allocation_share_pct,发行供给因子,period,2019-2020 注册制早期,237,-0.009096019866182912,0.009096019866182912,,ok
+market_turnover_pct_rank_1y,市场流动性因子,period,2024-2026 当前阶段,178,-0.008691363298687855,0.008691363298687855,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,period,2023 全面注册制切换,204,-0.0076245132199221155,0.0076245132199221155,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,period,2023 全面注册制切换,194,-0.0074059251510188665,0.0074059251510188665,,ok
+total_issue_shares_10k,发行供给因子,period,2024-2026 当前阶段,178,0.006029528420578966,0.006029528420578966,,ok
+market_turnover_ma20,市场流动性因子,period,未知时期,0,,,,insufficient_sample
+market_turnover_pct_rank_1y,市场流动性因子,period,未知时期,0,,,,insufficient_sample
+market_turnover_ma20_over_ma60,市场流动性因子,period,未知时期,0,,,,insufficient_sample
+market_return_ma20,市场情绪因子,period,未知时期,0,,,,insufficient_sample
+recent_ipo_first_day_return_ma20,市场情绪因子,period,未知时期,0,,,,insufficient_sample
+same_board_break_rate_ma10,市场情绪因子,period,未知时期,0,,,,insufficient_sample
+concurrent_ipo_count,IPO供给拥挤因子,period,未知时期,0,,,,insufficient_sample
+same_board_concurrent_ipo_count,IPO供给拥挤因子,period,未知时期,0,,,,insufficient_sample
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,period,未知时期,0,,,,insufficient_sample
+total_issue_shares_10k,发行供给因子,period,未知时期,0,,,,insufficient_sample
+offline_issue_before_clawback_10k,发行供给因子,period,未知时期,0,,,,insufficient_sample
+offline_issue_before_share_pct,发行供给因子,period,未知时期,0,,,,insufficient_sample
+strategic_allocation_share_pct,发行供给因子,period,未知时期,0,,,,insufficient_sample
+subscription_upper_limit_10k,申购规则因子,period,未知时期,0,,,,insufficient_sample
+subscription_lower_limit_10k,申购规则因子,period,未知时期,0,,,,insufficient_sample
+subscription_step_10k,申购规则因子,period,未知时期,0,,,,insufficient_sample
+industry_pe_at_ipo,估值因子,period,未知时期,0,,,,insufficient_sample
+comparable_pe_avg_ex_nonrecurring,估值因子,period,未知时期,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,period,2019-2020 注册制早期,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,period,2021-2022 扩容与破发阶段,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,period,2023 全面注册制切换,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,period,2024-2026 当前阶段,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,period,未知时期,0,,,,insufficient_sample
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2026.0,25,-0.8384615384615385,0.8384615384615385,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2026.0,29,-0.6162561576354678,0.6162561576354678,,ok
+subscription_step_10k,申购规则因子,year,2020.0,226,0.5953933235529087,0.5953933235529087,,ok
+industry_pe_at_ipo,估值因子,year,2026.0,28,-0.5911330049261083,0.5911330049261083,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2019.0,70,0.49491600595565394,0.49491600595565394,,ok
+same_board_break_rate_ma10,市场情绪因子,year,2019.0,45,0.4930344855611716,0.4930344855611716,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2021.0,309,0.48663513123268837,0.48663513123268837,,ok
+same_board_break_rate_ma10,市场情绪因子,year,2024.0,66,-0.47030659295528593,0.47030659295528593,,ok
+same_board_break_rate_ma10,市场情绪因子,year,2021.0,309,-0.4586566136847312,0.4586566136847312,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2019.0,69,-0.45683647094042157,0.45683647094042157,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2023.0,199,0.4084224151058322,0.4084224151058322,,ok
+offline_issue_before_share_pct,发行供给因子,year,2024.0,66,-0.39955722396136184,0.39955722396136184,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2019.0,70,-0.3924519059677003,0.3924519059677003,,ok
+market_turnover_ma20,市场流动性因子,year,2019.0,70,-0.37977929623680384,0.37977929623680384,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2020.0,226,-0.37846651421276456,0.37846651421276456,,ok
+offline_issue_before_share_pct,发行供给因子,year,2025.0,83,-0.3741248857239277,0.3741248857239277,,ok
+industry_pe_at_ipo,估值因子,year,2019.0,70,0.3698978105525788,0.3698978105525788,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2019.0,70,-0.367048154407628,0.367048154407628,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2019.0,70,-0.367048154407628,0.367048154407628,,ok
+total_issue_shares_10k,发行供给因子,year,2019.0,70,-0.36685787221212357,0.36685787221212357,,ok
+subscription_lower_limit_10k,申购规则因子,year,2020.0,226,0.35925573906841096,0.35925573906841096,,ok
+industry_pe_at_ipo,估值因子,year,2024.0,66,-0.3203523752444683,0.3203523752444683,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2020.0,226,-0.3192281935926736,0.3192281935926736,,ok
+market_return_ma20,市场情绪因子,year,2019.0,70,-0.31900198343060004,0.31900198343060004,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2019.0,65,-0.31875,0.31875,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2021.0,309,0.31694885586256477,0.31694885586256477,,ok
+subscription_step_10k,申购规则因子,year,2026.0,29,0.31622776601683794,0.31622776601683794,,ok
+offline_issue_before_share_pct,发行供给因子,year,2023.0,204,-0.29143457452502664,0.29143457452502664,,ok
+same_board_break_rate_ma10,市场情绪因子,year,2023.0,193,-0.28752452050514754,0.28752452050514754,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2020.0,216,0.27760273401683755,0.27760273401683755,,ok
+offline_issue_before_share_pct,发行供给因子,year,2019.0,70,-0.27134908768183763,0.27134908768183763,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2025.0,83,-0.2683976323412115,0.2683976323412115,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2020.0,226,-0.26463184353310215,0.26463184353310215,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2024.0,66,-0.2621058246866482,0.2621058246866482,,ok
+total_issue_shares_10k,发行供给因子,year,2022.0,248,-0.2581595531878588,0.2581595531878588,,ok
+subscription_upper_limit_10k,申购规则因子,year,2025.0,83,-0.2566806757789983,0.2566806757789983,,ok
+offline_issue_before_share_pct,发行供给因子,year,2026.0,29,-0.2544648375010404,0.2544648375010404,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2022.0,248,0.25349353532715163,0.25349353532715163,,ok
+market_return_ma20,市场情绪因子,year,2021.0,309,0.2495159234143486,0.2495159234143486,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2022.0,248,-0.24829482805534314,0.24829482805534314,,ok
+same_board_break_rate_ma10,市场情绪因子,year,2020.0,180,-0.2463048795158938,0.2463048795158938,,ok
+same_board_break_rate_ma10,市场情绪因子,year,2022.0,248,-0.2401260888224443,0.2401260888224443,,ok
+subscription_lower_limit_10k,申购规则因子,year,2022.0,248,0.23525476015823416,0.23525476015823416,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2020.0,226,-0.2345239911436907,0.2345239911436907,,ok
+market_return_ma20,市场情绪因子,year,2024.0,66,-0.23246104005462592,0.23246104005462592,,ok
+subscription_upper_limit_10k,申购规则因子,year,2022.0,248,-0.23075903669963413,0.23075903669963413,,ok
+market_return_ma20,市场情绪因子,year,2020.0,226,-0.21939091408133968,0.21939091408133968,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2024.0,65,-0.21901223776223777,0.21901223776223777,,ok
+subscription_lower_limit_10k,申购规则因子,year,2021.0,309,0.21766387828777473,0.21766387828777473,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2021.0,309,0.2056934609393112,0.2056934609393112,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2021.0,309,-0.205112962941697,0.205112962941697,,ok
+subscription_step_10k,申购规则因子,year,2022.0,248,0.2005289386372516,0.2005289386372516,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2025.0,83,0.2000335838126023,0.2000335838126023,,ok
+subscription_step_10k,申购规则因子,year,2021.0,309,0.19917357179777379,0.19917357179777379,,ok
+total_issue_shares_10k,发行供给因子,year,2021.0,309,-0.19823380510208433,0.19823380510208433,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2024.0,66,0.19754206416433645,0.19754206416433645,,ok
+subscription_upper_limit_10k,申购规则因子,year,2026.0,29,-0.19568703652840372,0.19568703652840372,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2024.0,66,-0.18654668511871395,0.18654668511871395,,ok
+recent_ipo_first_day_return_ma20,市场情绪因子,year,2024.0,66,-0.18442751278572178,0.18442751278572178,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2022.0,224,-0.18137581751861306,0.18137581751861306,,ok
+subscription_upper_limit_10k,申购规则因子,year,2021.0,309,-0.18119966132263224,0.18119966132263224,,ok
+strategic_allocation_share_pct,发行供给因子,year,2019.0,70,0.17776306501527428,0.17776306501527428,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2020.0,226,-0.17680045229641847,0.17680045229641847,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2025.0,83,0.17409603856211664,0.17409603856211664,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2023.0,204,-0.17226646804672377,0.17226646804672377,,ok
+subscription_lower_limit_10k,申购规则因子,year,2024.0,66,0.1720787880439305,0.1720787880439305,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2024.0,63,0.17089093701996927,0.17089093701996927,,ok
+subscription_step_10k,申购规则因子,year,2023.0,204,0.17065788555246295,0.17065788555246295,,ok
+total_issue_shares_10k,发行供给因子,year,2025.0,83,-0.160228793344967,0.160228793344967,,ok
+market_return_ma20,市场情绪因子,year,2025.0,83,0.15843610671581063,0.15843610671581063,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2025.0,75,-0.1577962858950715,0.1577962858950715,,ok
+market_return_ma20,市场情绪因子,year,2023.0,204,-0.15283956400817467,0.15283956400817467,,ok
+strategic_allocation_share_pct,发行供给因子,year,2020.0,167,-0.15132922229765403,0.15132922229765403,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2021.0,309,0.14854026794773909,0.14854026794773909,,ok
+market_turnover_ma20,市场流动性因子,year,2024.0,66,-0.14628239853280323,0.14628239853280323,,ok
+strategic_allocation_share_pct,发行供给因子,year,2025.0,72,-0.14303614757817268,0.14303614757817268,,ok
+industry_pe_at_ipo,估值因子,year,2023.0,202,-0.14047414610906686,0.14047414610906686,,ok
+market_turnover_ma20,市场流动性因子,year,2023.0,204,-0.13977226968337592,0.13977226968337592,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2023.0,204,-0.13943381573856153,0.13943381573856153,,ok
+offline_issue_before_share_pct,发行供给因子,year,2020.0,226,0.1341791237293683,0.1341791237293683,,ok
+strategic_allocation_share_pct,发行供给因子,year,2022.0,182,-0.12871254193583392,0.12871254193583392,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2026.0,29,-0.12610837438423642,0.12610837438423642,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2025.0,83,-0.12524663527227015,0.12524663527227015,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2023.0,204,0.12156796242301693,0.12156796242301693,,ok
+industry_pe_at_ipo,估值因子,year,2021.0,299,-0.12028284549256589,0.12028284549256589,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2023.0,204,-0.11240950818700982,0.11240950818700982,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2021.0,292,-0.11234994596291414,0.11234994596291414,,ok
+market_return_ma20,市场情绪因子,year,2026.0,29,-0.10946750885411705,0.10946750885411705,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2021.0,309,0.10669560463583767,0.10669560463583767,,ok
+subscription_upper_limit_10k,申购规则因子,year,2020.0,226,-0.10498557009768668,0.10498557009768668,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2022.0,248,0.09955041907411633,0.09955041907411633,,ok
+industry_pe_at_ipo,估值因子,year,2025.0,82,-0.09929525734395804,0.09929525734395804,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2019.0,70,-0.09875874948774954,0.09875874948774954,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2022.0,248,0.09770884504453754,0.09770884504453754,,ok
+subscription_lower_limit_10k,申购规则因子,year,2019.0,70,0.09647070343524007,0.09647070343524007,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2022.0,248,0.09151120893850913,0.09151120893850913,,ok
+strategic_allocation_share_pct,发行供给因子,year,2024.0,44,0.08860482187403243,0.08860482187403243,,ok
+market_turnover_ma20,市场流动性因子,year,2026.0,29,-0.08777124583798573,0.08777124583798573,,ok
+total_issue_shares_10k,发行供给因子,year,2024.0,66,0.08635016168041296,0.08635016168041296,,ok
+subscription_lower_limit_10k,申购规则因子,year,2023.0,204,0.08288615845468704,0.08288615845468704,,ok
+total_issue_shares_10k,发行供给因子,year,2023.0,204,-0.07527469557924855,0.07527469557924855,,ok
+subscription_step_10k,申购规则因子,year,2024.0,66,0.07487514999114352,0.07487514999114352,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2024.0,66,0.07357576677430086,0.07357576677430086,,ok
+subscription_upper_limit_10k,申购规则因子,year,2023.0,204,-0.07033655081688939,0.07033655081688939,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2026.0,27,0.07020757020757021,0.07020757020757021,,ok
+strategic_allocation_share_pct,发行供给因子,year,2021.0,225,0.06899024160069733,0.06899024160069733,,ok
+offline_issue_before_share_pct,发行供给因子,year,2022.0,248,0.06745188251400286,0.06745188251400286,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2021.0,309,0.06146647955310478,0.06146647955310478,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2022.0,248,-0.05996771487345379,0.05996771487345379,,ok
+subscription_lower_limit_10k,申购规则因子,year,2025.0,83,-0.058029469939143256,0.058029469939143256,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2023.0,204,-0.057557766391436144,0.057557766391436144,,ok
+market_turnover_ma20,市场流动性因子,year,2020.0,226,0.05693854594834319,0.05693854594834319,,ok
+strategic_allocation_share_pct,发行供给因子,year,2023.0,115,-0.05212392182938204,0.05212392182938204,,ok
+total_issue_shares_10k,发行供给因子,year,2020.0,226,-0.04893778927793075,0.04893778927793075,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2019.0,69,0.04819145049324078,0.04819145049324078,,ok
+subscription_upper_limit_10k,申购规则因子,year,2019.0,70,-0.042329444527199424,0.042329444527199424,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2020.0,180,0.0418860664423799,0.0418860664423799,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2025.0,83,-0.040578282757285554,0.040578282757285554,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2020.0,226,-0.0405398978135654,0.0405398978135654,,ok
+offline_issue_before_share_pct,发行供给因子,year,2021.0,309,-0.04018361799029925,0.04018361799029925,,ok
+industry_pe_at_ipo,估值因子,year,2022.0,244,-0.038392910249083444,0.038392910249083444,,ok
+total_issue_shares_10k,发行供给因子,year,2026.0,29,-0.03818674666271495,0.03818674666271495,,ok
+concurrent_ipo_count,IPO供给拥挤因子,year,2026.0,29,-0.03628632719019429,0.03628632719019429,,ok
+offline_issue_before_clawback_10k,发行供给因子,year,2024.0,66,-0.03220991765040962,0.03220991765040962,,ok
+industry_pe_at_ipo,估值因子,year,2020.0,183,0.027438555749589325,0.027438555749589325,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2025.0,83,0.026111020498798036,0.026111020498798036,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2022.0,248,0.0255499532137219,0.0255499532137219,,ok
+market_turnover_ma20,市场流动性因子,year,2021.0,309,-0.022519199868079296,0.022519199868079296,,ok
+market_turnover_ma20,市场流动性因子,year,2025.0,83,0.019134085627222443,0.019134085627222443,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2025.0,81,-0.01795392953929539,0.01795392953929539,,ok
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,2026.0,29,-0.016419362715838656,0.016419362715838656,,ok
+subscription_lower_limit_10k,申购规则因子,year,2026.0,29,-0.01573258378097499,0.01573258378097499,,ok
+strategic_allocation_share_pct,发行供给因子,year,2026.0,25,-0.014683310858710675,0.014683310858710675,,ok
+market_turnover_ma20,市场流动性因子,year,2022.0,248,0.013581247627204923,0.013581247627204923,,ok
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,2023.0,204,-0.0076245132199221155,0.0076245132199221155,,ok
+comparable_pe_avg_ex_nonrecurring,估值因子,year,2023.0,194,-0.0074059251510188665,0.0074059251510188665,,ok
+market_return_ma20,市场情绪因子,year,2022.0,248,0.003932283376246681,0.003932283376246681,,ok
+market_turnover_pct_rank_1y,市场流动性因子,year,2026.0,29,0.002969225714084371,0.002969225714084371,,ok
+subscription_upper_limit_10k,申购规则因子,year,2024.0,66,-0.0013369965343656496,0.0013369965343656496,,ok
+market_turnover_ma20_over_ma60,市场流动性因子,year,2026.0,29,0.0,0.0,,ok
+market_turnover_ma20,市场流动性因子,year,,0,,,,insufficient_sample
+market_turnover_pct_rank_1y,市场流动性因子,year,,0,,,,insufficient_sample
+market_turnover_ma20_over_ma60,市场流动性因子,year,,0,,,,insufficient_sample
+market_return_ma20,市场情绪因子,year,,0,,,,insufficient_sample
+recent_ipo_first_day_return_ma20,市场情绪因子,year,,0,,,,insufficient_sample
+same_board_break_rate_ma10,市场情绪因子,year,2025.0,83,,,,insufficient_sample
+same_board_break_rate_ma10,市场情绪因子,year,2026.0,29,,,,insufficient_sample
+same_board_break_rate_ma10,市场情绪因子,year,,0,,,,insufficient_sample
+concurrent_ipo_count,IPO供给拥挤因子,year,,0,,,,insufficient_sample
+same_board_concurrent_ipo_count,IPO供给拥挤因子,year,,0,,,,insufficient_sample
+concurrent_offline_issue_sum_10k,IPO供给拥挤因子,year,,0,,,,insufficient_sample
+total_issue_shares_10k,发行供给因子,year,,0,,,,insufficient_sample
+offline_issue_before_clawback_10k,发行供给因子,year,,0,,,,insufficient_sample
+offline_issue_before_share_pct,发行供给因子,year,,0,,,,insufficient_sample
+strategic_allocation_share_pct,发行供给因子,year,,0,,,,insufficient_sample
+subscription_upper_limit_10k,申购规则因子,year,,0,,,,insufficient_sample
+subscription_lower_limit_10k,申购规则因子,year,,0,,,,insufficient_sample
+subscription_step_10k,申购规则因子,year,2019.0,70,,,,insufficient_sample
+subscription_step_10k,申购规则因子,year,2025.0,83,,,,insufficient_sample
+subscription_step_10k,申购规则因子,year,,0,,,,insufficient_sample
+industry_pe_at_ipo,估值因子,year,,0,,,,insufficient_sample
+comparable_pe_avg_ex_nonrecurring,估值因子,year,,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2019.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2020.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2021.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2022.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2023.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2024.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2025.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,2026.0,0,,,,insufficient_sample
+offer_price_range_pct,估值因子,year,,0,,,,insufficient_sample

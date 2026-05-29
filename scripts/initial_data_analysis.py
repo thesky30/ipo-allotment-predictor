@@ -389,6 +389,8 @@ def load_market_daily(path: Path = MARKET_DAILY_PATH) -> pd.DataFrame | None:
 
     Returns the DataFrame sorted ascending by trade_date with two extra columns:
       turnover_ma20  : 20-trading-day mean of total_turnover_100m
+      turnover_ma60  : 60-trading-day mean of total_turnover_100m
+      turnover_pct_rank_252 : 252-trading-day percentile rank of turnover_ma20
       mkt_ret20      : 20-trading-day market return in % (close ratio)
     Returns None if the file is missing so the pipeline still runs without it.
     """
@@ -400,6 +402,13 @@ def load_market_daily(path: Path = MARKET_DAILY_PATH) -> pd.DataFrame | None:
     # Back-compat: older fetch_market_data.py wrote csi300_close.
     close_col = "mkt_close" if "mkt_close" in md.columns else "csi300_close"
     md["turnover_ma20"] = md["total_turnover_100m"].rolling(20, min_periods=10).mean()
+    md["turnover_ma60"] = md["total_turnover_100m"].rolling(60, min_periods=30).mean()
+    md["turnover_ma20_over_ma60"] = md["turnover_ma20"] / md["turnover_ma60"] - 1.0
+    md["turnover_pct_rank_252"] = (
+        md["turnover_ma20"]
+        .rolling(252, min_periods=60)
+        .apply(lambda x: pd.Series(x).rank(pct=True).iloc[-1], raw=False)
+    )
     md["mkt_ret20"] = (md[close_col] / md[close_col].shift(20) - 1.0) * 100
     return md
 
@@ -413,12 +422,16 @@ def _attach_market_features(out: pd.DataFrame, ref_date: pd.Series) -> pd.DataFr
     """
     md = load_market_daily()
     out["market_turnover_ma20"] = np.nan
+    out["market_turnover_pct_rank_1y"] = np.nan
+    out["market_turnover_ma20_over_ma60"] = np.nan
     out["market_return_ma20"] = np.nan
     if md is None:
         return out
 
     dates = md["trade_date"].values.astype("datetime64[ns]")
     turn_arr = md["turnover_ma20"].values
+    turn_rank_arr = md["turnover_pct_rank_252"].values
+    turn_ratio_arr = md["turnover_ma20_over_ma60"].values
     ret_arr = md["mkt_ret20"].values
 
     ref_vals = ref_date.values.astype("datetime64[ns]")
@@ -428,6 +441,8 @@ def _attach_market_features(out: pd.DataFrame, ref_date: pd.Series) -> pd.DataFr
     ok = valid & (idx >= 0)
     safe_idx = np.where(ok, idx, 0)
     out.loc[ok, "market_turnover_ma20"] = turn_arr[safe_idx][ok]
+    out.loc[ok, "market_turnover_pct_rank_1y"] = turn_rank_arr[safe_idx][ok]
+    out.loc[ok, "market_turnover_ma20_over_ma60"] = turn_ratio_arr[safe_idx][ok]
     out.loc[ok, "market_return_ma20"] = ret_arr[safe_idx][ok]
     return out
 
@@ -451,6 +466,47 @@ def _concurrent_ipo_count(sub: pd.Series, window_days: int = 7) -> np.ndarray:
         mask = notna & (s >= d - win) & (s <= d + win)
         counts[i] = int(mask.sum() - 1)  # exclude self
     return counts
+
+
+def _same_board_concurrent_ipo_count(
+    board: pd.Series,
+    sub: pd.Series,
+    window_days: int = 7,
+) -> np.ndarray:
+    """Count same-board IPOs in the public subscription-calendar window."""
+    counts = np.full(len(sub), np.nan)
+    b = board.reset_index(drop=True)
+    s = sub.reset_index(drop=True)
+    win = pd.Timedelta(days=window_days)
+    notna = s.notna()
+    for i in range(len(s)):
+        d = s.iloc[i]
+        if pd.isna(d):
+            continue
+        mask = notna & (b == b.iloc[i]) & (s >= d - win) & (s <= d + win)
+        counts[i] = int(mask.sum() - 1)
+    return counts
+
+
+def _concurrent_offline_issue_sum_10k(
+    sub: pd.Series,
+    offline_issue: pd.Series,
+    window_days: int = 7,
+) -> np.ndarray:
+    """Sum other IPOs' pre-clawback offline issue size in the calendar window."""
+    sums = np.full(len(sub), np.nan)
+    s = sub.reset_index(drop=True)
+    vals = pd.to_numeric(offline_issue.reset_index(drop=True), errors="coerce")
+    win = pd.Timedelta(days=window_days)
+    notna = s.notna()
+    for i in range(len(s)):
+        d = s.iloc[i]
+        if pd.isna(d):
+            continue
+        mask = notna & (s >= d - win) & (s <= d + win)
+        mask.iloc[i] = False
+        sums[i] = vals[mask].sum(min_count=1)
+    return sums
 
 
 def _same_board_break_rate_ma10(out: pd.DataFrame, ref_date: pd.Series) -> np.ndarray:
@@ -564,6 +620,12 @@ def add_features(df: pd.DataFrame) -> pd.DataFrame:
     ref_date = out["subscription_deadline_date"].fillna(out["listing_date"])
     out = _attach_market_features(out, ref_date)
     out["concurrent_ipo_count"] = _concurrent_ipo_count(out["subscription_deadline_date"])
+    out["same_board_concurrent_ipo_count"] = _same_board_concurrent_ipo_count(
+        out["board"], out["subscription_deadline_date"]
+    )
+    out["concurrent_offline_issue_sum_10k"] = _concurrent_offline_issue_sum_10k(
+        out["subscription_deadline_date"], out["offline_issue_before_clawback_10k"]
+    )
     out["same_board_break_rate_ma10"] = _same_board_break_rate_ma10(out, ref_date)
 
     return out
@@ -1098,8 +1160,10 @@ def main() -> None:
         "quote_price_weighted_avg", "quote_price_median", "quote_price_vs_offer",
         "offer_price_upper_yuan", "offer_price_lower_yuan",
         "recent_ipo_first_day_return_ma20",
-        "market_turnover_ma20", "market_return_ma20",
-        "concurrent_ipo_count", "same_board_break_rate_ma10",
+        "market_turnover_ma20", "market_turnover_pct_rank_1y",
+        "market_turnover_ma20_over_ma60", "market_return_ma20",
+        "concurrent_ipo_count", "same_board_concurrent_ipo_count",
+        "concurrent_offline_issue_sum_10k", "same_board_break_rate_ma10",
     ]
     describe_numeric(df, numeric_cols).to_csv(OUT_DIR / "descriptive_stats.csv", index=False, encoding="utf-8-sig")
 

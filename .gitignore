@@ -17,6 +17,7 @@ env/
 .claude/
 .vscode/
 .idea/
+.obsidian/
 .DS_Store
 
 # OS
