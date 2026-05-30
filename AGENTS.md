@@ -49,7 +49,9 @@ y = log(网下超额认购倍数)
    - 输出预测网下超额认购倍数、预测网下中签率、置信区间或风险分档。
    - 展示关键影响因素、历史相似样本和模型版本信息。
 
-## 板块建模策略待研究
+## 板块建模策略（已得出结论）
+
+> 以下三方案均已实现并经扩张窗口回测对比，**结论：统一模型 + 板块特征 ≥ 板块专属模型**（详见本节末「实际结论」）。原始候选方案保留如下供追溯。
 
 当前需要重点比较以下方案：
 
@@ -95,23 +97,20 @@ y = log(网下超额认购倍数)
 - 主板注册制后样本可能偏少。
 - 北交所样本可能存在流动性和数据口径问题，需要单独处理。
 
-### 初步建议
+### 实际结论
 
-第一阶段建议同时建立：
+三条线均已实现并经扩张窗口回测对比：
 
 ```text
 全市场大模型
-全市场模型 + 板块特征
+全市场模型 + 板块特征          ← 最终生产方案
 主板/创业板/科创板/北交所板块专属模型
 ```
 
-之后通过时间序列回测决定最终采用：
-
-```text
-统一模型
-分板块模型
-统一模型 + 板块校准
-```
+- **统一模型 + 板块特征 + 跨板块学习 ≥ 板块专属模型**：主板样本少（约 105 条）单独建模反而更差，不要默认"分板块就更好"。
+- 北交所有标签样本仅约 41 条、机制特殊，**未独立建模**，改为与其他板块合并训练、单独评估。
+- 方案 B 的残差校准 / 二阶段微调暂未实现，列入 backlog（见 `需要完善的部分.md`）。
+- 最终生产口径：统一 **T-6 LightGBM**（含 `board` 板块特征 + 跨板块学习）。
 
 ## 字段使用规则
 
@@ -167,6 +166,40 @@ y = log(网下超额认购倍数)
 y = log(网下超额认购倍数)
 ```
 
+### 工程因子字典（实际字段名 → 阶段）
+
+以下为代码中真实使用的字段名，时点归属由 `scripts/baseline_models.py` 的 `FEATURE_NODES` 唯一定义。**完整的来源与预期方向见 `README.md` 的「因子字典（特征全集）」**；此处供改字段时快速核对阶段，判断错误 = 数据泄露。
+
+**✅ T-6 询价前（正式生产口径，约 42 个，`lgbm_t6` 唯一可用）**
+
+- 板块结构：`board`
+- 发行结构：`total_issue_shares_10k`、`offline_issue_before_clawback_10k`、`online_issue_before_clawback_10k`、`offline_issue_before_share_pct`
+- 战略配售：`strategic_allocation_10k`、`strategic_allocation_share_pct`
+- 申购规则：`subscription_upper_limit_10k`、`subscription_lower_limit_10k`、`subscription_step_10k`、`offline_market_value_threshold_10k_yuan`
+- 发行定价（科创板）：`offer_price_upper_yuan`、`offer_price_lower_yuan`、`offer_price_range_pct`
+- 发行/公司规模与成长：`expected_fundraising_100m_yuan`、`log_expected_fundraising`、`latest_revenue_100m_yuan`、`log_latest_revenue`、`revenue_cagr_3y_pct`
+- 估值：`industry_pe_at_ipo`、`comparable_pe_avg_ex_nonrecurring`
+- 市场流动性/情绪：`market_turnover_ma20`、`market_turnover_pct_rank_1y`、`market_turnover_ma20_over_ma60`、`market_return_ma20`
+- 市场热度：`recent_ipo_first_day_return_ma20`、`same_board_break_rate_ma10`
+- 批次竞争：`concurrent_ipo_count`、`same_board_concurrent_ipo_count`、`concurrent_offline_issue_sum_10k`
+- 板块流动性/情绪：`board_turnover_ma20`、`board_turnover_pct_rank_1y`、`board_turnover_ma20_over_ma60`、`board_return_ma20`
+- 承销商声誉：`underwriter_prior_ipo_count`、`underwriter_prior_log_oversub_mean`、`underwriter_prior_first_day_return_mean`、`underwriter_prior_break_rate`
+- 行业历史热度：`sw_l1_prior_ipo_count`、`sw_l1_prior_log_oversub_mean`、`sw_l1_prior_first_day_return_mean`、`sw_l1_prior_break_rate`
+
+**⚠️ T-1 询价后（仅研究对照，禁止进正式模型）**
+
+`offer_price_yuan`、`offer_price_position_in_range`、`ipo_pe_diluted`、`issue_pb`、`pe_vs_industry`、`pe_vs_comparable`、`issue_amount_100m_yuan`、`inquiry_subscription_total_10k`、`inquiry_investors_count`、`inquiry_allotment_accounts`、`inquiry_oversubscription_ratio`、`quote_price_weighted_avg`、`quote_price_median`、`quote_price_vs_offer`、`excluded_subscription_share_pct`、`high_price_excluded_subscription_share_pct`
+
+**⚠️ T+1 回拨后（仅研究对照）**
+
+`clawback_ratio_pct`、`offline_issue_final_10k`、`offline_issue_final_share_pct`、`online_issue_final_10k`
+
+**🚫 T+2 申购/配售结果（目标变量本身，永不作为输入）**
+
+`offline_oversubscription_ratio`（及对数 `log_offline_oversubscription` = 标签）、`offline_allotment_ratio_pct`、`offline_subscription_total_10k`、`offline_valid_quote_subscription_10k`、`offline_allotment_accounts`、`offline_inquiry_investors`、`a_investor_*`、`offline_oversubscription_ratio_before_clawback`
+
+**已知暂未纳入**：`issue_pb_factor`（可能依赖最终发行价）、发行价格区间（非科创板数据全空）、行业行情滚动因子（缺申万代码-名称映射）。
+
 ## 代码与实验记录要求
 
 - 数据处理脚本应记录输入数据来源、字段映射、过滤条件和输出文件。
@@ -213,6 +246,7 @@ y = log(网下超额认购倍数)
 - 已补充 4 个 T-6 市场环境特征（2026-05-25）：`market_turnover_ma20`（沪深两市/全A 近20日日均成交额，来源 Wind 万得全A，经 `scripts/convert_wind_market.py` 转换）、`market_return_ma20`（近20日涨跌幅）、`concurrent_ipo_count`（申购截止日 ±7 天批次竞争）、`same_board_break_rate_ma10`（同板块已上市近10只破发率）。全部严格向后看；`market_turnover_ma20` 在 lgbm_t6 中重要性排名第 2。OOS：T-6 0.488→0.512。市场两列对 T-6 的增益有时间区制敏感性，整体净正向。
 - 已纳入一批确定口径 T-6 因子（2026-05-29）：网下询价市值门槛、预计募资额、近一年营收、三年营收 CAGR、板块滚动行情、主承销商历史表现、申万一级行业代码历史 IPO 热度。`issue_pb_factor`、发行价格区间、行业行情滚动因子暂不入模，分别因可能依赖最终价、当前全空、缺少申万代码-名称映射。重跑后正式 `lgbm_t6` OOS Spearman=0.619。
 - 保存的全量模型对“已入库历史股票”的逐股查询属样本内（偏乐观）；某只股票的真实无泄漏成绩须查 `outputs/baseline_models/predictions.csv`（回测产出）。
+- 文档同步（2026-05-31）：完整因子字典（T-6/T-1/T+1/T+2 全集 + 来源 + 预期方向）已写入 `README.md` 的「因子字典（特征全集）」；README 各章节已由「规划口吻」更新为「已完成」口径；本文件「字段使用规则」补充了实际字段名 → 阶段的工程因子字典。改字段时以 `FEATURE_NODES` 为唯一真源，并同步这两份文档。
 
 ### 代码与产出物地图
 
