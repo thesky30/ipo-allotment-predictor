@@ -2,7 +2,9 @@ streamlit>=1.40.0
 lightgbm>=4.0.0
 pandas>=2.0.0
 numpy>=1.24.0
-scikit-learn>=1.3.0
+# 必须与已提交 .joblib 模型的 pickle 版本一致：模型用 1.6.1 保存，
+# sklearn 1.7 移除了 _RemainderColsList，会导致 ColumnTransformer 反序列化失败。
+scikit-learn==1.6.1
 scipy>=1.10.0
 joblib>=1.2.0
 openpyxl>=3.1.0
