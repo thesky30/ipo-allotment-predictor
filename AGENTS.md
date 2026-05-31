@@ -249,7 +249,7 @@ y = log(网下超额认购倍数)
 - 保存的全量模型对“已入库历史股票”的逐股查询属样本内（偏乐观）；某只股票的真实无泄漏成绩须查 `outputs/baseline_models/predictions.csv`（回测产出）。
 - 文档同步（2026-05-31）：完整因子字典（T-6/T-1/T+1/T+2 全集 + 来源 + 预期方向）已写入 `README.md` 的「因子字典（特征全集）」；README 各章节已由「规划口吻」更新为「已完成」口径；本文件「字段使用规则」补充了实际字段名 → 阶段的工程因子字典。改字段时以 `FEATURE_NODES` 为唯一真源，并同步这两份文档。
 - 冷启动预测（2026-05-31，已合并到 main）：新增「未入库新股的询价前预测」能力（`scripts/feature_assembly.py` / `reference_data.py` / `predict.py::predict_new_ipo` / `app.py` 手动 tab）。核心做法是把新股追加为一行到历史参考表、**复用训练同一套 builder 再读回**，结构性杜绝 train-serve skew；并新增 pytest 套件。详见本文末「未入库新股的冷启动预测」节。
-- 招股书财务/估值字段抽取（2026-06-01）：`scripts/prospectus_extract.py` 已支持按分类锚点定位招股书相关页，避免财务页挤掉可比公司/申万行业页；可比公司/行业锚点页会携带后一页，减少表格跨页漏读。仅将封顶页数/字数内的财务、募资、可比公司、行业页面送 LLM，补充 `latest_revenue_100m_yuan`、`revenue_cagr_3y_pct`、`expected_fundraising_100m_yuan`、`sw_level1_industry_code`/`sw_level1_industry_name` 和招股书披露的 `comparable_company_names`。`C39` 这类证监会行业代码会经 `reference_data.normalize_sw_level1_industry_code` 映射/过滤，不允许直接进入申万代码字段。行业 PE 只从 Tushare 申万行业行情缓存回填到 `industry_pe_at_ipo`；可比公司 PE 优先由 `scripts/peer_valuation.py` 按招股书可比公司名拉 Tushare `daily_basic.pe_ttm` 后回填到 `comparable_pe_avg_ex_nonrecurring`；只有名单缺失时网页才显示“申万行业成分股 PE”兜底入口，并明确它不是行业 PE。网页仍要求人工核对后预测。
+- 招股书财务/估值字段抽取（2026-06-01）：`scripts/prospectus_extract.py` 已支持按分类锚点定位招股书相关页，避免财务页挤掉可比公司/申万行业页；可比公司/行业锚点页会携带后一页，减少表格跨页漏读。仅将封顶页数/字数内的财务、募资、可比公司、行业页面送 LLM，补充 `latest_revenue_100m_yuan`、`revenue_cagr_3y_pct`、`expected_fundraising_100m_yuan`、`sw_level1_industry_code`/`sw_level1_industry_name` 和招股书披露的 `comparable_company_names`。`C39` 这类证监会行业代码会经 `reference_data.normalize_sw_level1_industry_code` 映射/过滤，不允许直接进入申万代码字段。行业 PE 从 Tushare 申万行业行情缓存或实时拉取后回填到 `industry_pe_at_ipo`；可比公司 PE 优先由 `scripts/peer_valuation.py` 按招股书可比公司名拉 Tushare `daily_basic.pe_ttm` 后回填到 `comparable_pe_avg_ex_nonrecurring`；只有名单缺失时网页才显示“申万行业成分股 PE”兜底入口，并明确它不是行业 PE。网页仍要求人工核对后预测。
 - 端到端网页测试（2026-05-31）：用户已在本地完成 Streamlit 上传 PDF → 表单回填 → 人工核对 → 预测的端到端验证。后续不要再把“端到端未测”列为阻塞项。
 
 ### 代码与产出物地图
@@ -284,7 +284,7 @@ outputs/factor_insights/           因子字典、IC、五分位分组、SHAP贡
 - [~] Phase 3：爬虫自动抓取巨潮发行公告 PDF，暂缓；当前手动上传 PDF 已满足演示和近期使用，不作为下一阶段必要功能。
 - [x] 数据刷新基础层：`scripts/market_source.py` 已可通过 Tushare 刷新全市场成交/收益、申万一级行业代码-名称映射、申万行业行情与 PE，并落盘到 processed CSV / SQLite。AkShare 备源不再实现。
 - [x] 同行业估值近似层：`scripts/peer_valuation.py` 已可用招股书披露的可比公司名单 + Tushare `daily_basic.pe_ttm` 计算 peer PE 均值/中位数；也保留申万行业成分 fallback。
-- [x] 网页界面优化第一轮：手动表单已按“基础信息 / 发行结构 / 申购规则 / 财务估值”分组；PDF 抽取后展示字段来源；页面可从 Tushare 缓存回填行业 PE；可比公司 PE 优先按招股书名单拉取，未识别名单时才允许用手动选择的申万行业成分股 PE 兜底。
+- [x] 网页界面优化第一轮：手动表单已按“基础信息 / 发行结构 / 申购规则 / 财务估值”分组；PDF 抽取后展示字段来源和已识别摘要；页面可从 Tushare 缓存或实时拉取回填行业 PE；可比公司 PE 优先按招股书名单拉取，未识别名单时才允许用手动选择的申万行业成分股 PE 兜底。
 - [ ] 增加策略层评估：按预测中签率排序的申购优先级、分档命中率、模拟收益。
 - [ ] 在网页中加入历史相似新股检索与影响因素解释区。
 

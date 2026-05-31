@@ -178,6 +178,29 @@ def latest_sw_industry_pe(
     }
 
 
+def fetch_latest_sw_industry_pe(
+    pro,
+    sw_level1_industry_code: str,
+    trade_date: str | pd.Timestamp,
+    *,
+    lookback_days: int = 90,
+) -> dict[str, object] | None:
+    """Fetch latest available SW level-1 industry PE directly from Tushare."""
+    dt = pd.to_datetime(str(trade_date), format="%Y%m%d", errors="coerce")
+    if pd.isna(dt):
+        dt = pd.to_datetime(trade_date, errors="coerce")
+    if pd.isna(dt):
+        return None
+    mapping = fetch_sw_level1_mapping(pro)
+    row = mapping.loc[mapping["sw_level1_industry_code"].astype(str) == str(sw_level1_industry_code)]
+    if row.empty:
+        raise ValueError(f"unknown SW level-1 industry code: {sw_level1_industry_code}")
+    start_date = (dt - pd.Timedelta(days=lookback_days)).strftime("%Y%m%d")
+    end_date = dt.strftime("%Y%m%d")
+    daily = fetch_sw_level1_daily(pro, row, start_date=start_date, end_date=end_date)
+    return latest_sw_industry_pe(daily, sw_level1_industry_code, end_date)
+
+
 def write_outputs(
     market_daily: pd.DataFrame,
     sw_mapping: pd.DataFrame,

@@ -103,3 +103,26 @@ def test_latest_sw_industry_pe_uses_latest_available_before_trade_date():
 
     assert out["pe"] == 22.0
     assert out["trade_date"] == "20260529"
+
+
+def test_fetch_latest_sw_industry_pe_fetches_selected_industry_only():
+    class FakeSingleIndustryPro:
+        def index_classify(self, **kwargs):
+            return pd.DataFrame([
+                {"index_code": "801770.SI", "industry_name": "通信"},
+            ])
+
+        def sw_daily(self, ts_code, start_date, end_date, fields):
+            assert ts_code == "801770.SI"
+            assert end_date == "20260529"
+            return pd.DataFrame([
+                {"ts_code": ts_code, "trade_date": "20260528", "amount": 10000, "pct_change": 1.0, "pe": 31.0, "pb": 2.0},
+                {"ts_code": ts_code, "trade_date": "20260529", "amount": 10000, "pct_change": 1.0, "pe": 32.0, "pb": 2.0},
+            ])
+
+    out = market_source.fetch_latest_sw_industry_pe(
+        FakeSingleIndustryPro(), "1000042215000000", "20260529"
+    )
+
+    assert out["sw_level1_industry_name"] == "通信"
+    assert out["pe"] == 32.0
