@@ -126,7 +126,10 @@ def _known_underwriters_and_industries():
     import reference_data
     p = reference_data.load_history().panel
     uws = sorted(p["primary_underwriter"].dropna().astype(str).unique().tolist())
-    inds = sorted(p["sw_level1_industry_code"].dropna().astype(str).unique().tolist())
+    inds = sorted(
+        p["sw_level1_industry_code"].dropna().astype(str).unique().tolist(),
+        key=reference_data.sw_level1_industry_name,
+    )
     return uws, inds
 
 
@@ -366,7 +369,13 @@ with tab_manual:
     except Exception:
         _uw_list, _ind_list = [], []
     _uw_options = ["（未知/其他）"] + _uw_list
-    _ind_options = ["（未知/其他）"] + _ind_list
+    _ind_options = [None] + _ind_list
+
+    def _industry_label(code: str | None) -> str:
+        if code is None:
+            return "（未知/其他）"
+        import reference_data
+        return reference_data.sw_level1_industry_name(code)
 
     st.markdown("##### 可选：上传巨潮『发行安排及初步询价公告』PDF 自动识别")
     up = st.file_uploader("上传 PDF（识别后回填下方表单，请务必人工核对）", type="pdf")
@@ -421,8 +430,9 @@ with tab_manual:
         c3, c4 = st.columns(2)
         uw_sel = c3.selectbox("主承销商", options=_uw_options,
             index=_uw_options.index(_pf["lead_underwriter"]) if _pf.get("lead_underwriter") in _uw_options else 0)
-        ind_sel = c4.selectbox("申万一级行业代码", options=_ind_options,
-            index=_ind_options.index(str(_pf["sw_level1_industry_code"])) if _pf.get("sw_level1_industry_code") is not None and str(_pf["sw_level1_industry_code"]) in _ind_options else 0)
+        ind_sel = c4.selectbox("申万一级行业", options=_ind_options,
+            index=_ind_options.index(str(_pf["sw_level1_industry_code"])) if _pf.get("sw_level1_industry_code") is not None and str(_pf["sw_level1_industry_code"]) in _ind_options else 0,
+            format_func=_industry_label)
 
         c5, c6 = st.columns(2)
         total_shares = c5.number_input("发行总股数（万股）", min_value=0.0,
@@ -475,7 +485,7 @@ with tab_manual:
                 "board":                                board_sel,
                 "subscription_deadline_date":          str(deadline_date),
                 "lead_underwriter":                    uw_sel if uw_sel != "（未知/其他）" else None,
-                "sw_level1_industry_code":             ind_sel if ind_sel != "（未知/其他）" else None,
+                "sw_level1_industry_code":             ind_sel,
                 "total_issue_shares_10k":              total_shares or None,
                 "offline_issue_before_clawback_10k":   offline_before or None,
                 "online_issue_before_clawback_10k":    online_before or None,

@@ -211,6 +211,7 @@ Streamlit 网页工具（`app.py`）已实现，包括：
 
 - ✅ 新股信息输入区（按代码/名称查询，或手动输入字段）。
 - ✅ 手动输入页可上传「发行安排及初步询价公告」PDF 回填发行结构/申购规则，也可另传招股书 PDF 补全营收、3 年营收 CAGR、可比 PE、拟募资额；PDF 抽取结果必须人工核对后才预测。
+- ✅ 手动输入页的申万一级行业下拉框展示中文行业名，内部仍保留真实申万行业代码用于历史先验匹配。
 - ✅ 预测结果展示区。
 - ✅ 特征贡献或影响因素解释区。
 - ✅ 模型版本和样本范围说明。
@@ -419,6 +420,12 @@ python scripts/predict.py --code 688041 --stage T6
 
 # 6. 启动网页演示
 streamlit run app.py
+
+# 7.（可选）Tushare 数据刷新：市场/申万行业行情与行业 PE
+python scripts/market_source.py --start-date 20190101
+
+# 8.（可选）同行业 peer PE 近似统计（不覆盖招股书披露口径）
+python scripts/peer_valuation.py --sw-level1-code 1000042211000000 --trade-date 20260529
 ```
 
 ### 代码与产出物
@@ -431,6 +438,8 @@ scripts/board_models.py                  板块专项模型对比
 scripts/factor_insights.py               询价前因子洞察 + 板块/时期特征报告
 scripts/pdf_extract.py                   发行安排及初步询价公告 PDF → T-6 原始字段
 scripts/prospectus_extract.py            招股书 PDF 相关页定位 → T-6 财务/估值字段
+scripts/market_source.py                 Tushare 市场/申万行业行情与 PE 刷新
+scripts/peer_valuation.py                Tushare 同行业成分 + daily_basic → peer PE 近似统计
 scripts/process_company_factors.py       公司基本面因子处理
 scripts/process_board_industry_market.py  板块/行业/承销商滚动因子
 scripts/build_new_factor_research.py     新因子 IC、分组收益分析
