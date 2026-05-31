@@ -384,6 +384,24 @@ with tab_manual:
                     st.success(f"已识别 {len(res.fields)} 个字段，已回填下方表单，请核对后再预测。")
                 except Exception as e:
                     st.error(f"识别失败：{e}。请改为手动输入。")
+
+    up2 = st.file_uploader("（可选）上传招股书 PDF 补充财务/估值字段（营收/CAGR/可比PE/拟募资）", type="pdf", key="prospectus_pdf")
+    if up2 is not None and st.button("识别招股书字段", key="run_prospectus_extract"):
+        import prospectus_extract, llm_client
+        if not llm_client.is_configured():
+            st.error("未配置 LLM（见 .env / Secrets：LLM_API_KEY），无法识别招股书。")
+        else:
+            with st.spinner("定位章节并识别招股书中…"):
+                try:
+                    res2 = prospectus_extract.extract_prospectus_fields(up2.read())
+                    merged = dict(st.session_state.get("pdf_prefill", {}))
+                    merged.update(res2.fields)
+                    st.session_state["pdf_prefill"] = merged
+                    for w in res2.warnings:
+                        st.info(w)
+                    st.success(f"招股书补充了 {len(res2.fields)} 个字段，请在下方核对。")
+                except Exception as e:
+                    st.error(f"招股书识别失败：{e}。请手动输入这些字段。")
     _pf = st.session_state.get("pdf_prefill", {})
 
     with st.form("manual_form"):
