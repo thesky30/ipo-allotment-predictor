@@ -99,3 +99,24 @@ def test_assembly_matches_training_context_features(modeling_data, offset):
         assert np.isclose(float(got), float(row[f]), rtol=1e-6, atol=1e-6), (
             f"{f}: assembled {got} != training {row[f]}"
         )
+
+
+def test_log_fields_and_missing_keys():
+    r = assemble_t6({
+        "board": "创业板",
+        "subscription_deadline_date": "2024-06-03",
+        "expected_fundraising_100m_yuan": 10.0,
+        "latest_revenue_100m_yuan": 5.0,
+    })
+    assert np.isclose(r.features["log_expected_fundraising"], np.log1p(10.0))
+    assert np.isclose(r.features["log_latest_revenue"], np.log1p(5.0))
+    # No underwriter / industry supplied → a warning fires for each.
+    assert any("承销商" in w for w in r.warnings)
+    assert any("行业" in w for w in r.warnings)
+    # When missing underwriter, prior count is filled with 0.0
+    assert r.features["underwriter_prior_ipo_count"] == 0.0
+
+
+def test_requires_subscription_date():
+    with pytest.raises(ValueError):
+        assemble_t6({"board": "主板"})
