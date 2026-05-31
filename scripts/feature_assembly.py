@@ -75,7 +75,12 @@ def assemble_t6(raw: dict[str, Any], history: reference_data.History | None = No
     new_sample_df = pd.DataFrame([new_sample]).astype(
         {c: t for c, t in hist.sample.dtypes.items() if c in new_sample}, errors="ignore")
     sample_aug = pd.concat([hist.sample, new_sample_df], ignore_index=True)
-    built = add_features(sample_aug)
+    # Suppress benign float warnings/overflows inside the reused training builders.
+    # Training ran them under numpy's default 'warn' mode; ignoring over/divide/invalid
+    # here yields the identical numeric result but never raises, even if the ambient
+    # numpy error mode is 'raise' (which happens intermittently under pytest).
+    with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+        built = add_features(sample_aug)
     new_built = built.iloc[-1]
 
     # 2) board rolling + underwriter/sw_l1 priors — reuse panel builders.
@@ -109,9 +114,10 @@ def assemble_t6(raw: dict[str, Any], history: reference_data.History | None = No
     # datetime64 so merge_asof can compare with prediction_date (datetime64).
     board_market = hist.board_market.copy()
     board_market["trade_date"] = pd.to_datetime(board_market["trade_date"], errors="coerce")
-    panel_aug = add_board_market_factors(panel_aug, board_market)
-    panel_aug = prior_group_stats(panel_aug, "primary_underwriter", "underwriter")
-    panel_aug = prior_group_stats(panel_aug, "sw_level1_industry_code", "sw_l1")
+    with np.errstate(over="ignore", divide="ignore", invalid="ignore"):
+        panel_aug = add_board_market_factors(panel_aug, board_market)
+        panel_aug = prior_group_stats(panel_aug, "primary_underwriter", "underwriter")
+        panel_aug = prior_group_stats(panel_aug, "sw_level1_industry_code", "sw_l1")
     # add_board_market_factors and prior_group_stats sort by prediction_date, so
     # the new row is no longer last; locate it by security_code instead of iloc[-1].
     new_prior = panel_aug.loc[panel_aug["security_code"] == NEW_CODE].iloc[0]
