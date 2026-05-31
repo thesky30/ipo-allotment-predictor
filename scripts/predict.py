@@ -134,6 +134,30 @@ FEATURE_LABELS: dict[str, str] = {
     "offline_issue_final_10k":            "回拨后网下发行量(万股)",
     "offline_issue_final_share_pct":      "回拨后网下发行占比",
     "online_issue_final_10k":             "回拨后网上发行量(万股)",
+    # T-6 公司基本面 / 规模 / 成长
+    "offline_market_value_threshold_10k_yuan": "网下询价市值门槛(万元)",
+    "expected_fundraising_100m_yuan":     "预计募资额(亿元)",
+    "log_expected_fundraising":           "预计募资额(对数)",
+    "latest_revenue_100m_yuan":           "近一年营收(亿元)",
+    "log_latest_revenue":                 "近一年营收(对数)",
+    "revenue_cagr_3y_pct":                "3年营收复合增速(%)",
+    # T-6 板块滚动行情
+    "board_turnover_ma20":                "板块近20日成交额均值",
+    "board_turnover_pct_rank_1y":         "板块成交额一年分位",
+    "board_turnover_ma20_over_ma60":      "板块成交额20日/60日偏离",
+    "board_return_ma20":                  "板块近20日涨跌幅",
+    # T-6 主承销商历史先验
+    "underwriter_prior_ipo_count":        "主承销商历史IPO数量",
+    "underwriter_prior_log_oversub_mean": "主承销商历史平均超额认购(对数)",
+    "underwriter_prior_first_day_return_mean": "主承销商历史首日涨幅均值",
+    "underwriter_prior_break_rate":       "主承销商历史破发率",
+    # T-6 申万一级行业历史先验
+    "sw_l1_prior_ipo_count":              "同行业历史IPO数量",
+    "sw_l1_prior_log_oversub_mean":       "同行业历史平均超额认购(对数)",
+    "sw_l1_prior_first_day_return_mean":  "同行业历史首日涨幅均值",
+    "sw_l1_prior_break_rate":             "同行业历史破发率",
+    "offer_price_upper_yuan":             "发行价格上限(元)",
+    "offer_price_lower_yuan":             "发行价格下限(底价,元)",
     "__other__":                          "其他特征合计",
 }
 
