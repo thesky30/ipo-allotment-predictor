@@ -25,8 +25,6 @@ FIELD_SCHEMA: dict[str, str] = {
     "subscription_lower_limit_10k": "网下单个配售对象申购下限（万股）",
     "subscription_step_10k": "网下申购步长（万股）",
     "offline_market_value_threshold_10k_yuan": "网下投资者市值门槛（万元）",
-    "industry_pe_at_ipo": "发行时所属行业最近一个月平均静态市盈率",
-    "comparable_pe_avg_ex_nonrecurring": "可比公司扣非后市盈率平均值",
     "expected_fundraising_100m_yuan": "预计募集资金总额（亿元）",
     "latest_revenue_100m_yuan": "最近一年营业收入（亿元）",
     "revenue_cagr_3y_pct": "最近三年营业收入复合增长率（%）",

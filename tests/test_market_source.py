@@ -69,3 +69,37 @@ def test_fetch_sw_level1_daily_adds_wind_code_and_pe():
     assert df.loc[0, "sw_level1_industry_name"] == "机械设备"
     assert df.loc[0, "pe"] == 22.3
     assert df.loc[0, "turnover_100m_yuan"] == 12.3456
+
+
+def test_choose_sw_daily_output_keeps_cache_when_refresh_empty():
+    cached = pd.DataFrame([
+        {
+            "trade_date": pd.Timestamp("2026-05-29"),
+            "sw_level1_industry_code": "1000042211000000",
+            "sw_level1_industry_name": "机械设备",
+            "tushare_index_code": "801890.SI",
+            "turnover_100m_yuan": 12.3,
+            "return_pct": 1.2,
+            "pe": 22.3,
+            "pb": 2.1,
+        }
+    ])
+    fresh = pd.DataFrame(columns=cached.columns)
+
+    out, used_cache = market_source.choose_sw_daily_output(fresh, cached)
+
+    assert used_cache is True
+    assert out.equals(cached)
+
+
+def test_latest_sw_industry_pe_uses_latest_available_before_trade_date():
+    sw_daily = pd.DataFrame([
+        {"trade_date": "2026-05-28", "sw_level1_industry_code": "1000042211000000", "pe": 21.0},
+        {"trade_date": "2026-05-29", "sw_level1_industry_code": "1000042211000000", "pe": 22.0},
+        {"trade_date": "2026-05-30", "sw_level1_industry_code": "1000042211000000", "pe": 23.0},
+    ])
+
+    out = market_source.latest_sw_industry_pe(sw_daily, "1000042211000000", "20260529")
+
+    assert out["pe"] == 22.0
+    assert out["trade_date"] == "20260529"

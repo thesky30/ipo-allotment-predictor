@@ -14,7 +14,7 @@ from pdf_extract import ExtractResult
 PROSPECTUS_FIELD_SCHEMA: dict[str, str] = {
     "latest_revenue_100m_yuan": "最近一个完整会计年度的营业收入（亿元，纯数字）",
     "revenue_cagr_3y_pct": "最近三年营业收入的复合年增长率（%）；无现成数字则用最近三年营收推算",
-    "comparable_pe_avg_ex_nonrecurring": "招股书披露的同行业可比上市公司『扣非后市盈率』平均值",
+    "comparable_company_names": "招股书披露的同行业可比上市公司名称列表（数组）；只取上市公司，找不到输出空数组",
     "expected_fundraising_100m_yuan": "本次发行『拟』募集资金总额（亿元）；不是发行后最终募资",
 }
 

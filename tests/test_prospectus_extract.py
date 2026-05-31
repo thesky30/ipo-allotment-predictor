@@ -34,6 +34,7 @@ def test_extract_prospectus_fields_with_injected_llm():
         "latest_revenue_100m_yuan": 7.2,
         "revenue_cagr_3y_pct": 25.0,
         "comparable_pe_avg_ex_nonrecurring": 41.3,
+        "comparable_company_names": ["中际旭创", "新易盛"],
         "expected_fundraising_100m_yuan": 11.0,
         "board": "科创板",
     }
@@ -42,7 +43,8 @@ def test_extract_prospectus_fields_with_injected_llm():
         pages=["营业收入 募集资金 可比公司"],
     )
     assert res.fields["latest_revenue_100m_yuan"] == 7.2
-    assert res.fields["comparable_pe_avg_ex_nonrecurring"] == 41.3
+    assert "comparable_pe_avg_ex_nonrecurring" not in res.fields
+    assert res.fields["comparable_company_names"] == ["中际旭创", "新易盛"]
     assert "board" not in res.fields
 
 

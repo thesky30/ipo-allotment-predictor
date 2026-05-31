@@ -41,3 +41,32 @@ def test_active_members_on_date_respects_entry_and_exit_dates():
     active = peer_valuation.active_members_on_date(members, "20260529")
 
     assert active["con_code"].tolist() == ["000001.SZ"]
+
+
+class FakeNamePro:
+    def stock_basic(self, **kwargs):
+        return pd.DataFrame([
+            {"ts_code": "300308.SZ", "name": "中际旭创"},
+            {"ts_code": "300502.SZ", "name": "新易盛"},
+            {"ts_code": "000001.SZ", "name": "平安银行"},
+        ])
+
+    def daily_basic(self, trade_date, fields):
+        return pd.DataFrame([
+            {"ts_code": "300308.SZ", "trade_date": trade_date, "pe_ttm": 30.0, "pe": 28.0},
+            {"ts_code": "300502.SZ", "trade_date": trade_date, "pe_ttm": 50.0, "pe": 46.0},
+            {"ts_code": "000001.SZ", "trade_date": trade_date, "pe_ttm": 5.0, "pe": 5.0},
+        ])
+
+
+def test_estimate_peer_pe_from_prospectus_company_names():
+    result = peer_valuation.estimate_peer_pe_from_company_names(
+        FakeNamePro(),
+        ["中际旭创", "新易盛"],
+        "20260529",
+    )
+
+    assert result["resolved_peer_count"] == 2
+    assert result["resolved_ts_codes"] == ["300308.SZ", "300502.SZ"]
+    assert result["peer_pe_ttm_mean"] == 40.0
+    assert result["peer_pe_ttm_median"] == 40.0

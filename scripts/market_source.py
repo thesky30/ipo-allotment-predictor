@@ -23,6 +23,10 @@ START_DATE = "20190101"
 SSE_COMPOSITE = "000001.SH"
 SZSE_COMPOSITE = "399106.SZ"
 CSI300 = "000300.SH"
+SW_DAILY_COLUMNS = [
+    "trade_date", "sw_level1_industry_code", "sw_level1_industry_name",
+    "tushare_index_code", "turnover_100m_yuan", "return_pct", "pe", "pb",
+]
 
 
 def _date_col(series: pd.Series) -> pd.Series:
@@ -104,10 +108,7 @@ def fetch_sw_level1_daily(
         df["tushare_index_code"] = row.tushare_index_code
         frames.append(df)
     if not frames:
-        return pd.DataFrame(columns=[
-            "trade_date", "sw_level1_industry_code", "sw_level1_industry_name",
-            "tushare_index_code", "turnover_100m_yuan", "return_pct", "pe", "pb",
-        ])
+        return pd.DataFrame(columns=SW_DAILY_COLUMNS)
     out = pd.concat(frames, ignore_index=True)
     out["trade_date"] = _date_col(out["trade_date"])
     out["turnover_100m_yuan"] = pd.to_numeric(out["amount"], errors="coerce") / 10000
@@ -116,6 +117,65 @@ def fetch_sw_level1_daily(
         "trade_date", "sw_level1_industry_code", "sw_level1_industry_name",
         "tushare_index_code", "turnover_100m_yuan", "return_pct", "pe", "pb",
     ]].sort_values(["trade_date", "sw_level1_industry_code"]).reset_index(drop=True)
+
+
+def read_cached_sw_daily(data_dir: Path = DATA_DIR) -> pd.DataFrame:
+    path = data_dir / "sw_level1_market_daily_tushare.csv"
+    if not path.exists():
+        return pd.DataFrame(columns=SW_DAILY_COLUMNS)
+    df = pd.read_csv(path)
+    if "trade_date" in df.columns:
+        df["trade_date"] = pd.to_datetime(df["trade_date"], errors="coerce")
+    return df
+
+
+def choose_sw_daily_output(
+    fresh: pd.DataFrame,
+    cached: pd.DataFrame | None = None,
+) -> tuple[pd.DataFrame, bool]:
+    """Use cached SW daily data when the fresh refresh is empty.
+
+    Tushare SW daily endpoints can be quota-limited. Keeping the previous
+    non-empty cache avoids replacing useful data with an empty file.
+    """
+    if fresh is not None and not fresh.empty:
+        return fresh, False
+    if cached is not None and not cached.empty:
+        return cached, True
+    return pd.DataFrame(columns=SW_DAILY_COLUMNS), False
+
+
+def latest_sw_industry_pe(
+    sw_daily: pd.DataFrame,
+    sw_level1_industry_code: str,
+    trade_date: str | pd.Timestamp,
+) -> dict[str, object] | None:
+    if sw_daily is None or sw_daily.empty:
+        return None
+    df = sw_daily.copy()
+    df["trade_date"] = pd.to_datetime(df["trade_date"], errors="coerce")
+    dt = pd.to_datetime(str(trade_date), format="%Y%m%d", errors="coerce")
+    if pd.isna(dt):
+        dt = pd.to_datetime(trade_date, errors="coerce")
+    if pd.isna(dt):
+        return None
+    pe = pd.to_numeric(df.get("pe"), errors="coerce")
+    mask = (
+        (df["sw_level1_industry_code"].astype(str) == str(sw_level1_industry_code))
+        & (df["trade_date"] <= dt)
+        & pe.notna()
+        & (pe > 0)
+    )
+    matched = df.loc[mask].sort_values("trade_date")
+    if matched.empty:
+        return None
+    row = matched.iloc[-1]
+    return {
+        "sw_level1_industry_code": str(row["sw_level1_industry_code"]),
+        "sw_level1_industry_name": row.get("sw_level1_industry_name"),
+        "trade_date": row["trade_date"].strftime("%Y%m%d"),
+        "pe": float(row["pe"]),
+    }
 
 
 def write_outputs(
@@ -165,10 +225,13 @@ def main() -> None:
             "trade_date", "sw_level1_industry_code", "sw_level1_industry_name",
             "tushare_index_code", "turnover_100m_yuan", "return_pct", "pe", "pb",
         ])
+    sw_daily, used_cache = choose_sw_daily_output(sw_daily, read_cached_sw_daily())
     write_outputs(market, mapping, sw_daily)
     print(f"market_daily rows: {len(market)}")
     print(f"sw_level1_mapping rows: {len(mapping)}")
     print(f"sw_level1_market_daily_tushare rows: {len(sw_daily)}")
+    if used_cache:
+        print("sw_level1_market_daily_tushare used existing cache because fresh refresh was empty", file=sys.stderr)
 
 
 if __name__ == "__main__":

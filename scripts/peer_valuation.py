@@ -1,7 +1,9 @@
-"""Peer-industry valuation helpers using Tushare daily_basic data.
+"""Peer valuation helpers using Tushare daily_basic data.
 
-This is a market-derived fallback for display/research. It does not overwrite
-the prospectus-disclosed ``comparable_pe_avg_ex_nonrecurring`` model input.
+The preferred cold-start path is: extract comparable company names from the
+prospectus, resolve them to A-share ``ts_code`` values, then calculate a peer
+PE input from ``daily_basic.pe_ttm``. SW-industry members remain available as a
+broader fallback/reference.
 """
 from __future__ import annotations
 
@@ -53,6 +55,54 @@ def fetch_daily_basic(pro, trade_date: str) -> pd.DataFrame:
     )
 
 
+def _norm_company_name(name: object) -> str:
+    text = str(name or "").strip()
+    for suffix in ("股份有限公司", "有限责任公司", "有限公司", "集团", "股份"):
+        text = text.replace(suffix, "")
+    return text.replace(" ", "")
+
+
+def resolve_ts_codes_by_names(pro, company_names: list[str]) -> pd.DataFrame:
+    """Resolve prospectus peer company names to A-share ts_code values.
+
+    Exact normalized-name matches are preferred; a contains fallback handles
+    shortened names commonly used in prospectus peer tables.
+    """
+    wanted = [str(x).strip() for x in company_names if str(x).strip()]
+    if not wanted:
+        return pd.DataFrame(columns=["requested_name", "ts_code", "name"])
+
+    stocks = pro.stock_basic(exchange="", list_status="L", fields="ts_code,name")
+    if stocks is None or stocks.empty:
+        return pd.DataFrame(columns=["requested_name", "ts_code", "name"])
+    stocks = stocks.copy()
+    stocks["_norm"] = stocks["name"].map(_norm_company_name)
+
+    rows = []
+    seen: set[str] = set()
+    for requested in wanted:
+        key = _norm_company_name(requested)
+        match = stocks.loc[stocks["_norm"] == key]
+        if match.empty:
+            match = stocks.loc[
+                stocks["_norm"].str.contains(key, regex=False, na=False)
+                | pd.Series([key in n for n in stocks["_norm"]], index=stocks.index)
+            ]
+        if match.empty:
+            continue
+        row = match.iloc[0]
+        ts_code = str(row["ts_code"])
+        if ts_code in seen:
+            continue
+        seen.add(ts_code)
+        rows.append({
+            "requested_name": requested,
+            "ts_code": ts_code,
+            "name": row["name"],
+        })
+    return pd.DataFrame(rows, columns=["requested_name", "ts_code", "name"])
+
+
 def fetch_index_members(pro, index_code: str) -> pd.DataFrame:
     df = pro.index_member_all(l1_code=index_code)
     if df is None:
@@ -81,6 +131,27 @@ def estimate_industry_peer_pe(
     return {**info, "trade_date": trade_date, **stats}
 
 
+def estimate_peer_pe_from_company_names(
+    pro,
+    company_names: list[str],
+    trade_date: str,
+    *,
+    exclude_ts_codes: set[str] | None = None,
+) -> dict[str, object]:
+    resolved = resolve_ts_codes_by_names(pro, company_names)
+    members = pd.DataFrame({"con_code": resolved["ts_code"]}) if not resolved.empty else pd.DataFrame(columns=["con_code"])
+    daily = fetch_daily_basic(pro, trade_date)
+    stats = peer_pe_stats(daily, members, exclude_ts_codes=exclude_ts_codes, pe_col="pe_ttm")
+    return {
+        "trade_date": trade_date,
+        "requested_peer_names": list(company_names),
+        "resolved_peer_count": int(len(resolved)),
+        "resolved_ts_codes": resolved["ts_code"].tolist() if not resolved.empty else [],
+        "resolved_names": resolved["name"].tolist() if not resolved.empty else [],
+        **stats,
+    }
+
+
 def _pro_api(token: str | None = None):
     import tushare as ts
 
@@ -92,7 +163,8 @@ def _pro_api(token: str | None = None):
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Estimate same-industry peer PE from Tushare")
-    parser.add_argument("--sw-level1-code", required=True)
+    parser.add_argument("--sw-level1-code", default=None)
+    parser.add_argument("--peer-name", action="append", default=[], help="prospectus peer company name; repeatable")
     parser.add_argument("--trade-date", required=True, help="YYYYMMDD")
     parser.add_argument("--exclude", action="append", default=[], help="ts_code to exclude; repeatable")
     parser.add_argument("--token", default=None)
@@ -101,12 +173,23 @@ def main() -> None:
     from config import load_env
 
     load_env()
-    result = estimate_industry_peer_pe(
-        _pro_api(args.token),
-        args.sw_level1_code,
-        args.trade_date,
-        exclude_ts_codes=set(args.exclude),
-    )
+    pro = _pro_api(args.token)
+    if args.peer_name:
+        result = estimate_peer_pe_from_company_names(
+            pro,
+            args.peer_name,
+            args.trade_date,
+            exclude_ts_codes=set(args.exclude),
+        )
+    else:
+        if not args.sw_level1_code:
+            parser.error("--sw-level1-code is required unless --peer-name is provided")
+        result = estimate_industry_peer_pe(
+            pro,
+            args.sw_level1_code,
+            args.trade_date,
+            exclude_ts_codes=set(args.exclude),
+        )
     print(pd.Series(result).to_json(force_ascii=False, indent=2))
 
 

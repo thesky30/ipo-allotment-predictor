@@ -92,7 +92,7 @@ FEATURE_NODES: dict[str, dict] = {
     "offer_price_upper_yuan":               {"node": "T-6", "src": "询价公告（科创板）",     "cat": "发行定价"},
     "offer_price_lower_yuan":               {"node": "T-6", "src": "询价公告（科创板）",     "cat": "发行定价"},
     "offer_price_range_pct":                {"node": "T-6", "src": "派生（科创板）",         "cat": "发行定价"},
-    "comparable_pe_avg_ex_nonrecurring":    {"node": "T-6", "src": "招股书",               "cat": "估值"},
+    "comparable_pe_avg_ex_nonrecurring":    {"node": "T-6", "src": "招股书可比公司名单+Tushare peer PE", "cat": "估值"},
     "industry_pe_at_ipo":                   {"node": "T-6", "src": "市场数据",              "cat": "估值"},
     "recent_ipo_first_day_return_ma20":     {"node": "T-6", "src": "历史IPO数据派生（滚动）","cat": "市场热度"},
     "market_turnover_ma20":                 {"node": "T-6", "src": "Tushare 沪深成交额派生（滚动）","cat": "市场流动性"},

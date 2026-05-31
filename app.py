@@ -133,6 +133,40 @@ def _known_underwriters_and_industries():
     return uws, inds
 
 
+def _to_tushare_trade_date(value) -> str:
+    dt = pd.to_datetime(value, errors="coerce")
+    if pd.isna(dt):
+        dt = pd.Timestamp.today()
+    return dt.strftime("%Y%m%d")
+
+
+def _estimate_peer_pe_from_names(company_names: list[str], trade_date: str) -> dict:
+    import peer_valuation
+
+    pro = peer_valuation._pro_api()
+    return peer_valuation.estimate_peer_pe_from_company_names(pro, company_names, trade_date)
+
+
+def _show_prefill_summary(prefill: dict, sources: dict | None = None) -> None:
+    if not prefill:
+        return
+    import ui_helpers
+
+    rows = []
+    for key, value in prefill.items():
+        if isinstance(value, list):
+            display = "、".join(map(str, value))
+        else:
+            display = value
+        rows.append({
+            "字段": key,
+            "值": display,
+            "来源": ui_helpers.prefill_source_label(key, (sources or {}).get(key)),
+        })
+    with st.expander("查看已回填字段与来源", expanded=False):
+        st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+
+
 # ── Result display ────────────────────────────────────────────────────────────
 def _conf_html(conf: str) -> str:
     cls = {"high": "conf-high", "medium": "conf-medium", "low": "conf-low"}.get(conf, "")
@@ -388,13 +422,14 @@ with tab_manual:
                 try:
                     res = pdf_extract.extract_ipo_fields(up.read())
                     st.session_state["pdf_prefill"] = res.fields
+                    st.session_state["pdf_prefill_sources"] = {k: "pdf" for k in res.fields}
                     for w in res.warnings:
                         st.warning(w)
                     st.success(f"已识别 {len(res.fields)} 个字段，已回填下方表单，请核对后再预测。")
                 except Exception as e:
                     st.error(f"识别失败：{e}。请改为手动输入。")
 
-    up2 = st.file_uploader("（可选）上传招股书 PDF 补充财务/估值字段（营收/CAGR/可比PE/拟募资）", type="pdf", key="prospectus_pdf")
+    up2 = st.file_uploader("（可选）上传招股书 PDF 补充财务/估值字段（营收/CAGR/可比公司名单/拟募资）", type="pdf", key="prospectus_pdf")
     if up2 is not None and st.button("识别招股书字段", key="run_prospectus_extract"):
         import prospectus_extract, llm_client
         if not llm_client.is_configured():
@@ -405,15 +440,82 @@ with tab_manual:
                     res2 = prospectus_extract.extract_prospectus_fields(up2.read())
                     merged = dict(st.session_state.get("pdf_prefill", {}))
                     merged.update(res2.fields)
+                    sources = dict(st.session_state.get("pdf_prefill_sources", {}))
+                    sources.update({k: "prospectus" for k in res2.fields})
                     st.session_state["pdf_prefill"] = merged
+                    st.session_state["pdf_prefill_sources"] = sources
                     for w in res2.warnings:
                         st.info(w)
                     st.success(f"招股书补充了 {len(res2.fields)} 个字段，请在下方核对。")
                 except Exception as e:
                     st.error(f"招股书识别失败：{e}。请手动输入这些字段。")
     _pf = st.session_state.get("pdf_prefill", {})
+    _src = st.session_state.get("pdf_prefill_sources", {})
+    _show_prefill_summary(_pf, _src)
+
+    sw_code_for_pe = _pf.get("sw_level1_industry_code")
+    if sw_code_for_pe:
+        try:
+            import market_source
+            import reference_data
+            ref_pe = market_source.latest_sw_industry_pe(
+                market_source.read_cached_sw_daily(),
+                str(sw_code_for_pe),
+                _to_tushare_trade_date(_pf.get("subscription_deadline_date")),
+            )
+            if ref_pe:
+                st.caption(
+                    f"Tushare 申万行业 PE 参考："
+                    f"{reference_data.sw_level1_industry_name(sw_code_for_pe)} "
+                    f"{ref_pe['pe']:.2f}（{ref_pe['trade_date']}）"
+                )
+                if st.button("回填行业 PE", key="fill_industry_pe"):
+                    merged = dict(_pf)
+                    merged["industry_pe_at_ipo"] = round(float(ref_pe["pe"]), 2)
+                    st.session_state["pdf_prefill"] = merged
+                    sources = dict(_src)
+                    sources["industry_pe_at_ipo"] = "industry_pe"
+                    st.session_state["pdf_prefill_sources"] = sources
+                    _pf = merged
+                    _src = sources
+                    st.success(f"已回填行业 PE {float(ref_pe['pe']):.2f}")
+        except Exception:
+            pass
+
+    peer_names = _pf.get("comparable_company_names") or []
+    if isinstance(peer_names, str):
+        peer_names = [x.strip() for x in peer_names.replace("，", ",").split(",") if x.strip()]
+    if peer_names:
+        st.info("招股书识别到可比公司：" + "、".join(map(str, peer_names)))
+        if st.button("用 Tushare 计算可比公司 PE 并回填", key="run_peer_pe"):
+            trade_date = _to_tushare_trade_date(_pf.get("subscription_deadline_date"))
+            with st.spinner("拉取可比公司行情 PE 中…"):
+                try:
+                    stats = _estimate_peer_pe_from_names(list(peer_names), trade_date)
+                    pe_mean = stats.get("peer_pe_ttm_mean")
+                    if not pe_mean:
+                        st.warning("未匹配到可用的可比公司 PE，请手动输入。")
+                    else:
+                        merged = dict(_pf)
+                        merged["comparable_pe_avg_ex_nonrecurring"] = round(float(pe_mean), 2)
+                        merged["peer_pe_ttm_median"] = stats.get("peer_pe_ttm_median")
+                        merged["peer_pe_trade_date"] = stats.get("trade_date")
+                        st.session_state["pdf_prefill"] = merged
+                        sources = dict(_src)
+                        sources["comparable_pe_avg_ex_nonrecurring"] = "peer_pe"
+                        st.session_state["pdf_prefill_sources"] = sources
+                        _pf = merged
+                        _src = sources
+                        st.success(
+                            f"已回填可比公司 PE 均值 {float(pe_mean):.2f}，"
+                            f"匹配 {stats.get('resolved_peer_count', 0)} 家："
+                            + "、".join(stats.get("resolved_names", []))
+                        )
+                except Exception as e:
+                    st.error(f"Tushare peer PE 拉取失败：{e}")
 
     with st.form("manual_form"):
+        st.markdown("##### 基础信息")
         c1, c2 = st.columns(2)
         _boards = ["科创板", "创业板", "主板", "北交所"]
         board_sel = c1.selectbox("板块 *", _boards,
@@ -434,6 +536,7 @@ with tab_manual:
             index=_ind_options.index(str(_pf["sw_level1_industry_code"])) if _pf.get("sw_level1_industry_code") is not None and str(_pf["sw_level1_industry_code"]) in _ind_options else 0,
             format_func=_industry_label)
 
+        st.markdown("##### 发行结构")
         c5, c6 = st.columns(2)
         total_shares = c5.number_input("发行总股数（万股）", min_value=0.0,
             value=float(_pf.get("total_issue_shares_10k") or 0.0))
@@ -451,6 +554,7 @@ with tab_manual:
             _strat_pct_val = 0.0
         strategic_pct = c8.number_input("战略配售占比（%）", min_value=0.0, value=_strat_pct_val, step=0.1)
 
+        st.markdown("##### 申购规则")
         c9, c10 = st.columns(2)
         sub_upper = c9.number_input("网下申购上限（万股）", min_value=0.0,
             value=float(_pf.get("subscription_upper_limit_10k") or 0.0))
@@ -463,16 +567,19 @@ with tab_manual:
         mkt_threshold = c12.number_input("网下市值门槛（万元）", min_value=0.0,
             value=float(_pf.get("offline_market_value_threshold_10k_yuan") or 0.0))
 
+        st.markdown("##### 财务估值")
         c13, c14 = st.columns(2)
         industry_pe = c13.number_input("行业PE", min_value=0.0,
             value=float(_pf.get("industry_pe_at_ipo") or 0.0), step=0.1)
-        expected_raise = c14.number_input("预计募资额（亿元）", min_value=0.0,
-            value=float(_pf.get("expected_fundraising_100m_yuan") or 0.0), step=0.1)
+        comparable_pe = c14.number_input("可比公司PE（招股书名单 + Tushare PE）", min_value=0.0,
+            value=float(_pf.get("comparable_pe_avg_ex_nonrecurring") or 0.0), step=0.1)
 
         c15, c16 = st.columns(2)
-        revenue = c15.number_input("近一年营收（亿元）", min_value=0.0,
+        expected_raise = c15.number_input("预计募资额（亿元）", min_value=0.0,
+            value=float(_pf.get("expected_fundraising_100m_yuan") or 0.0), step=0.1)
+        revenue = c16.number_input("近一年营收（亿元）", min_value=0.0,
             value=float(_pf.get("latest_revenue_100m_yuan") or 0.0), step=0.1)
-        revenue_cagr = c16.number_input("3年营收CAGR（%）",
+        revenue_cagr = st.number_input("3年营收CAGR（%）",
             value=float(_pf.get("revenue_cagr_3y_pct") or 0.0), step=0.1)
 
         submitted = st.form_submit_button("预测", type="primary")
@@ -498,6 +605,7 @@ with tab_manual:
                 "subscription_step_10k":               sub_step or None,
                 "offline_market_value_threshold_10k_yuan": mkt_threshold or None,
                 "industry_pe_at_ipo":                  industry_pe or None,
+                "comparable_pe_avg_ex_nonrecurring":   comparable_pe or None,
                 "expected_fundraising_100m_yuan":      expected_raise or None,
                 "latest_revenue_100m_yuan":            revenue or None,
                 "revenue_cagr_3y_pct":                 revenue_cagr if revenue_cagr != 0.0 else None,

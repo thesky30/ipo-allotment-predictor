@@ -16,6 +16,7 @@ def test_extract_ipo_fields_with_injected_llm():
         "lead_underwriter": "中信证券股份有限公司",
         "total_issue_shares_10k": 4000,
         "industry_pe_at_ipo": 38.5,
+        "comparable_pe_avg_ex_nonrecurring": 42.0,
         "not_a_field": "ignored",
         "expected_fundraising_100m_yuan": None,
     }
@@ -24,6 +25,8 @@ def test_extract_ipo_fields_with_injected_llm():
     )
     assert res.fields["board"] == "科创板"
     assert res.fields["total_issue_shares_10k"] == 4000
+    assert "industry_pe_at_ipo" not in res.fields
+    assert "comparable_pe_avg_ex_nonrecurring" not in res.fields
     assert "not_a_field" not in res.fields
     assert "expected_fundraising_100m_yuan" not in res.fields
     assert res.text_chars == len("一些公告文本")
