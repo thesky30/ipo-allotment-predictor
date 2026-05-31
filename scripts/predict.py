@@ -432,6 +432,25 @@ def predict_from_dict(
 
 
 # ---------------------------------------------------------------------------
+# Public API — cold-start prediction for a new IPO not in the DB
+# ---------------------------------------------------------------------------
+
+def predict_new_ipo(raw: dict[str, Any], stage: str = "T6") -> dict[str, Any]:
+    """Cold-start prediction for an IPO not in the DB.
+
+    Assembles the full T-6 feature vector as-of the subscription date, then
+    predicts. Adds ``data_as_of`` and ``warnings`` to the result for honest UI.
+    """
+    from feature_assembly import assemble_t6
+    asm = assemble_t6(raw)
+    result = predict_from_dict(asm.features, stage=stage, prefer_board_model=False)
+    result["data_as_of"] = asm.data_as_of
+    result["warnings"] = asm.warnings
+    result["security_name"] = raw.get("security_name", "新IPO")
+    return result
+
+
+# ---------------------------------------------------------------------------
 # SHAP-style explanation (exact TreeSHAP via LightGBM, no `shap` dependency)
 # ---------------------------------------------------------------------------
 

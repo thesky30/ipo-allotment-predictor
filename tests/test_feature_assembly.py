@@ -120,3 +120,21 @@ def test_log_fields_and_missing_keys():
 def test_requires_subscription_date():
     with pytest.raises(ValueError):
         assemble_t6({"board": "主板"})
+
+
+def test_predict_new_ipo_returns_prediction():
+    from predict import predict_new_ipo
+    res = predict_new_ipo({
+        "board": "科创板",
+        "subscription_deadline_date": "2024-09-01",
+        "lead_underwriter": "中信证券",
+        "sw_level1_industry_code": "730000",
+        "total_issue_shares_10k": 5000,
+        "offline_issue_before_clawback_10k": 3000,
+        "industry_pe_at_ipo": 35.0,
+        "expected_fundraising_100m_yuan": 12.0,
+    })
+    # assert on the REAL prediction key found in Step 0:
+    assert "oversubscription_ratio_pred" in res
+    assert res["data_as_of"] is not None
+    assert isinstance(res["warnings"], list)
