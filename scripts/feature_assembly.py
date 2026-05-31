@@ -22,18 +22,6 @@ from baseline_models import FEATS_T6
 
 NEW_CODE = "__NEW_IPO__"
 
-RAW_INPUT_KEYS = [
-    "board", "subscription_deadline_date", "lead_underwriter",
-    "sw_level1_industry_code",
-    "total_issue_shares_10k", "offline_issue_before_clawback_10k",
-    "online_issue_before_clawback_10k", "strategic_allocation_10k",
-    "subscription_upper_limit_10k", "subscription_lower_limit_10k",
-    "subscription_step_10k", "offline_market_value_threshold_10k_yuan",
-    "industry_pe_at_ipo", "comparable_pe_avg_ex_nonrecurring",
-    "expected_fundraising_100m_yuan", "latest_revenue_100m_yuan",
-    "revenue_cagr_3y_pct", "offer_price_upper_yuan", "offer_price_lower_yuan",
-]
-
 
 @dataclass
 class AssemblyResult:
@@ -84,8 +72,9 @@ def assemble_t6(raw: dict[str, Any], history: reference_data.History | None = No
               "offer_price_lower_yuan"):
         if k in new_sample and raw.get(k) is not None:
             new_sample[k] = raw[k]
-    sample_aug = pd.concat([hist.sample, pd.DataFrame([new_sample])],
-                           ignore_index=True)
+    new_sample_df = pd.DataFrame([new_sample]).astype(
+        {c: t for c, t in hist.sample.dtypes.items() if c in new_sample}, errors="ignore")
+    sample_aug = pd.concat([hist.sample, new_sample_df], ignore_index=True)
     built = add_features(sample_aug)
     new_built = built.iloc[-1]
 
@@ -100,8 +89,9 @@ def assemble_t6(raw: dict[str, Any], history: reference_data.History | None = No
     new_panel["prediction_date"] = pred_date - pd.Timedelta(nanoseconds=1)
     new_panel["primary_underwriter"] = primary_underwriter(raw.get("lead_underwriter"))
     new_panel["sw_level1_industry_code"] = raw.get("sw_level1_industry_code")
-    panel_aug = pd.concat([hist.panel, pd.DataFrame([new_panel])],
-                          ignore_index=True)
+    new_panel_df = pd.DataFrame([new_panel]).astype(
+        {c: t for c, t in hist.panel.dtypes.items() if c in new_panel}, errors="ignore")
+    panel_aug = pd.concat([hist.panel, new_panel_df], ignore_index=True)
     # Ensure prediction_date stays datetime after concat (mixed-type concat can
     # produce object dtype, which breaks merge_asof in add_board_market_factors).
     panel_aug["prediction_date"] = pd.to_datetime(panel_aug["prediction_date"], errors="coerce")
@@ -126,9 +116,11 @@ def assemble_t6(raw: dict[str, Any], history: reference_data.History | None = No
     # the new row is no longer last; locate it by security_code instead of iloc[-1].
     new_prior = panel_aug.loc[panel_aug["security_code"] == NEW_CODE].iloc[0]
 
-    if new_panel["primary_underwriter"] is None or pd.isna(new_prior.get("underwriter_prior_ipo_count")):
+    _uw_cnt = new_prior.get("underwriter_prior_ipo_count")
+    if pd.isna(new_panel["primary_underwriter"]) or not (_uw_cnt and _uw_cnt > 0):
         warnings.append("该主承销商无历史样本，承销商先验按缺失处理。")
-    if raw.get("sw_level1_industry_code") is None or pd.isna(new_prior.get("sw_l1_prior_ipo_count")):
+    _sw_cnt = new_prior.get("sw_l1_prior_ipo_count")
+    if raw.get("sw_level1_industry_code") is None or not (_sw_cnt and _sw_cnt > 0):
         warnings.append("该申万一级行业无历史样本，行业先验按缺失处理。")
 
     # 3) Pass-through raw features add_features does not derive.
@@ -150,6 +142,12 @@ def assemble_t6(raw: dict[str, Any], history: reference_data.History | None = No
         feats["log_latest_revenue"] = float(np.log1p(raw["latest_revenue_100m_yuan"]))
     feats["board"] = raw.get("board")
 
-    feats = {k: (None if (not isinstance(v, str) and pd.isna(v)) else v)
-             for k, v in feats.items()}
+    def _to_none_if_na(v):
+        if isinstance(v, str):
+            return v
+        try:
+            return None if pd.isna(v) else v
+        except (TypeError, ValueError):
+            return v
+    feats = {k: _to_none_if_na(v) for k, v in feats.items()}
     return AssemblyResult(features=feats, data_as_of=as_of, warnings=warnings)
