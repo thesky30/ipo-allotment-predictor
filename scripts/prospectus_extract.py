@@ -6,23 +6,30 @@
 from __future__ import annotations
 
 import io
+import re
 from typing import Callable
 
 import llm_client
 from pdf_extract import ExtractResult
+from reference_data import SW_LEVEL1_INDUSTRY_NAME_BY_CODE
 
 PROSPECTUS_FIELD_SCHEMA: dict[str, str] = {
     "latest_revenue_100m_yuan": "最近一个完整会计年度的营业收入（亿元，纯数字）",
     "revenue_cagr_3y_pct": "最近三年营业收入的复合年增长率（%）；无现成数字则用最近三年营收推算",
+    "sw_level1_industry_code": "申万一级行业代码；若只有行业名称则留空",
+    "sw_level1_industry_name": "申万一级行业名称，例如电子、通信、机械设备；找不到输出 null",
     "comparable_company_names": "招股书披露的同行业可比上市公司名称列表（数组）；只取上市公司，找不到输出空数组",
     "expected_fundraising_100m_yuan": "本次发行『拟』募集资金总额（亿元）；不是发行后最终募资",
 }
 
-_ANCHORS: tuple[str, ...] = (
-    "营业收入", "主要财务数据", "扣除非经常性损益", "归属于母公司",
-    "募集资金", "拟募集", "募集资金运用",
-    "可比公司", "同行业可比上市公司",
-)
+_ANCHOR_GROUPS: dict[str, tuple[str, ...]] = {
+    "financial": ("营业收入", "主要财务数据", "扣除非经常性损益", "归属于母公司"),
+    "fundraising": ("募集资金", "拟募集", "募集资金运用"),
+    "peer": ("可比公司", "可比上市公司", "同行业可比上市公司", "证券简称"),
+    "industry": ("所属行业", "行业分类", "申万一级", "申万一级行业", "所属申万"),
+}
+_ANCHORS: tuple[str, ...] = tuple(kw for group in _ANCHOR_GROUPS.values() for kw in group)
+_SW_CODE_BY_NAME = {v: k for k, v in SW_LEVEL1_INDUSTRY_NAME_BY_CODE.items()}
 
 SYSTEM_PROMPT = (
     "你是严谨的招股书信息抽取助手。下面给你的是从某 A 股招股说明书中"
@@ -47,25 +54,74 @@ def locate_relevant_pages(
     max_pages: int = MAX_PAGES,
     max_chars: int = MAX_CHARS,
 ) -> tuple[str, list[int]]:
-    """按锚点关键词给每页打分，挑得分最高的页，按文档顺序拼接。"""
-    scored = []
+    """按锚点关键词给每页打分，挑得分最高的页，按文档顺序拼接。
+
+    招股书财务页可能反复出现“营业收入”，全局 top-N 容易挤掉可比公司
+    或申万行业页；先按类别各保留一页，再用总分补齐。
+    """
+    scored: list[tuple[int, int]] = []
+    by_group: dict[str, list[tuple[int, int]]] = {}
     for i, txt in enumerate(pages):
         score = sum(txt.count(kw) for kw in _ANCHORS)
         if score:
             scored.append((score, i))
+        for group, anchors in _ANCHOR_GROUPS.items():
+            group_score = sum(txt.count(kw) for kw in anchors)
+            if group_score:
+                by_group.setdefault(group, []).append((group_score, i))
 
-    scored.sort(key=lambda t: (-t[0], t[1]))
     chosen: list[int] = []
     total = 0
+
+    def add_page(i: int) -> None:
+        nonlocal total
+        if i not in chosen and len(chosen) < max_pages and total < max_chars:
+            chosen.append(i)
+            total += len(pages[i])
+
+    for group in ("financial", "fundraising", "peer", "industry"):
+        group_scores = sorted(by_group.get(group, []), key=lambda t: (-t[0], t[1]))
+        if group_scores:
+            add_page(group_scores[0][1])
+
+    scored.sort(key=lambda t: (-t[0], t[1]))
     for _score, i in scored:
         if len(chosen) >= max_pages or total >= max_chars:
             break
-        chosen.append(i)
-        total += len(pages[i])
+        add_page(i)
 
     chosen.sort()
     text = "\n\n".join(pages[i] for i in chosen)[:max_chars]
     return text, chosen
+
+
+def _clean_sw_industry_name(value: object) -> str:
+    text = str(value or "").strip()
+    return text.replace("(申万)", "").replace("（申万）", "").strip()
+
+
+def _sw_code_from_name(value: object) -> str | None:
+    name = _clean_sw_industry_name(value)
+    return _SW_CODE_BY_NAME.get(name)
+
+
+def _normalize_peer_names(value: object) -> list[str]:
+    if value in (None, ""):
+        return []
+    values = value if isinstance(value, list) else [value]
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in values:
+        parts = re.split(r"[、,，;；\n/]+", str(item))
+        for part in parts:
+            name = re.sub(r"[（(][0-9A-Za-z.\-]+[）)]", "", part).strip()
+            for suffix in ("股份有限公司", "有限责任公司", "有限公司", "集团", "股份"):
+                name = name.replace(suffix, "")
+            name = name.replace(" ", "")
+            if name and name not in seen:
+                seen.add(name)
+                out.append(name)
+    return out
 
 
 def extract_prospectus_fields(
@@ -90,5 +146,13 @@ def extract_prospectus_fields(
         for k in PROSPECTUS_FIELD_SCHEMA
         if raw.get(k) not in (None, "")
     }
+    if "sw_level1_industry_name" in fields:
+        fields["sw_level1_industry_name"] = _clean_sw_industry_name(fields["sw_level1_industry_name"])
+    if "sw_level1_industry_code" not in fields and fields.get("sw_level1_industry_name"):
+        code = _sw_code_from_name(fields["sw_level1_industry_name"])
+        if code:
+            fields["sw_level1_industry_code"] = code
+    if "comparable_company_names" in fields:
+        fields["comparable_company_names"] = _normalize_peer_names(fields["comparable_company_names"])
     warnings.append(f"招股书仅取定位到的页 {used}（共 {len(text)} 字送抽取，省 token）。")
     return ExtractResult(fields=fields, text_chars=len(text), warnings=warnings)

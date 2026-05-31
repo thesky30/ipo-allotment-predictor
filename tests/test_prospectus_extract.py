@@ -22,6 +22,23 @@ def test_locate_picks_anchor_pages_and_caps():
     assert 0 not in used and 2 not in used
 
 
+def test_locate_keeps_peer_and_industry_pages_when_financial_pages_dominate():
+    pages = [
+        "营业收入 " * 100,
+        "营业收入 " * 90,
+        "营业收入 " * 80,
+        "同行业可比上市公司 证券简称 中际旭创 新易盛",
+        "所属行业 申万一级行业 通信",
+    ]
+
+    text, used = pe.locate_relevant_pages(pages, max_pages=3, max_chars=100000)
+
+    assert 3 in used
+    assert 4 in used
+    assert "中际旭创" in text
+    assert "申万一级行业 通信" in text
+
+
 def test_locate_respects_char_cap():
     pages = ["营业收入 " * 1000, "募集资金 " * 1000]
     text, used = pe.locate_relevant_pages(pages, max_pages=8, max_chars=500)
@@ -46,6 +63,21 @@ def test_extract_prospectus_fields_with_injected_llm():
     assert "comparable_pe_avg_ex_nonrecurring" not in res.fields
     assert res.fields["comparable_company_names"] == ["中际旭创", "新易盛"]
     assert "board" not in res.fields
+
+
+def test_extract_prospectus_fields_normalizes_peer_name_string_and_sw_industry():
+    canned = {
+        "comparable_company_names": "中际旭创股份有限公司（300308.SZ）、新易盛、天孚通信",
+        "sw_level1_industry_name": "通信(申万)",
+    }
+    res = pe.extract_prospectus_fields(
+        b"", extract_json=lambda system, user: canned,
+        pages=["同行业可比上市公司 所属行业 申万一级行业 通信"],
+    )
+
+    assert res.fields["comparable_company_names"] == ["中际旭创", "新易盛", "天孚通信"]
+    assert res.fields["sw_level1_industry_name"] == "通信"
+    assert res.fields["sw_level1_industry_code"] == "1000042215000000"
 
 
 @pytest.mark.skipif(

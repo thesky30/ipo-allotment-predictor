@@ -211,8 +211,8 @@ Streamlit 网页工具（`app.py`）已实现，包括：
 
 - ✅ 新股信息输入区（按代码/名称查询，或手动输入字段）。
 - ✅ 手动输入页已按「基础信息 / 发行结构 / 申购规则 / 财务估值」分组，减少字段堆叠和误填。
-- ✅ 手动输入页可上传「发行安排及初步询价公告」PDF 回填发行结构/申购规则，也可另传招股书 PDF 补全营收、3 年营收 CAGR、拟募资额和可比公司名单；PDF 抽取结果必须人工核对后才预测。
-- ✅ 页面会展示已回填字段及来源；行业 PE 可从 Tushare 申万行业行情缓存回填，可比公司 PE 可由招股书可比公司名单 + Tushare `daily_basic.pe_ttm` 计算后回填。
+- ✅ 手动输入页可上传「发行安排及初步询价公告」PDF 回填发行结构/申购规则，也可另传招股书 PDF 补全营收、3 年营收 CAGR、拟募资额、申万一级行业和可比公司名单；PDF 抽取结果必须人工核对后才预测。
+- ✅ 页面会展示已回填字段及来源；行业 PE 可从 Tushare 申万行业行情缓存回填，可比公司 PE 优先由招股书可比公司名单 + Tushare `daily_basic.pe_ttm` 计算后回填，也可用申万行业成分股 PE 作为兜底参考。
 - ✅ 手动输入页的申万一级行业下拉框展示中文行业名，内部仍保留真实申万行业代码用于历史先验匹配。
 - ✅ 预测结果展示区。
 - ✅ 特征贡献或影响因素解释区。
@@ -280,8 +280,8 @@ Streamlit 网页工具（`app.py`）已实现，包括：
 - [x] 询价前因子洞察（IC / 分组收益 / SHAP / 板块时期画像，`factor_insights.py`）。
 - [x] 完整因子字典写入 README（T-6 / T-1 / T+1 / T+2 全集与预期方向）。
 - [x] 未入库新股冷启动预测：手动输入/PDF 回填后组装 T-6 特征并预测。
-- [x] 招股书抽取：定位相关页，抽取财务字段和可比公司名单。
-- [x] Tushare 估值接入：行业 PE 缓存回填，可比公司名单解析后计算 peer PE。
+- [x] 招股书抽取：定位相关页，抽取财务字段、申万一级行业和可比公司名单。
+- [x] Tushare 估值接入：行业 PE 缓存回填，可比公司名单解析后计算 peer PE；可比公司名单缺失时支持申万行业成分股 PE 兜底参考。
 - [x] 页面第一轮整理：手动表单分组、字段来源展示、可比 PE 输入进入预测。
 
 > 剩余增量项以 `需要完善的部分.md` 为准；demo 录屏、Word 报告、PPT 汇报和 AkShare 备源已明确不再列入 backlog。
@@ -444,7 +444,7 @@ scripts/baseline_models.py               三阶段建模 + 时间序列回测
 scripts/board_models.py                  板块专项模型对比
 scripts/factor_insights.py               询价前因子洞察 + 板块/时期特征报告
 scripts/pdf_extract.py                   发行安排及初步询价公告 PDF → T-6 原始字段
-scripts/prospectus_extract.py            招股书 PDF 相关页定位 → T-6 财务/估值字段
+scripts/prospectus_extract.py            招股书 PDF 相关页定位 → T-6 财务/行业/估值字段
 scripts/market_source.py                 Tushare 市场/申万行业行情与 PE 刷新
 scripts/peer_valuation.py                Tushare 可比公司/同行业成分 + daily_basic → peer PE 统计
 scripts/process_company_factors.py       公司基本面因子处理

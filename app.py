@@ -147,6 +147,13 @@ def _estimate_peer_pe_from_names(company_names: list[str], trade_date: str) -> d
     return peer_valuation.estimate_peer_pe_from_company_names(pro, company_names, trade_date)
 
 
+def _estimate_industry_peer_pe(sw_level1_industry_code: str, trade_date: str) -> dict:
+    import peer_valuation
+
+    pro = peer_valuation._pro_api()
+    return peer_valuation.estimate_industry_peer_pe(pro, sw_level1_industry_code, trade_date)
+
+
 def _show_prefill_summary(prefill: dict, sources: dict | None = None) -> None:
     if not prefill:
         return
@@ -479,12 +486,37 @@ with tab_manual:
                     _pf = merged
                     _src = sources
                     st.success(f"已回填行业 PE {float(ref_pe['pe']):.2f}")
+            if st.button("用申万行业成分估算可比公司 PE 并回填", key="run_industry_peer_pe"):
+                trade_date = _to_tushare_trade_date(_pf.get("subscription_deadline_date"))
+                with st.spinner("拉取申万行业成分股 PE 中…"):
+                    try:
+                        stats = _estimate_industry_peer_pe(str(sw_code_for_pe), trade_date)
+                        pe_mean = stats.get("peer_pe_ttm_mean")
+                        if not pe_mean:
+                            st.warning("未取得可用的申万行业成分股 PE，请手动输入可比公司 PE。")
+                        else:
+                            merged = dict(_pf)
+                            merged["comparable_pe_avg_ex_nonrecurring"] = round(float(pe_mean), 2)
+                            merged["peer_pe_ttm_median"] = stats.get("peer_pe_ttm_median")
+                            merged["peer_pe_trade_date"] = stats.get("trade_date")
+                            st.session_state["pdf_prefill"] = merged
+                            sources = dict(_src)
+                            sources["comparable_pe_avg_ex_nonrecurring"] = "peer_pe"
+                            st.session_state["pdf_prefill_sources"] = sources
+                            _pf = merged
+                            _src = sources
+                            st.success(
+                                f"已按申万行业成分回填可比公司 PE 均值 {float(pe_mean):.2f}，"
+                                f"样本 {stats.get('peer_count', 0)} 家。"
+                            )
+                    except Exception as e:
+                        st.error(f"Tushare 申万行业成分 PE 拉取失败：{e}")
         except Exception:
             pass
 
     peer_names = _pf.get("comparable_company_names") or []
     if isinstance(peer_names, str):
-        peer_names = [x.strip() for x in peer_names.replace("，", ",").split(",") if x.strip()]
+        peer_names = [x.strip() for x in peer_names.replace("，", ",").replace("、", ",").split(",") if x.strip()]
     if peer_names:
         st.info("招股书识别到可比公司：" + "、".join(map(str, peer_names)))
         if st.button("用 Tushare 计算可比公司 PE 并回填", key="run_peer_pe"):
