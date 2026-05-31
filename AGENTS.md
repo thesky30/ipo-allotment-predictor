@@ -206,6 +206,7 @@ y = log(网下超额认购倍数)
 - 模型训练脚本应记录模型名称、特征集合、训练窗口、验证窗口和随机种子。
 - 回测结果应保存为结构化文件，便于后续生成图表和报告。
 - 网页部署前应固定一个可复现实验版本，记录模型文件、特征列表和训练样本范围。
+- **部署 Python 版本必须固定为 3.11**（与 devcontainer 和保存 `.joblib` 的环境一致）。Streamlit Community Cloud 默认拉最新 Python（如 3.14），该 ML 栈无 3.14 wheel，源码编译后环境残缺会报 `ModuleNotFoundError: joblib`。仓库已含 `.python-version=3.11`，并须在 Streamlit Cloud 后台 Settings 把 Python version 设为 3.11（权威设置）后 Reboot。
 
 ## 当前开发进展（截至 2026-05-22）
 
