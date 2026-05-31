@@ -15,6 +15,8 @@ import market_source
 
 def active_members_on_date(members: pd.DataFrame, trade_date: str | pd.Timestamp) -> pd.DataFrame:
     out = members.copy()
+    if "con_code" not in out.columns and "ts_code" in out.columns:
+        out = out.rename(columns={"ts_code": "con_code"})
     date = pd.to_datetime(str(trade_date), format="%Y%m%d", errors="coerce")
     if pd.isna(date):
         date = pd.to_datetime(trade_date)
@@ -52,10 +54,13 @@ def fetch_daily_basic(pro, trade_date: str) -> pd.DataFrame:
 
 
 def fetch_index_members(pro, index_code: str) -> pd.DataFrame:
-    return pro.index_member_all(
-        index_code=index_code,
-        fields="index_code,con_code,in_date,out_date,is_new",
-    )
+    df = pro.index_member_all(l1_code=index_code)
+    if df is None:
+        return pd.DataFrame(columns=["con_code", "in_date", "out_date", "is_new"])
+    df = df.copy()
+    if "con_code" not in df.columns and "ts_code" in df.columns:
+        df = df.rename(columns={"ts_code": "con_code"})
+    return df
 
 
 def estimate_industry_peer_pe(

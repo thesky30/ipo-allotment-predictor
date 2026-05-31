@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import os
 import sqlite3
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -156,7 +157,14 @@ def main() -> None:
     pro = _pro_api(args.token)
     market = fetch_market_daily(pro, args.start_date, args.end_date)
     mapping = fetch_sw_level1_mapping(pro)
-    sw_daily = fetch_sw_level1_daily(pro, mapping, args.start_date, args.end_date)
+    try:
+        sw_daily = fetch_sw_level1_daily(pro, mapping, args.start_date, args.end_date)
+    except Exception as e:  # noqa: BLE001 - keep market/mapping refresh usable under low Tushare quotas
+        print(f"WARNING: sw_daily refresh skipped: {e}", file=sys.stderr)
+        sw_daily = pd.DataFrame(columns=[
+            "trade_date", "sw_level1_industry_code", "sw_level1_industry_name",
+            "tushare_index_code", "turnover_100m_yuan", "return_pct", "pe", "pb",
+        ])
     write_outputs(market, mapping, sw_daily)
     print(f"market_daily rows: {len(market)}")
     print(f"sw_level1_mapping rows: {len(mapping)}")
