@@ -403,7 +403,7 @@ with tab_code:
 # ── Tab 2: Manual feature input ────────────────────────────────────────────────
 with tab_manual:
     st.markdown("#### 手动输入新IPO特征")
-    st.info("新股预测固定使用 T-6 询价前正式模型（无询价/回拨数据）。")
+    st.caption("固定使用 T-6 询价前正式模型，不使用询价/回拨数据。")
 
     try:
         _uw_list, _ind_list = _known_underwriters_and_industries()
@@ -418,12 +418,12 @@ with tab_manual:
         import reference_data
         return reference_data.sw_level1_industry_name(code)
 
-    st.markdown("##### 可选：上传巨潮『发行安排及初步询价公告』PDF 自动识别")
+    st.markdown("##### 上传巨潮『发行安排及初步询价公告』PDF 自动识别")
     up = st.file_uploader("上传 PDF（识别后回填下方表单，请务必人工核对）", type="pdf")
     if up is not None and st.button("识别 PDF 字段", key="run_pdf_extract"):
         import pdf_extract, llm_client
         if not llm_client.is_configured():
-            st.error("未配置抽取用 LLM。请在部署环境设置 LLM_API_KEY（及可选 LLM_BASE_URL / LLM_MODEL）后重试，或直接手动输入。")
+            st.error("未配置抽取用 LLM。请在部署环境设置 LLM_API_KEY（按需设置 LLM_BASE_URL / LLM_MODEL）后重试，或直接手动输入。")
         else:
             with st.spinner("识别中…"):
                 try:
@@ -436,7 +436,7 @@ with tab_manual:
                 except Exception as e:
                     st.error(f"识别失败：{e}。请改为手动输入。")
 
-    up2 = st.file_uploader("（可选）上传招股书 PDF 补充财务/估值字段（营收/CAGR/可比公司名单/拟募资）", type="pdf", key="prospectus_pdf")
+    up2 = st.file_uploader("上传招股书 PDF 补充财务/估值字段（营收/CAGR/可比公司名单/拟募资）", type="pdf", key="prospectus_pdf")
     if up2 is not None and st.button("识别招股书字段", key="run_prospectus_extract"):
         import prospectus_extract, llm_client
         if not llm_client.is_configured():
@@ -464,7 +464,7 @@ with tab_manual:
     if isinstance(peer_names, str):
         peer_names = [x.strip() for x in peer_names.replace("，", ",").replace("、", ",").split(",") if x.strip()]
 
-    st.markdown("##### Tushare 估值回填（可选）")
+    st.markdown("##### Tushare 估值回填")
     st.caption("需要申万一级行业。可由询价公告/招股书自动识别，也可以在这里手动选择；不是必须先上传询价文件。")
     prefill_sw_code = str(_pf.get("sw_level1_industry_code")) if _pf.get("sw_level1_industry_code") is not None else None
     if prefill_sw_code and prefill_sw_code not in _ind_options:
@@ -514,12 +514,12 @@ with tab_manual:
                     _src = sources
                     st.success(f"已回填行业 PE {float(ref_pe['pe']):.2f}")
             else:
-                st.info(f"未找到 {sw_name_for_pe} 的申万行业行情 PE 缓存；行业 PE 需要手动输入或先刷新 Tushare 行情缓存。")
+                st.caption(f"暂无 {sw_name_for_pe} 的申万行业行情 PE 缓存；行业 PE 可手动输入，或先刷新 Tushare 行情缓存。")
         except Exception:
             pass
 
     if peer_names:
-        st.info("招股书识别到可比公司：" + "、".join(map(str, peer_names)))
+        st.caption("招股书识别到可比公司：" + "、".join(map(str, peer_names)))
         if st.button("用招股书可比公司名单计算可比公司 PE 并回填", key="run_peer_pe"):
             trade_date = _to_tushare_trade_date(_pf.get("subscription_deadline_date"))
             with st.spinner("拉取可比公司行情 PE 中…"):
@@ -547,7 +547,7 @@ with tab_manual:
                 except Exception as e:
                     st.error(f"Tushare peer PE 拉取失败：{e}")
     elif sw_code_for_pe:
-        st.warning("未识别到招股书可比公司名单。只有在这种情况下，才建议把申万行业成分股 PE 作为“可比公司 PE”的兜底代理；它不是行业 PE。")
+        st.caption("未识别到招股书可比公司名单时，可用申万行业成分股 PE 作为可比公司 PE 的兜底代理；它不是行业 PE。")
         if st.button("兜底：用申万行业成分股 PE 填可比公司 PE", key="run_industry_peer_pe"):
             trade_date = _to_tushare_trade_date(_pf.get("subscription_deadline_date"))
             with st.spinner("拉取申万行业成分股 PE 中…"):
