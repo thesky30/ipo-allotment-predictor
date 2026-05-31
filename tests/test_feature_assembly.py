@@ -8,27 +8,15 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import reference_data
 from feature_assembly import assemble_t6
 
-# Context features that can be exactly reproduced by assemble_t6 for in-DB stocks.
-#
-# Excluded from CONTEXT_FEATS (documented below):
-#
-# "concurrent_ipo_count", "same_board_concurrent_ipo_count",
-# "concurrent_offline_issue_sum_10k":
-#   When an in-DB stock is re-assembled, the new row is appended at the same
-#   subscription_deadline_date as the original DB row. _concurrent_ipo_count
-#   then counts the original row as a peer of the new row, inflating the count
-#   by 1. This is CORRECT semantics for a genuinely new IPO (it should count
-#   all existing historical stocks as concurrent peers), but it makes exact
-#   reproduction of training values impossible for in-DB stocks.
-#
-# "recent_ipo_first_day_return_ma20":
-#   add_features sorts each board group by sort_date_for_heat using quicksort
-#   (default, non-stable). When the new row and the original in-DB stock share
-#   the same subscription_deadline_date, the sort order between them is
-#   non-deterministic. The rolling window either matches or is shifted by one
-#   position depending on how quicksort partitions the tie.
+# Context features verified to match training exactly under leave-one-out assembly.
+# The target stock is removed from history before assembly so that:
+#   - concurrent-peer counts (concurrent_ipo_count, same_board_concurrent_ipo_count,
+#     concurrent_offline_issue_sum_10k) are not inflated by the original DB row.
+#   - recent_ipo_first_day_return_ma20 rolling windows include exactly the same
+#     peers as training without a spurious extra row shifting the window.
 
 CONTEXT_FEATS = [
     "market_turnover_ma20", "market_turnover_pct_rank_1y",
@@ -40,6 +28,12 @@ CONTEXT_FEATS = [
     "underwriter_prior_first_day_return_mean", "underwriter_prior_break_rate",
     "sw_l1_prior_ipo_count", "sw_l1_prior_log_oversub_mean",
     "sw_l1_prior_first_day_return_mean", "sw_l1_prior_break_rate",
+    # Batch-competition features: pass under leave-one-out.
+    "concurrent_ipo_count",
+    "same_board_concurrent_ipo_count",
+    "concurrent_offline_issue_sum_10k",
+    # Rolling heat feature: also passes under leave-one-out.
+    "recent_ipo_first_day_return_ma20",
 ]
 
 
@@ -82,7 +76,21 @@ def test_assembly_matches_training_context_features(modeling_data, offset):
     panel_meta = _load_panel_metadata()
     df = df.merge(panel_meta, on="security_code", how="left")
     row = df.iloc[offset % len(df)]
-    result = assemble_t6(_raw_from_row(row))
+    code = row["security_code"]
+
+    # Leave-one-out: remove the target stock from history before assembly so that
+    # batch-competition features (concurrent_ipo_count, same_board_concurrent_ipo_count,
+    # concurrent_offline_issue_sum_10k) reproduce training values exactly. Without this,
+    # the original DB row stays in history and is counted as a concurrent peer of the
+    # newly-assembled row, inflating counts by 1.
+    full = reference_data.load_history()
+    reduced = reference_data.History(
+        sample=full.sample[full.sample["security_code"] != code].reset_index(drop=True),
+        panel=full.panel[full.panel["security_code"] != code].reset_index(drop=True),
+        board_market=full.board_market,
+    )
+
+    result = assemble_t6(_raw_from_row(row), history=reduced)
     for f in CONTEXT_FEATS:
         if f not in df.columns or pd.isna(row[f]):
             continue

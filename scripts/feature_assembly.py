@@ -47,8 +47,8 @@ def _date_to_excel_serial(ts: pd.Timestamp) -> float:
     return float((ts - pd.Timestamp("1899-12-30")).days)
 
 
-def assemble_t6(raw: dict[str, Any]) -> AssemblyResult:
-    hist = reference_data.load_history()
+def assemble_t6(raw: dict[str, Any], history: reference_data.History | None = None) -> AssemblyResult:
+    hist = history if history is not None else reference_data.load_history()
     warnings: list[str] = []
 
     sub_date = pd.to_datetime(raw.get("subscription_deadline_date"), errors="coerce")
