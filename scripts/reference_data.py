@@ -42,12 +42,40 @@ SW_LEVEL1_INDUSTRY_NAME_BY_CODE = {
     "1000042219000000": "美容护理",
 }
 
+SW_LEVEL1_INDUSTRY_CODE_BY_NAME = {v: k for k, v in SW_LEVEL1_INDUSTRY_NAME_BY_CODE.items()}
+
+# Some prospectuses disclose the CSRC industry code rather than a SW level-1
+# code. Keep this fallback intentionally narrow and still editable in the UI.
+CSRC_TO_SW_LEVEL1_INDUSTRY_CODE = {
+    "C39": "1000042193000000",  # 计算机、通信和其他电子设备制造业 -> 电子
+}
+
 
 def sw_level1_industry_name(code: object) -> str:
     if code is None:
         return ""
     text = str(code)
     return SW_LEVEL1_INDUSTRY_NAME_BY_CODE.get(text, text)
+
+
+def _clean_industry_name(value: object) -> str:
+    return str(value or "").replace("(申万)", "").replace("（申万）", "").strip()
+
+
+def normalize_sw_level1_industry_code(value: object, name: object | None = None) -> str | None:
+    """Return the internal Wind-style SW level-1 code, or None if unknown."""
+    text = str(value or "").strip()
+    if text in SW_LEVEL1_INDUSTRY_NAME_BY_CODE:
+        return text
+
+    name_key = _clean_industry_name(name)
+    if name_key in SW_LEVEL1_INDUSTRY_CODE_BY_NAME:
+        return SW_LEVEL1_INDUSTRY_CODE_BY_NAME[name_key]
+
+    upper = text.upper()
+    if upper in CSRC_TO_SW_LEVEL1_INDUSTRY_CODE:
+        return CSRC_TO_SW_LEVEL1_INDUSTRY_CODE[upper]
+    return None
 
 
 @dataclass(frozen=True)

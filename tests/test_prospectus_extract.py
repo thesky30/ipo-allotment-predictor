@@ -80,6 +80,39 @@ def test_extract_prospectus_fields_normalizes_peer_name_string_and_sw_industry()
     assert res.fields["sw_level1_industry_code"] == "1000042215000000"
 
 
+def test_extract_prospectus_fields_maps_csrc_c39_and_keeps_neighbor_peer_names():
+    canned = {
+        "sw_level1_industry_code": "C39",
+        "comparable_company_names": "300308.SZ 中际旭创 300502.SZ 新易盛",
+    }
+    res = pe.extract_prospectus_fields(
+        b"", extract_json=lambda system, user: canned,
+        pages=[
+            "营业收入 " * 20,
+            "同行业可比上市公司",
+            "中际旭创（300308.SZ） 新易盛",
+            "所属行业 C39 计算机、通信和其他电子设备制造业",
+        ],
+    )
+
+    assert res.fields["sw_level1_industry_code"] == "1000042193000000"
+    assert res.fields["sw_level1_industry_name"] == "电子"
+    assert res.fields["comparable_company_names"] == ["中际旭创", "新易盛"]
+
+
+def test_locate_keeps_neighbor_page_after_peer_anchor():
+    pages = [
+        "营业收入 " * 20,
+        "同行业可比上市公司",
+        "中际旭创 新易盛 天孚通信",
+    ]
+
+    text, used = pe.locate_relevant_pages(pages, max_pages=3, max_chars=100000)
+
+    assert used == [0, 1, 2]
+    assert "中际旭创" in text
+
+
 @pytest.mark.skipif(
     not list(FIXTURES.glob("*招股*.pdf")),
     reason="把真实招股书 PDF（文件名含『招股』）放进 tests/fixtures/ 才跑此测试",

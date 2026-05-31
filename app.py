@@ -460,7 +460,29 @@ with tab_manual:
     _src = st.session_state.get("pdf_prefill_sources", {})
     _show_prefill_summary(_pf, _src)
 
-    sw_code_for_pe = _pf.get("sw_level1_industry_code")
+    st.markdown("##### Tushare 估值回填（可选）")
+    st.caption("需要申万一级行业。可由询价公告/招股书自动识别，也可以在这里手动选择；不是必须先上传询价文件。")
+    prefill_sw_code = str(_pf.get("sw_level1_industry_code")) if _pf.get("sw_level1_industry_code") is not None else None
+    if prefill_sw_code and prefill_sw_code not in _ind_options:
+        st.warning(f"已忽略无法用于申万行情映射的行业代码：{prefill_sw_code}。请改选申万一级行业。")
+        prefill_sw_code = None
+    pe_ind_sel = st.selectbox(
+        "用于 Tushare 回填的申万一级行业",
+        options=_ind_options,
+        index=_ind_options.index(prefill_sw_code) if prefill_sw_code in _ind_options else 0,
+        format_func=_industry_label,
+    )
+    if pe_ind_sel:
+        merged = dict(_pf)
+        merged["sw_level1_industry_code"] = pe_ind_sel
+        st.session_state["pdf_prefill"] = merged
+        sources = dict(_src)
+        sources.setdefault("sw_level1_industry_code", "manual")
+        st.session_state["pdf_prefill_sources"] = sources
+        _pf = merged
+        _src = sources
+
+    sw_code_for_pe = pe_ind_sel
     if sw_code_for_pe:
         try:
             import market_source

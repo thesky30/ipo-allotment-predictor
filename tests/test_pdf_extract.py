@@ -32,6 +32,19 @@ def test_extract_ipo_fields_with_injected_llm():
     assert res.text_chars == len("一些公告文本")
 
 
+def test_extract_ipo_fields_does_not_pass_csrc_code_as_sw_code():
+    canned = {
+        "sw_level1_industry_code": "C39",
+    }
+
+    res = pdf_extract.extract_ipo_fields(
+        b"", extract_json=lambda system, user: canned, text="所属行业 C39 计算机、通信和其他电子设备制造业"
+    )
+
+    assert res.fields["sw_level1_industry_code"] == "1000042193000000"
+    assert res.fields["sw_level1_industry_name"] == "电子"
+
+
 def test_schema_keys_match_assemble_contract():
     import feature_assembly  # noqa: F401
     assert "subscription_deadline_date" in pdf_extract.FIELD_SCHEMA

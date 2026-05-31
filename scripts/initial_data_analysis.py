@@ -324,7 +324,12 @@ def strip_xlsx_styles(src: Path, dst: Path) -> None:
 
 def excel_serial_to_datetime(series: pd.Series) -> pd.Series:
     numeric = pd.to_numeric(series, errors="coerce")
-    return pd.to_datetime(numeric, unit="D", origin="1899-12-30", errors="coerce")
+    numeric = numeric.where((numeric >= 1) & (numeric <= 80000))
+    out = pd.Series(pd.NaT, index=series.index, dtype="datetime64[ns]")
+    valid = numeric.notna()
+    if valid.any():
+        out.loc[valid] = pd.to_datetime(numeric.loc[valid], unit="D", origin="1899-12-30", errors="coerce")
+    return out
 
 
 def read_source(spec: dict, temp_dir: Path) -> pd.DataFrame:

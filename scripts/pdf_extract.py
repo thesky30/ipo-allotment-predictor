@@ -9,6 +9,7 @@ from dataclasses import dataclass, field as _field
 from typing import Any, Callable
 
 import llm_client
+from reference_data import normalize_sw_level1_industry_code, sw_level1_industry_name
 
 # Extraction contract: key -> 中文描述 (also drives the LLM prompt). These keys
 # are exactly the raw inputs feature_assembly.assemble_t6 consumes.
@@ -16,7 +17,8 @@ FIELD_SCHEMA: dict[str, str] = {
     "board": "板块（取值之一：科创板/创业板/主板/北交所）",
     "subscription_deadline_date": "网下申购截止日（格式 YYYY-MM-DD）",
     "lead_underwriter": '主承销商全称（法人全称，如“中信证券股份有限公司”）',
-    "sw_level1_industry_code": "申万一级行业代码（若公告中无，留空）",
+    "sw_level1_industry_code": "申万一级行业代码；仅填 16 位 Wind 风格申万一级代码；不要填 C39 这类证监会行业代码，找不到则输出 null",
+    "sw_level1_industry_name": "申万一级行业名称，例如电子、通信、机械设备；不要输出证监会行业大类名称，找不到输出 null",
     "total_issue_shares_10k": "本次发行总股数（万股，纯数字）",
     "offline_issue_before_clawback_10k": "网下初始发行数量（回拨前，万股）",
     "online_issue_before_clawback_10k": "网上初始发行数量（回拨前，万股）",
@@ -69,6 +71,15 @@ def extract_ipo_fields(
     fn = extract_json or llm_client.extract_json
     raw = fn(SYSTEM_PROMPT, text[:MAX_CHARS])
     fields = {k: raw.get(k) for k in FIELD_SCHEMA if raw.get(k) not in (None, "")}
+    raw_sw_code = fields.get("sw_level1_industry_code")
+    raw_sw_name = fields.get("sw_level1_industry_name")
+    code = normalize_sw_level1_industry_code(raw_sw_code, raw_sw_name)
+    if code:
+        fields["sw_level1_industry_code"] = code
+        fields["sw_level1_industry_name"] = sw_level1_industry_name(code)
+    elif raw_sw_code:
+        fields.pop("sw_level1_industry_code", None)
+        warnings.append(f"忽略无法映射为申万一级行业的代码：{raw_sw_code}。")
     if not fields:
         warnings.append("未从公告中抽取到任何字段，请改为手动输入。")
     return ExtractResult(fields=fields, text_chars=len(text), warnings=warnings)

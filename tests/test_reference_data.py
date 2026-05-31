@@ -26,3 +26,12 @@ def test_sw_level1_industry_name_mapping():
     assert sw_level1_industry_name("1000042211000000") == "机械设备"
     assert sw_level1_industry_name("1000042199000000") == "医药生物"
     assert sw_level1_industry_name("unknown") == "unknown"
+
+
+def test_normalize_sw_level1_industry_code_accepts_names_and_csrc_c39():
+    from reference_data import normalize_sw_level1_industry_code
+
+    assert normalize_sw_level1_industry_code("1000042215000000") == "1000042215000000"
+    assert normalize_sw_level1_industry_code(None, "通信(申万)") == "1000042215000000"
+    assert normalize_sw_level1_industry_code("C39") == "1000042193000000"
+    assert normalize_sw_level1_industry_code("C99") is None
