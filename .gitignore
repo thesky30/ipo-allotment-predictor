@@ -27,6 +27,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+.streamlit/secrets.toml
 
 # Raw/private data exports
 data/raw/

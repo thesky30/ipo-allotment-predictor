@@ -17,6 +17,11 @@ import streamlit as st
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "scripts"))
 
+# Load LLM_API_KEY / LLM_BASE_URL / LLM_MODEL / TUSHARE_TOKEN from .env (local)
+# or st.secrets (Streamlit Cloud) into the environment. See .env.example.
+from config import load_env                 # noqa: E402
+load_env()
+
 from predict import (                       # noqa: E402
     predict_from_code,
     predict_from_dict,
