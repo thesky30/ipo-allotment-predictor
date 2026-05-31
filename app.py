@@ -154,13 +154,6 @@ def _estimate_industry_peer_pe(sw_level1_industry_code: str, trade_date: str) ->
     return peer_valuation.estimate_industry_peer_pe(pro, sw_level1_industry_code, trade_date)
 
 
-def _fetch_latest_sw_industry_pe(sw_level1_industry_code: str, trade_date: str) -> dict | None:
-    import market_source
-
-    pro = market_source._pro_api()
-    return market_source.fetch_latest_sw_industry_pe(pro, sw_level1_industry_code, trade_date)
-
-
 def _show_prefill_summary(prefill: dict, sources: dict | None = None) -> None:
     if not prefill:
         return
@@ -521,31 +514,26 @@ with tab_manual:
                     f"{ref_pe['pe']:.2f}（{ref_pe['trade_date']}）"
                 )
             else:
-                st.caption(f"暂无 {sw_name_for_pe} 的申万行业行情 PE 缓存，可直接点击按钮实时拉取。")
+                st.caption(f"暂无 {sw_name_for_pe} 的申万行业行情 PE 缓存；请先导入最新行业 PE 文件。")
         except Exception as e:
             ref_pe = None
             st.caption(f"读取本地行业 PE 缓存失败：{e}")
-        if st.button("拉取并回填申万行业 PE", key="fill_industry_pe"):
-            with st.spinner("拉取申万行业 PE 中…"):
-                try:
-                    pe_result = ref_pe or _fetch_latest_sw_industry_pe(str(sw_code_for_pe), trade_date_for_pe)
-                    if not pe_result:
-                        st.warning("未取得可用的申万行业 PE，请手动输入或稍后重试。")
-                    else:
-                        merged = dict(_pf)
-                        merged["industry_pe_at_ipo"] = round(float(pe_result["pe"]), 2)
-                        st.session_state["pdf_prefill"] = merged
-                        sources = dict(_src)
-                        sources["industry_pe_at_ipo"] = "industry_pe"
-                        st.session_state["pdf_prefill_sources"] = sources
-                        _pf = merged
-                        _src = sources
-                        st.success(f"已回填行业 PE {float(pe_result['pe']):.2f}（{pe_result['trade_date']}）")
-                except Exception as e:
-                    st.error(f"Tushare 申万行业 PE 拉取失败：{e}")
+        if st.button("从本地缓存回填申万行业 PE", key="fill_industry_pe"):
+            if not ref_pe:
+                st.warning("本地缓存没有可用的申万行业 PE，请先导入最新行业 PE 文件，或手动输入。")
+            else:
+                merged = dict(_pf)
+                merged["industry_pe_at_ipo"] = round(float(ref_pe["pe"]), 2)
+                st.session_state["pdf_prefill"] = merged
+                sources = dict(_src)
+                sources["industry_pe_at_ipo"] = "industry_pe"
+                st.session_state["pdf_prefill_sources"] = sources
+                _pf = merged
+                _src = sources
+                st.success(f"已回填行业 PE {float(ref_pe['pe']):.2f}（{ref_pe['trade_date']}）")
     else:
-        st.button("拉取并回填申万行业 PE", key="fill_industry_pe_disabled", disabled=True)
-        st.caption("先选择或识别申万一级行业，再拉取行业 PE。")
+        st.button("从本地缓存回填申万行业 PE", key="fill_industry_pe_disabled", disabled=True)
+        st.caption("先选择或识别申万一级行业，再回填行业 PE。")
 
     if peer_names:
         st.caption("招股书识别到可比公司：" + "、".join(map(str, peer_names)))
