@@ -48,6 +48,7 @@ def prefill_source_label(field: str, source: str | None) -> str:
         "prospectus": "招股书",
         "industry_pe": "Tushare行业PE参考",
         "peer_pe": "Tushare peer PE参考",
+        "industry_constituent_pe": "Tushare申万行业成分PE兜底",
         "history": "历史上下文自动生成",
     }
     return labels.get(str(source or ""), "")
