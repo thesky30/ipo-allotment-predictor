@@ -363,38 +363,84 @@ with tab_manual:
     _uw_options = ["（未知/其他）"] + _uw_list
     _ind_options = ["（未知/其他）"] + _ind_list
 
+    st.markdown("##### 可选：上传巨潮『发行安排及初步询价公告』PDF 自动识别")
+    up = st.file_uploader("上传 PDF（识别后回填下方表单，请务必人工核对）", type="pdf")
+    if up is not None and st.button("识别 PDF 字段", key="run_pdf_extract"):
+        import pdf_extract, llm_client
+        if not llm_client.is_configured():
+            st.error("未配置抽取用 LLM。请在部署环境设置 LLM_API_KEY（及可选 LLM_BASE_URL / LLM_MODEL）后重试，或直接手动输入。")
+        else:
+            with st.spinner("识别中…"):
+                try:
+                    res = pdf_extract.extract_ipo_fields(up.read())
+                    st.session_state["pdf_prefill"] = res.fields
+                    for w in res.warnings:
+                        st.warning(w)
+                    st.success(f"已识别 {len(res.fields)} 个字段，已回填下方表单，请核对后再预测。")
+                except Exception as e:
+                    st.error(f"识别失败：{e}。请改为手动输入。")
+    _pf = st.session_state.get("pdf_prefill", {})
+
     with st.form("manual_form"):
         c1, c2 = st.columns(2)
-        board_sel = c1.selectbox("板块 *", ["科创板", "创业板", "主板", "北交所"])
-        deadline_date = c2.date_input("申购截止日 *", value=None)
+        _boards = ["科创板", "创业板", "主板", "北交所"]
+        board_sel = c1.selectbox("板块 *", _boards,
+            index=_boards.index(_pf["board"]) if _pf.get("board") in _boards else 0)
+
+        import datetime as _dt
+        _dd = _pf.get("subscription_deadline_date")
+        try:
+            _dd = _dt.date.fromisoformat(_dd) if _dd else None
+        except (TypeError, ValueError):
+            _dd = None
+        deadline_date = c2.date_input("申购截止日 *", value=_dd)
 
         c3, c4 = st.columns(2)
-        uw_sel = c3.selectbox("主承销商", options=_uw_options)
-        ind_sel = c4.selectbox("申万一级行业代码", options=_ind_options)
+        uw_sel = c3.selectbox("主承销商", options=_uw_options,
+            index=_uw_options.index(_pf["lead_underwriter"]) if _pf.get("lead_underwriter") in _uw_options else 0)
+        ind_sel = c4.selectbox("申万一级行业代码", options=_ind_options,
+            index=_ind_options.index(str(_pf["sw_level1_industry_code"])) if _pf.get("sw_level1_industry_code") is not None and str(_pf["sw_level1_industry_code"]) in _ind_options else 0)
 
         c5, c6 = st.columns(2)
-        total_shares = c5.number_input("发行总股数（万股）", min_value=0.0, value=0.0)
-        offline_before = c6.number_input("网下发行量（回拨前，万股）", min_value=0.0, value=0.0)
+        total_shares = c5.number_input("发行总股数（万股）", min_value=0.0,
+            value=float(_pf.get("total_issue_shares_10k") or 0.0))
+        offline_before = c6.number_input("网下发行量（回拨前，万股）", min_value=0.0,
+            value=float(_pf.get("offline_issue_before_clawback_10k") or 0.0))
 
         c7, c8 = st.columns(2)
-        online_before = c7.number_input("网上发行量（回拨前，万股）", min_value=0.0, value=0.0)
-        strategic_pct = c8.number_input("战略配售占比（%）", min_value=0.0, value=0.0, step=0.1)
+        online_before = c7.number_input("网上发行量（回拨前，万股）", min_value=0.0,
+            value=float(_pf.get("online_issue_before_clawback_10k") or 0.0))
+        _strat_alloc = _pf.get("strategic_allocation_10k")
+        _total_pf = _pf.get("total_issue_shares_10k")
+        if _strat_alloc and _total_pf and float(_total_pf) > 0:
+            _strat_pct_val = round(float(_strat_alloc) / float(_total_pf) * 100, 2)
+        else:
+            _strat_pct_val = 0.0
+        strategic_pct = c8.number_input("战略配售占比（%）", min_value=0.0, value=_strat_pct_val, step=0.1)
 
         c9, c10 = st.columns(2)
-        sub_upper = c9.number_input("网下申购上限（万股）", min_value=0.0, value=0.0)
-        sub_lower = c10.number_input("网下申购下限（万股）", min_value=0.0, value=0.0)
+        sub_upper = c9.number_input("网下申购上限（万股）", min_value=0.0,
+            value=float(_pf.get("subscription_upper_limit_10k") or 0.0))
+        sub_lower = c10.number_input("网下申购下限（万股）", min_value=0.0,
+            value=float(_pf.get("subscription_lower_limit_10k") or 0.0))
 
         c11, c12 = st.columns(2)
-        sub_step = c11.number_input("网下申购步长（万股）", min_value=0.0, value=0.0)
-        mkt_threshold = c12.number_input("网下市值门槛（万元）", min_value=0.0, value=0.0)
+        sub_step = c11.number_input("网下申购步长（万股）", min_value=0.0,
+            value=float(_pf.get("subscription_step_10k") or 0.0))
+        mkt_threshold = c12.number_input("网下市值门槛（万元）", min_value=0.0,
+            value=float(_pf.get("offline_market_value_threshold_10k_yuan") or 0.0))
 
         c13, c14 = st.columns(2)
-        industry_pe = c13.number_input("行业PE", min_value=0.0, value=0.0, step=0.1)
-        expected_raise = c14.number_input("预计募资额（亿元）", min_value=0.0, value=0.0, step=0.1)
+        industry_pe = c13.number_input("行业PE", min_value=0.0,
+            value=float(_pf.get("industry_pe_at_ipo") or 0.0), step=0.1)
+        expected_raise = c14.number_input("预计募资额（亿元）", min_value=0.0,
+            value=float(_pf.get("expected_fundraising_100m_yuan") or 0.0), step=0.1)
 
         c15, c16 = st.columns(2)
-        revenue = c15.number_input("近一年营收（亿元）", min_value=0.0, value=0.0, step=0.1)
-        revenue_cagr = c16.number_input("3年营收CAGR（%）", value=0.0, step=0.1)
+        revenue = c15.number_input("近一年营收（亿元）", min_value=0.0,
+            value=float(_pf.get("latest_revenue_100m_yuan") or 0.0), step=0.1)
+        revenue_cagr = c16.number_input("3年营收CAGR（%）",
+            value=float(_pf.get("revenue_cagr_3y_pct") or 0.0), step=0.1)
 
         submitted = st.form_submit_button("预测", type="primary")
 
