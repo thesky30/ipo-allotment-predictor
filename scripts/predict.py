@@ -447,6 +447,9 @@ def predict_new_ipo(raw: dict[str, Any], stage: str = "T6") -> dict[str, Any]:
     result["data_as_of"] = asm.data_as_of
     result["warnings"] = asm.warnings
     result["security_name"] = raw.get("security_name", "新IPO")
+    # Expose the assembled vector so the UI explanation (SHAP) is computed on the
+    # SAME features that produced the prediction, not the sparse raw user input.
+    result["features"] = asm.features
     return result
 
 
