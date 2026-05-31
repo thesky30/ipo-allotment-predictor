@@ -117,6 +117,15 @@ def _fetch_row(code: str) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+@st.cache_data(show_spinner=False)
+def _known_underwriters_and_industries():
+    import reference_data
+    p = reference_data.load_history().panel
+    uws = sorted(p["primary_underwriter"].dropna().astype(str).unique().tolist())
+    inds = sorted(p["sw_level1_industry_code"].dropna().astype(str).unique().tolist())
+    return uws, inds
+
+
 # ── Result display ────────────────────────────────────────────────────────────
 def _conf_html(conf: str) -> str:
     cls = {"high": "conf-high", "medium": "conf-medium", "low": "conf-low"}.get(conf, "")
@@ -229,6 +238,18 @@ def _try_explain(explain_input, stage: str) -> None:
         st.caption(f"（解释暂不可用：{e}）")
 
 
+def _render_no_label_note(res: dict) -> None:
+    import pandas as pd
+    as_of = res.get("data_as_of")
+    for w in res.get("warnings", []):
+        st.warning(w)
+    st.caption(
+        "⚠️ 本股暂无真实披露的网下中签率，**无法计算本股准确率**。\n\n"
+        "下列为**模型整体回测水平**（OOS Spearman 0.62 / MAE 0.31，模型级，非本股）；"
+        f"市场/参考数据截至 **{pd.Timestamp(as_of).date() if as_of is not None else '—'}**。"
+    )
+
+
 def run_and_show(code: str, stage: str) -> None:
     """Predict by code and render, with consistent error handling."""
     with st.spinner("预测中…"):
@@ -327,79 +348,86 @@ with tab_code:
 # ── Tab 2: Manual feature input ────────────────────────────────────────────────
 with tab_manual:
     st.markdown("#### 手动输入新IPO特征")
-    st.caption("适用于尚未入库的新IPO。正式预测只填写询价前可获得字段；询价结果和回拨字段不参与正式模型。")
+    st.info("新股预测固定使用 T-6 询价前正式模型（无询价/回拨数据）。")
+
+    try:
+        _uw_list, _ind_list = _known_underwriters_and_industries()
+    except Exception:
+        _uw_list, _ind_list = [], []
+    _uw_options = ["（未知/其他）"] + _uw_list
+    _ind_options = ["（未知/其他）"] + _ind_list
 
     with st.form("manual_form"):
         c1, c2 = st.columns(2)
         board_sel = c1.selectbox("板块 *", ["科创板", "创业板", "主板", "北交所"])
-        total_shares = c2.number_input("发行总股数（万股）", min_value=0.0, value=0.0)
+        deadline_date = c2.date_input("申购截止日 *", value=None)
 
         c3, c4 = st.columns(2)
-        offline_before = c3.number_input("网下发行量（回拨前，万股）", min_value=0.0, value=0.0)
-        online_before = c4.number_input("网上发行量（回拨前，万股）", min_value=0.0, value=0.0)
+        uw_sel = c3.selectbox("主承销商", options=_uw_options)
+        ind_sel = c4.selectbox("申万一级行业代码", options=_ind_options)
 
         c5, c6 = st.columns(2)
-        sub_upper = c5.number_input("网下申购上限（万股）", min_value=0.0, value=0.0)
-        sub_lower = c6.number_input("网下申购下限（万股）", min_value=0.0, value=0.0)
+        total_shares = c5.number_input("发行总股数（万股）", min_value=0.0, value=0.0)
+        offline_before = c6.number_input("网下发行量（回拨前，万股）", min_value=0.0, value=0.0)
 
         c7, c8 = st.columns(2)
-        sub_step = c7.number_input("网下申购步长（万股）", min_value=0.0, value=0.0)
+        online_before = c7.number_input("网上发行量（回拨前，万股）", min_value=0.0, value=0.0)
         strategic_pct = c8.number_input("战略配售占比（%）", min_value=0.0, value=0.0, step=0.1)
 
         c9, c10 = st.columns(2)
-        industry_pe = c9.number_input("发行时行业市盈率", min_value=0.0, value=0.0, step=0.1)
-        mkt_heat = c10.number_input("近20只IPO首日涨幅均值（%）", value=0.0, step=0.1,
-                                    help="recent_ipo_first_day_return_ma20；留0则模型按缺失值处理")
+        sub_upper = c9.number_input("网下申购上限（万股）", min_value=0.0, value=0.0)
+        sub_lower = c10.number_input("网下申购下限（万股）", min_value=0.0, value=0.0)
 
-        research_raw: dict = {}
-        if stage != OFFICIAL_STAGE:
-            st.markdown("##### 研究模型附加字段")
-            r1, r2 = st.columns(2)
-            offer_price = r1.number_input("最终发行价（元）", min_value=0.0, value=0.0, step=0.01)
-            inq_total = r2.number_input("询价申购总量（万股）", min_value=0.0, value=0.0)
-            r3, r4 = st.columns(2)
-            investors = r3.number_input("参与询价投资者数（家）", min_value=0, value=0, step=1)
-            allot_accts = r4.number_input("询价配售对象数（个）", min_value=0, value=0, step=1)
-            r5, r6 = st.columns(2)
-            issue_amt = r5.number_input("募集资金总额（亿元）", min_value=0.0, value=0.0, step=0.1)
-            quote_avg = r6.number_input("询价加权均价（元）", min_value=0.0, value=0.0, step=0.01)
-            research_raw = {
-                "offer_price_yuan": offer_price or None,
-                "inquiry_subscription_total_10k": inq_total or None,
-                "inquiry_investors_count": investors or None,
-                "inquiry_allotment_accounts": allot_accts or None,
-                "issue_amount_100m_yuan": issue_amt or None,
-                "quote_price_weighted_avg": quote_avg or None,
-            }
+        c11, c12 = st.columns(2)
+        sub_step = c11.number_input("网下申购步长（万股）", min_value=0.0, value=0.0)
+        mkt_threshold = c12.number_input("网下市值门槛（万元）", min_value=0.0, value=0.0)
+
+        c13, c14 = st.columns(2)
+        industry_pe = c13.number_input("行业PE", min_value=0.0, value=0.0, step=0.1)
+        expected_raise = c14.number_input("预计募资额（亿元）", min_value=0.0, value=0.0, step=0.1)
+
+        c15, c16 = st.columns(2)
+        revenue = c15.number_input("近一年营收（亿元）", min_value=0.0, value=0.0, step=0.1)
+        revenue_cagr = c16.number_input("3年营收CAGR（%）", value=0.0, step=0.1)
 
         submitted = st.form_submit_button("预测", type="primary")
 
     if submitted:
-        raw: dict = {
-            "board":                          board_sel,
-            "offline_issue_before_clawback_10k": offline_before or None,
-            "online_issue_before_clawback_10k": online_before or None,
-            "subscription_upper_limit_10k":   sub_upper or None,
-            "subscription_lower_limit_10k":   sub_lower or None,
-            "subscription_step_10k":          sub_step or None,
-            "strategic_allocation_share_pct": strategic_pct or None,
-            "industry_pe_at_ipo":             industry_pe or None,
-            "total_issue_shares_10k":         total_shares or None,
-            "recent_ipo_first_day_return_ma20": mkt_heat if mkt_heat != 0.0 else None,
-        }
-        raw.update(research_raw)
-        # Remove None values; compute derived features
-        raw = {k: v for k, v in raw.items() if v is not None}
-        if stage != OFFICIAL_STAGE:
-            raw = compute_t1_features(raw)
-
-        with st.spinner("预测中…"):
-            try:
-                res = predict_from_dict(raw, stage=stage, prefer_board_model=False)
-                show_result(res)
-                _try_explain(raw, stage)
-            except Exception as e:
-                st.error(f"预测出错：{e}")
+        if deadline_date is None:
+            st.error("申购截止日为必填项，请选择日期后重试。")
+        else:
+            raw: dict = {
+                "board":                                board_sel,
+                "subscription_deadline_date":          str(deadline_date),
+                "lead_underwriter":                    uw_sel if uw_sel != "（未知/其他）" else None,
+                "sw_level1_industry_code":             ind_sel if ind_sel != "（未知/其他）" else None,
+                "total_issue_shares_10k":              total_shares or None,
+                "offline_issue_before_clawback_10k":   offline_before or None,
+                "online_issue_before_clawback_10k":    online_before or None,
+                "strategic_allocation_10k":            (
+                    round(total_shares * strategic_pct / 100, 4) if total_shares and strategic_pct
+                    else None
+                ),
+                "subscription_upper_limit_10k":        sub_upper or None,
+                "subscription_lower_limit_10k":        sub_lower or None,
+                "subscription_step_10k":               sub_step or None,
+                "offline_market_value_threshold_10k_yuan": mkt_threshold or None,
+                "industry_pe_at_ipo":                  industry_pe or None,
+                "expected_fundraising_100m_yuan":      expected_raise or None,
+                "latest_revenue_100m_yuan":            revenue or None,
+                "revenue_cagr_3y_pct":                 revenue_cagr if revenue_cagr != 0.0 else None,
+            }
+            # Drop None values
+            raw = {k: v for k, v in raw.items() if v is not None}
+            with st.spinner("组装因子并预测中…"):
+                try:
+                    from predict import predict_new_ipo
+                    res = predict_new_ipo(raw, stage="T6")
+                    show_result(res)
+                    _render_no_label_note(res)
+                    _try_explain(res.get("features", raw), "T6")
+                except Exception as e:
+                    st.error(f"预测出错：{e}")
 
 # ── Tab 3: Recent IPO reference ────────────────────────────────────────────────
 with tab_recent:
