@@ -248,7 +248,9 @@ y = log(网下超额认购倍数)
 - 已纳入一批确定口径 T-6 因子（2026-05-29）：网下询价市值门槛、预计募资额、近一年营收、三年营收 CAGR、板块滚动行情、主承销商历史表现、申万一级行业代码历史 IPO 热度。`issue_pb_factor`、发行价格区间、行业行情滚动因子暂不入模，分别因可能依赖最终价、当前全空、缺少申万代码-名称映射。重跑后正式 `lgbm_t6` OOS Spearman=0.619。
 - 保存的全量模型对“已入库历史股票”的逐股查询属样本内（偏乐观）；某只股票的真实无泄漏成绩须查 `outputs/baseline_models/predictions.csv`（回测产出）。
 - 文档同步（2026-05-31）：完整因子字典（T-6/T-1/T+1/T+2 全集 + 来源 + 预期方向）已写入 `README.md` 的「因子字典（特征全集）」；README 各章节已由「规划口吻」更新为「已完成」口径；本文件「字段使用规则」补充了实际字段名 → 阶段的工程因子字典。改字段时以 `FEATURE_NODES` 为唯一真源，并同步这两份文档。
+- 冷启动预测（2026-05-31，已合并到 main）：新增「未入库新股的询价前预测」能力（`scripts/feature_assembly.py` / `reference_data.py` / `predict.py::predict_new_ipo` / `app.py` 手动 tab）。核心做法是把新股追加为一行到历史参考表、**复用训练同一套 builder 再读回**，结构性杜绝 train-serve skew；并新增 pytest 套件。详见本文末「未入库新股的冷启动预测」节。
 - 招股书财务/估值字段抽取（2026-05-31）：`scripts/prospectus_extract.py` 已支持按锚点定位招股书相关页，仅将封顶页数/字数内的财务、募资、可比公司页面送 LLM，补充 `latest_revenue_100m_yuan`、`revenue_cagr_3y_pct`、`comparable_pe_avg_ex_nonrecurring`、`expected_fundraising_100m_yuan` 四个 T-6 字段；网页仍要求人工核对后预测。
+- 端到端网页测试（2026-05-31）：用户已在本地完成 Streamlit 上传 PDF → 表单回填 → 人工核对 → 预测的端到端验证。后续不要再把“端到端未测”列为阻塞项。
 
 ### 代码与产出物地图
 
@@ -278,3 +280,71 @@ outputs/factor_insights/           因子字典、IC、五分位分组、SHAP贡
 - [ ] 形成 Word 课题报告与 PPT 答辩稿（汇报文档已在 `项目汇报_新股网下中签率预测.md`）。
 - [ ] 录制产品 demo（`streamlit run app.py` 后录屏，覆盖按名称查询/手动输入/三阶段切换，产出 demo.mp4 + 关键截图）。
 - [ ] 升级 Anaconda 环境 jinja2（≥3.1.2）或继续使用 `column_config` 规避 Styler 依赖。
+- [x] 未入库新股冷启动预测（Phase 1）：特征自动组装 + T-6 预测 + 诚实无标签展示 + 同板块分位（已合并到 main，见文末专节）。
+- [x] Phase 2：巨潮「发行安排及初步询价公告」PDF → provider-agnostic LLM 抽取 → 回填可编辑表单（`scripts/pdf_extract.py` + `scripts/llm_client.py`，强制人工确认）。运行时配置 `LLM_API_KEY` /（可选）`LLM_BASE_URL` / `LLM_MODEL`（任意 OpenAI 兼容供应商）；未配置回退手填；LLM/PDF 测试均 mock。
+- [~] Phase 3：爬虫自动抓取巨潮发行公告 PDF，暂缓；当前手动上传 PDF 已满足演示和近期使用，不作为下一阶段必要功能。
+- [ ] 下一阶段重点：数据持续刷新，新增 `scripts/market_source.py`（Tushare 主 / AkShare 备，**不走 Wind**），增量更新市场/板块/历史 IPO 参考表。
+- [ ] 下一阶段重点：网页界面优化。当前 Streamlit 手动输入/PDF 上传流程已可用，但界面仍需整理字段布局、提示文案、缺失字段说明和预测结果展示。
+
+## 未入库新股的冷启动预测（Phase 1/2 已实现）
+
+> 设计：`docs/superpowers/specs/2026-05-31-cold-start-ipo-prediction-design.md`；实现计划：`docs/superpowers/plans/2026-05-31-cold-start-ipo-prediction-phase1.md`、`docs/superpowers/plans/2026-05-31-cold-start-ipo-prediction-phase2.md`、`docs/superpowers/plans/2026-05-31-prospectus-extraction.md`。Phase 1/2 与招股书提取均已合并到 main。
+
+### 目标
+预测**数据库里没有的全新股票**：只给询价前原始字段（板块、发行/申购结构、战略配售、行业 PE、可比 PE、预计募资额、近一年营收、3 年营收 CAGR、网下市值门槛、主承销商、申万一级行业代码、申购截止日），系统补齐其余上下文因子后出 T-6 预测。真实场景没有披露的网下中签率 → **完全未披露的最新股只给预测、不给本股准确率（无标签）**，答辩须如实说明此限制与未来优化方向。
+
+### 三层架构
+1. **输入获取**：Phase 1 手动表单；Phase 2 拖入巨潮「发行安排及初步询价公告」PDF 和招股书 PDF → LLM 抽取回填；Phase 3 爬虫自动抓 PDF 暂缓。
+2. **特征组装**（`scripts/feature_assembly.py`）：把新股**追加为一行到历史参考表、复用训练同一套 builder 再读回**，结构性杜绝 train-serve skew。`assemble_t6(raw, history=None)` → 完整 42 维 T-6 向量 + `data_as_of` + `warnings`。
+3. **预测展示**（`predict.py::predict_new_ipo` + `app.py` 手动 tab）：T-6 LightGBM → 超额认购倍数/中签率 + 同板块历史分位（`oversub_percentile`）+ SHAP 因子贡献；诚实标注无本股准确率、只给模型整体回测水平（OOS Spearman 0.62 / MAE 0.31，模型级）+ 数据截止日。
+
+### 给后续 Agent 的硬性约束（红线）
+- **不重写因子公式**：冷启动必须复用 `initial_data_analysis.add_features` 与 `build_new_factor_research` 的 builder；任何「为推理另写一份计算」都会引入 skew。
+- **一致性测试是红线**：`tests/test_feature_assembly.py` 用 leave-one-out 对在库股票验证 21 个上下文因子与训练值精确相等（rtol/atol=1e-6）。改 `feature_assembly` 或任一 builder 后必须全绿。
+- **承销商 / 申万行业先验需精确匹配 DB 真实值**（承销商=全称法人名、行业=Wind 风格代码）；UI 用数据库下拉框，自由文本会让先验落空并触发缺失提示。Wind 代码↔名称映射仍缺（已知 backlog）。
+- **numpy 错误模式**：`tests/conftest.py` 的 autouse fixture 把 `over` 固定为 `warn`（与生产一致），勿移除——否则 pytest 偶发 `over='raise'` 会把无害精度 round 溢出变成 `FloatingPointError`（生产默认 `warn`，不受影响）。
+- 时点纪律照旧：新因子先判定三阶段；冷启动只用 T-6。
+
+### Phase 2 / 3 与数据持续性
+- Phase 2 的 LLM 抽取已做成 **provider-agnostic**（OpenAI 兼容 `base_url`+`key`+`model` 配置化，接自备 API，不绑定某家），抽取结果**强制人工确认**后才允许预测。
+- 已支持两类 PDF：巨潮「发行安排及初步询价公告」（结构/申购规则字段，`scripts/pdf_extract.py`）和招股书（财务/估值字段，`scripts/prospectus_extract.py`）。招股书不整本喂 LLM，而是先按锚点定位相关页并限制页数/字数。
+- Phase 3 自动抓取 PDF 暂缓：当前手动上传已满足近期演示和使用，不作为必要功能。
+- **数据持续刷新是下一阶段重点**。Wind 无持续 API 权限是硬约束：训练用 Wind 一次性历史导出（质量最高）；生产/持续刷新改用可编程开放源（**Tushare 主 / AkShare 备**，`scripts/market_source.py`，复用 `fetch_market_data.py`），数据源做抽象层，未来若拿到 Wind 量化接口（WindPy）可无缝替换。
+
+### 冷启动 T-6 字段取数来源（重要：PE 三分法 + Tushare/招股书边界）
+
+**PE 必须分三种，别混**（防数据泄露）：
+- **公司发行市盈率** `ipo_pe_diluted` / `issue_pb` / `pe_vs_*` / `issue_amount_100m_yuan` → **T-1，依赖最终发行价，询价后才有 → 正式 T-6 永不使用**。
+- **行业 PE** `industry_pe_at_ipo` → **T-6**，中证指数行业基准 PE，市场公开、不取决于发行人定价，询价前可得。
+- **可比公司 PE** `comparable_pe_avg_ex_nonrecurring` → **T-6**，招股书里可比同行扣非 PE。
+- 同理：「预计/拟募资额」`expected_fundraising_100m_yuan` 是 T-6（招股书拟募）；「最终募资额」`issue_amount` 是 T-1（定价后）。
+
+**「发行安排及初步询价公告」PDF 里只有发行结构 + 申购规则 + 承销商 + 板块 + 市值门槛**；以下 T-6 字段公告里没有，来源各异：
+
+| T-6 字段 | 来源 | Tushare 能补吗（未上市新股） |
+| --- | --- | --- |
+| `industry_pe_at_ipo` | 市场数据（中证/申万行业指数 PE） | △ 可近似：`index_dailybasic` + 行业→指数映射；非官方「近一月静态PE」但够用 |
+| `comparable_pe_avg_ex_nonrecurring` | 招股书（可比公司名单）+ 各 peer PE | △ 部分：Tushare `daily_basic` 有上市公司 PE，但 peer 名单须来自招股书 |
+| `latest_revenue_100m_yuan` | 招股书 | ✗ 未上市无 ts_code 财报；`new_share` 不含财务 |
+| `revenue_cagr_3y_pct` | 招股书（三年营收） | ✗ 同上 |
+| `expected_fundraising_100m_yuan` | 招股书（拟募） | ✗ `new_share.amount` 是定价后最终募资（T-1） |
+
+- ⚠️ **别用 Tushare `new_share` 补 T-6**：它要等申购信息公布（询价后）才有记录，且带的 `pe`/`price` 是发行市盈率/发行价（正是要排除的公司 PE）。
+- **招股书拿不到时**：上述财务/可比字段就留空，模型按缺失值照常预测（信息少一点，非 bug）。
+- **优先方案不是绕开招股书，而是把招股书也走 PDF 上传**：用户同时传「发行公告」+「招股书」两份 PDF，LLM 各抽各的。招股书很大，必须**先定位章节、只把相关页喂 LLM** 省 token，已由 `scripts/prospectus_extract.py` 实现。Tushare 只负责「行业 PE 自动补」那一路（随 `market_source` 落地）。
+
+### 招股书提取（已实现）
+
+- `scripts/prospectus_extract.py`：`extract_pages`（pdfplumber 逐页）→ `locate_relevant_pages`（按锚点词「营业收入/扣非/募集资金/拟募/可比公司/同行业可比」给每页打分，封顶 `max_pages=8`、`max_chars=16000`）→ `extract_prospectus_fields`（窄 schema 4 字段，LLM 可注入）。复用 `pdf_extract.ExtractResult`。
+- 抽取字段仅限：`latest_revenue_100m_yuan`、`revenue_cagr_3y_pct`、`comparable_pe_avg_ex_nonrecurring`、`expected_fundraising_100m_yuan`。这些字段与发行公告 schema 不重叠，网页用 `merged.update(res.fields)` 纯补充到 `pdf_prefill`。
+- 测试要求：`tests/test_prospectus_extract.py` 使用合成页 + 注入假 LLM，确定性、不调用真实 API；真实招股书测试用 `@pytest.mark.skipif`。
+- 已用「长进光子招股书」做本地 API 验证：可抽取最近一年营收、3 年营收 CAGR、拟募资额；该 PDF 未披露明确可比公司扣非 PE 均值，因此 `comparable_pe_avg_ex_nonrecurring` 缺失属于正常情况。
+
+### 部署配置
+
+- 本地用 `.env`，线上 Streamlit Cloud 用 Secrets。`scripts/config.py` 会把 `.env` 或 `st.secrets` 中的 `LLM_API_KEY` / `LLM_BASE_URL` / `LLM_MODEL` / `TUSHARE_TOKEN` 注入 `os.environ`。
+- Streamlit Cloud 需要在 Settings/Secrets 中配置 LLM：
+  - `LLM_API_KEY`：必填，否则 PDF/招股书识别不可用，只能手填。
+  - `LLM_BASE_URL`：OpenAI 兼容供应商时填写，例如 DeepSeek 可填 `https://api.deepseek.com`。
+  - `LLM_MODEL`：例如 `deepseek-chat`；不填则默认 `gpt-4o-mini`。
+- 不要提交真实 `.env` 或 `.streamlit/secrets.toml`；仓库只提交 `.env.example`。
