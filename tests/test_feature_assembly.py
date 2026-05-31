@@ -138,3 +138,9 @@ def test_predict_new_ipo_returns_prediction():
     assert "oversubscription_ratio_pred" in res
     assert res["data_as_of"] is not None
     assert isinstance(res["warnings"], list)
+
+
+def test_oversub_percentile_in_unit_range():
+    from predict import oversub_percentile
+    p = oversub_percentile(predicted_oversub=2000.0, board="科创板")
+    assert 0.0 <= p <= 1.0

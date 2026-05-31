@@ -641,6 +641,21 @@ def compute_t1_features(raw: dict[str, Any]) -> dict[str, Any]:
 
 # ---------------------------------------------------------------------------
 # Pretty print helper
+def oversub_percentile(predicted_oversub: float, board: str) -> float:
+    """Percentile (0..1) of a predicted over-subscription ratio among same-board
+    historical disclosed values. Falls back to all boards if same-board is sparse."""
+    import reference_data
+    hist = reference_data.load_history()
+    s = hist.sample
+    col = "offline_oversubscription_ratio"
+    vals = pd.to_numeric(s.loc[s["board"] == board, col], errors="coerce").dropna()
+    if len(vals) < 20:
+        vals = pd.to_numeric(s[col], errors="coerce").dropna()
+    if vals.empty:
+        return float("nan")
+    return float((vals < predicted_oversub).mean())
+
+
 # ---------------------------------------------------------------------------
 
 def print_result(result: dict[str, Any]) -> None:

@@ -22,7 +22,6 @@ from predict import (                       # noqa: E402
     predict_from_dict,
     resolve_code_by_name,
     explain_prediction,
-    compute_t1_features,
     DB_PATH,
 )
 
@@ -248,6 +247,13 @@ def _render_no_label_note(res: dict) -> None:
         "下列为**模型整体回测水平**（OOS Spearman 0.62 / MAE 0.31，模型级，非本股）；"
         f"市场/参考数据截至 **{pd.Timestamp(as_of).date() if as_of is not None else '—'}**。"
     )
+    pred = res.get("oversubscription_ratio_pred")
+    board = res.get("board")
+    if pred is not None and board:
+        from predict import oversub_percentile
+        pct = oversub_percentile(float(pred), board)
+        if pct == pct:  # not NaN
+            st.caption(f"该预测超额认购倍数处于同板块历史 **{pct*100:.0f}%** 分位。")
 
 
 def run_and_show(code: str, stage: str) -> None:
