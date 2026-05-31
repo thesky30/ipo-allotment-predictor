@@ -93,7 +93,11 @@ def assemble_t6(raw: dict[str, Any]) -> AssemblyResult:
     new_panel = {c: np.nan for c in hist.panel.columns}
     new_panel["security_code"] = NEW_CODE
     new_panel["board"] = raw.get("board")
-    new_panel["prediction_date"] = pred_date
+    # Subtract 1 nanosecond so the new row sorts strictly before same-date historical
+    # stocks in prior_group_stats (which uses sort_values, not stable by default).
+    # 1 ns does not change board-market lookup (trade_dates are day-resolution) and
+    # does not affect merge_asof backward search semantics.
+    new_panel["prediction_date"] = pred_date - pd.Timedelta(nanoseconds=1)
     new_panel["primary_underwriter"] = primary_underwriter(raw.get("lead_underwriter"))
     new_panel["sw_level1_industry_code"] = raw.get("sw_level1_industry_code")
     panel_aug = pd.concat([hist.panel, pd.DataFrame([new_panel])],
@@ -101,6 +105,16 @@ def assemble_t6(raw: dict[str, Any]) -> AssemblyResult:
     # Ensure prediction_date stays datetime after concat (mixed-type concat can
     # produce object dtype, which breaks merge_asof in add_board_market_factors).
     panel_aug["prediction_date"] = pd.to_datetime(panel_aug["prediction_date"], errors="coerce")
+    # hist.panel already has board-rolling columns baked in from the DB; drop them
+    # before re-running add_board_market_factors to avoid _x/_y column collisions
+    # in merge_asof (which requires left frame NOT to have the merged columns).
+    _board_rolling_cols = [
+        "board_turnover_ma20", "board_turnover_pct_rank_1y",
+        "board_turnover_ma20_over_ma60", "board_return_ma20",
+    ]
+    panel_aug = panel_aug.drop(
+        columns=[c for c in _board_rolling_cols if c in panel_aug.columns]
+    )
     # board_market.trade_date may be stored as str in SQLite; ensure it is
     # datetime64 so merge_asof can compare with prediction_date (datetime64).
     board_market = hist.board_market.copy()
@@ -108,7 +122,9 @@ def assemble_t6(raw: dict[str, Any]) -> AssemblyResult:
     panel_aug = add_board_market_factors(panel_aug, board_market)
     panel_aug = prior_group_stats(panel_aug, "primary_underwriter", "underwriter")
     panel_aug = prior_group_stats(panel_aug, "sw_level1_industry_code", "sw_l1")
-    new_prior = panel_aug.iloc[-1]
+    # add_board_market_factors and prior_group_stats sort by prediction_date, so
+    # the new row is no longer last; locate it by security_code instead of iloc[-1].
+    new_prior = panel_aug.loc[panel_aug["security_code"] == NEW_CODE].iloc[0]
 
     if new_panel["primary_underwriter"] is None or pd.isna(new_prior.get("underwriter_prior_ipo_count")):
         warnings.append("该主承销商无历史样本，承销商先验按缺失处理。")
