@@ -210,6 +210,7 @@ Spearman 排名相关
 Streamlit 网页工具（`app.py`）已实现，包括：
 
 - ✅ 新股信息输入区（按代码/名称查询，或手动输入字段）。
+- ✅ 手动输入页可上传「发行安排及初步询价公告」PDF 回填发行结构/申购规则，也可另传招股书 PDF 补全营收、3 年营收 CAGR、可比 PE、拟募资额；PDF 抽取结果必须人工核对后才预测。
 - ✅ 预测结果展示区。
 - ✅ 特征贡献或影响因素解释区。
 - ✅ 模型版本和样本范围说明。
@@ -428,6 +429,8 @@ scripts/initial_data_analysis.py         数据清洗 + EDA
 scripts/baseline_models.py               三阶段建模 + 时间序列回测
 scripts/board_models.py                  板块专项模型对比
 scripts/factor_insights.py               询价前因子洞察 + 板块/时期特征报告
+scripts/pdf_extract.py                   发行安排及初步询价公告 PDF → T-6 原始字段
+scripts/prospectus_extract.py            招股书 PDF 相关页定位 → T-6 财务/估值字段
 scripts/process_company_factors.py       公司基本面因子处理
 scripts/process_board_industry_market.py  板块/行业/承销商滚动因子
 scripts/build_new_factor_research.py     新因子 IC、分组收益分析
